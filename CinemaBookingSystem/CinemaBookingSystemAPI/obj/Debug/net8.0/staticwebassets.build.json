@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "x8iev592l9pKH/e9s2ZK5udW/qGQnzRYmoqIqPv/fE0=",
+  "Source": "CinemaBookingSystemAPI",
+  "BasePath": "_content/CinemaBookingSystemAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

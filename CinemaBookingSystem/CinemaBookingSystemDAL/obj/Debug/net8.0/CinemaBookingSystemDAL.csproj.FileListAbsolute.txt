@@ -1,0 +1,14 @@
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\bin\Debug\net8.0\CinemaBookingSystemDAL.deps.json
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\bin\Debug\net8.0\CinemaBookingSystemDAL.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\bin\Debug\net8.0\CinemaBookingSystemDAL.pdb
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.csproj.AssemblyReference.cache
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.GeneratedMSBuildEditorConfig.editorconfig
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.AssemblyInfoInputs.cache
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.AssemblyInfo.cs
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.csproj.CoreCompileInputs.cache
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\refint\CinemaBookingSystemDAL.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.pdb
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\ref\CinemaBookingSystemDAL.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\bin\Debug\net8.0\CinemaBookingSystemDAL.runtimeconfig.json
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.genruntimeconfig.cache

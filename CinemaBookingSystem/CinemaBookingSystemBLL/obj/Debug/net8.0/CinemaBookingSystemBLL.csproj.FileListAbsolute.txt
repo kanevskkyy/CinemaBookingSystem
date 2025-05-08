@@ -1,0 +1,15 @@
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\bin\Debug\net8.0\CinemaBookingSystemBLL.deps.json
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\bin\Debug\net8.0\CinemaBookingSystemBLL.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\bin\Debug\net8.0\CinemaBookingSystemBLL.pdb
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\bin\Debug\net8.0\CinemaBookingSystemDAL.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\bin\Debug\net8.0\CinemaBookingSystemDAL.pdb
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBookingSystemBLL.csproj.AssemblyReference.cache
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBookingSystemBLL.GeneratedMSBuildEditorConfig.editorconfig
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBookingSystemBLL.AssemblyInfoInputs.cache
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBookingSystemBLL.AssemblyInfo.cs
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBookingSystemBLL.csproj.CoreCompileInputs.cache
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBo.F6CA0208.Up2Date
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBookingSystemBLL.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\refint\CinemaBookingSystemBLL.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBookingSystemBLL.pdb
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\ref\CinemaBookingSystemBLL.dll
