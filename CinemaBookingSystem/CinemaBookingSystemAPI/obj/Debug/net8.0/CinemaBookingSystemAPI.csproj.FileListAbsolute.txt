@@ -140,3 +140,5 @@ D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\obj\Debug\net8
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\obj\Debug\net8.0\CinemaBookingSystemAPI.pdb
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\obj\Debug\net8.0\CinemaBookingSystemAPI.genruntimeconfig.cache
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\obj\Debug\net8.0\ref\CinemaBookingSystemAPI.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\obj\Debug\net8.0\CinemaBookingSystemAPI.sourcelink.json
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\bin\Debug\net8.0\Bogus.dll

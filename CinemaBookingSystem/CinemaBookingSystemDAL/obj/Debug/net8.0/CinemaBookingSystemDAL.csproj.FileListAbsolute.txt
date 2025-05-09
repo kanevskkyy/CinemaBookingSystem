@@ -12,3 +12,4 @@ D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\ref\CinemaBookingSystemDAL.dll
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\bin\Debug\net8.0\CinemaBookingSystemDAL.runtimeconfig.json
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.genruntimeconfig.cache
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemDAL\obj\Debug\net8.0\CinemaBookingSystemDAL.sourcelink.json

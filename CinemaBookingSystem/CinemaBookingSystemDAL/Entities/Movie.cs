@@ -13,6 +13,10 @@ namespace CinemaBookingSystemDAL.Entities
         public String Description { get; set; }
         public int Duration { get; set; }
         public String PosterUrl { get; set; }
+
+        public int GenreId { get; set; }
+        public Genre Genre { get; set; }
+
         public ICollection<Session> Sessions { get; set; } = new List<Session>();
 
     }

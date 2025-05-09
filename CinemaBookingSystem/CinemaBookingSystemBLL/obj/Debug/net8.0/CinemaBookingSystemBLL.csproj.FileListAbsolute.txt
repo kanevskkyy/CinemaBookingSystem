@@ -13,3 +13,4 @@ D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\refint\CinemaBookingSystemBLL.dll
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBookingSystemBLL.pdb
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\ref\CinemaBookingSystemBLL.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemBLL\obj\Debug\net8.0\CinemaBookingSystemBLL.sourcelink.json

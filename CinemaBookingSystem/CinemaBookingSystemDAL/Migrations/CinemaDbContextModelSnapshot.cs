@@ -22,6 +22,24 @@ namespace CinemaBookingSystemDAL.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Genre", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Genres");
+                });
+
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Hall", b =>
                 {
                     b.Property<int>("Id")
@@ -62,6 +80,9 @@ namespace CinemaBookingSystemDAL.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("integer");
 
+                    b.Property<int>("GenreId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PosterUrl")
                         .IsRequired()
                         .HasColumnType("text");
@@ -72,6 +93,8 @@ namespace CinemaBookingSystemDAL.Migrations
                         .HasColumnType("character varying(90)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GenreId");
 
                     b.ToTable("Movies");
                 });
@@ -178,6 +201,10 @@ namespace CinemaBookingSystemDAL.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -186,6 +213,17 @@ namespace CinemaBookingSystemDAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Movie", b =>
+                {
+                    b.HasOne("CinemaBookingSystemDAL.Entities.Genre", "Genre")
+                        .WithMany("Movies")
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Genre");
                 });
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Seat", b =>
@@ -243,6 +281,11 @@ namespace CinemaBookingSystemDAL.Migrations
                     b.Navigation("Session");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Genre", b =>
+                {
+                    b.Navigation("Movies");
                 });
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Hall", b =>

@@ -26,6 +26,9 @@ namespace CinemaBookingSystemDAL.Configurations
                    .WithOne(t => t.User)
                    .HasForeignKey(t => t.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(f => f.Password)
+                .IsRequired();
         }
     }
 }

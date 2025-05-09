@@ -8,11 +8,20 @@
     ".NETCoreApp,Version=v8.0": {
       "CinemaBookingSystemDAL/1.0.0": {
         "dependencies": {
+          "Bogus": "35.6.3",
           "Microsoft.EntityFrameworkCore.Design": "9.0.4",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4"
         },
         "runtime": {
           "CinemaBookingSystemDAL.dll": {}
+        }
+      },
+      "Bogus/35.6.3": {
+        "runtime": {
+          "lib/net6.0/Bogus.dll": {
+            "assemblyVersion": "35.6.3.0",
+            "fileVersion": "35.6.3.0"
+          }
         }
       },
       "Humanizer.Core/2.14.1": {
@@ -654,6 +663,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "Bogus/35.6.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-+5omfZWy8gOcbpc48vKfMI4h/ecbdf3NQm6xCl3zMbaP4J3rMMm5h3kPFeIWBgt4mbz6YY0eeZDLR/6yv1khKw==",
+      "path": "bogus/35.6.3",
+      "hashPath": "bogus.35.6.3.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",

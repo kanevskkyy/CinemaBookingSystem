@@ -33,6 +33,11 @@ namespace CinemaBookingSystemDAL.Configurations
                 .WithOne(p => p.Movie)
                 .HasForeignKey(p => p.MovieId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(p => p.Genre)
+            .WithMany(g => g.Movies)
+            .HasForeignKey(p => p.GenreId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

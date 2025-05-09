@@ -12,7 +12,6 @@ namespace CinemaBookingSystemDAL.Entities
         public int HallId { get; set; }
         public int RowNumber { get; set; }
         public int SeatNumber { get; set; }
-
         public Hall Hall { get; set; }
         public ICollection<Ticket> Ticket { get; set; } = new List<Ticket>();
     }

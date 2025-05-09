@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "z3eILWHJ5Sc=",
+  "dgSpecHash": "r0JmFpdo9zA=",
   "success": true,
   "projectFilePath": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\alexander\\.nuget\\packages\\bogus\\35.6.3\\bogus.35.6.3.nupkg.sha512",
     "C:\\Users\\alexander\\.nuget\\packages\\microsoft.entityframeworkcore\\9.0.1\\microsoft.entityframeworkcore.9.0.1.nupkg.sha512",
     "C:\\Users\\alexander\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\9.0.1\\microsoft.entityframeworkcore.abstractions.9.0.1.nupkg.sha512",
     "C:\\Users\\alexander\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\9.0.1\\microsoft.entityframeworkcore.analyzers.9.0.1.nupkg.sha512",
