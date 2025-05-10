@@ -14,7 +14,8 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
                 .RuleFor(p => p.Description, k => k.Lorem.Paragraph())
                 .RuleFor(p => p.Duration, k => k.Random.Number(60, 180))
                 .RuleFor(p => p.PosterUrl, k => k.Image.PicsumUrl())
-                .RuleFor(m => m.GenreId, f => f.PickRandom(genreList).Id);
+                .RuleFor(p => p.GenreId, f => f.PickRandom(genreList).Id)
+                .RuleFor(p => p.Rating, f => f.Random.Double(2.0, 10.0));
 
             var movies = movieFaker.Generate(60);
             context.Movies.AddRange(movies);

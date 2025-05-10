@@ -87,6 +87,9 @@ namespace CinemaBookingSystemDAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<double>("Rating")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(90)

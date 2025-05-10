@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CinemaBookingSystemAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c1a939d804758056a0d542078daa6e456b01cdc6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d824b0c344f587cd23f405af853a934c1fa976d5")]
 [assembly: System.Reflection.AssemblyProductAttribute("CinemaBookingSystemAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CinemaBookingSystemAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

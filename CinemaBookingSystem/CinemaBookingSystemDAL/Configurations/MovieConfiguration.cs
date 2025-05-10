@@ -38,6 +38,9 @@ namespace CinemaBookingSystemDAL.Configurations
             .WithMany(g => g.Movies)
             .HasForeignKey(p => p.GenreId)
             .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(p => p.Rating)
+                .IsRequired();
         }
     }
 }
