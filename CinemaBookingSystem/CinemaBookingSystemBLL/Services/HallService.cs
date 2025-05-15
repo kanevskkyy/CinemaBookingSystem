@@ -41,12 +41,6 @@ namespace CinemaBookingSystemBLL.Services
             else return new HallResponseDTO { Id = hall.Id, Name = hall.Name, RowsAmount = hall.RowsAmount, SeatsPerRow = hall.SeatsPerRow };
         }
 
-        public async Task<List<HallResponseDTO>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default)
-        {
-            var halls = await _unitOfWork.Halls.GetAllWithDetailsAsync(cancellationToken);
-            return halls.Select(h => new HallResponseDTO { Id = h.Id, Name = h.Name, RowsAmount = h.RowsAmount, SeatsPerRow = h.SeatsPerRow }).ToList();
-        }
-
         public async Task<HallResponseDTO> CreateAsync(HallCreateDTO dto, CancellationToken cancellationToken = default)
         {
             Hall hall = new Hall { Name = dto.Name, RowsAmount = dto.RowAmount, SeatsPerRow = dto.SeatsPerRow };

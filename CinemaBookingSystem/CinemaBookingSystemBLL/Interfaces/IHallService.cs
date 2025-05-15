@@ -15,6 +15,5 @@ namespace CinemaBookingSystemBLL.Interfaces
         Task<HallResponseDTO?> UpdateAsync(int id, HallUpdateDTO dto, CancellationToken cancellationToken = default);
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
         Task<HallResponseDTO?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
-        Task<List<HallResponseDTO>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default);
     }
 }

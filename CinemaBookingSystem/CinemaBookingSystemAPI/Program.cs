@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using CinemaBookingSystemDAL;
 using CinemaBookingSystemDAL.DbCreating;
+using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Services;
+using CinemaBookingSystemDAL.Unit_of_Work;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +17,25 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<CinemaDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly("CinemaBookingSystemDAL")));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
+
+
+
+builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IHallService, HallService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<ISeatService, SeatService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())

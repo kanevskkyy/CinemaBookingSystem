@@ -8,7 +8,7 @@ namespace CinemaBookingSystemBLL.DTO.Halls
 {
     public class HallCreateDTO
     {
-        public string Name = string.Empty;
+        public string Name { get; set; }
         public int RowAmount {  get; set; }
         public int SeatsPerRow { get; set; }
     }

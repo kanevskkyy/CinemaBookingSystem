@@ -7,7 +7,7 @@ using CinemaBookingSystemDAL.Entities;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface IMovieRepository
+    public interface IMovieRepository : IGenericRepository<Movie>
     {
         Task<List<Movie>> GetByGenreAsync(int genreId, CancellationToken cancellationToken = default);
         Task<List<Movie>> GetTopRatedAsync(CancellationToken cancellationToken = default);

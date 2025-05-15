@@ -1,12 +1,54 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1E409B45-679B-4ABC-9C0F-A657E7607AE9}|CinemaBookingSystemAPI\\CinemaBookingSystemAPI.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystemapi\\controllers\\hallcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1E409B45-679B-4ABC-9C0F-A657E7607AE9}|CinemaBookingSystemAPI\\CinemaBookingSystemAPI.csproj|solutionrelative:cinemabookingsystemapi\\controllers\\hallcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystembll\\dto\\halls\\hallcreatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|solutionrelative:cinemabookingsystembll\\dto\\halls\\hallcreatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HallController.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemAPI\\Controllers\\HallController.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemAPI\\Controllers\\HallController.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemAPI\\Controllers\\HallController.cs",
+              "RelativeToolTip": "CinemaBookingSystemAPI\\Controllers\\HallController.cs",
+              "ViewState": "AgIAADEAAAAAAAAAAAAkwD8AAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-15T09:13:30.442Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "HallCreateDTO.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\DTO\\Halls\\HallCreateDTO.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemBLL\\DTO\\Halls\\HallCreateDTO.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\DTO\\Halls\\HallCreateDTO.cs",
+              "RelativeToolTip": "CinemaBookingSystemBLL\\DTO\\Halls\\HallCreateDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-15T09:13:07.952Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

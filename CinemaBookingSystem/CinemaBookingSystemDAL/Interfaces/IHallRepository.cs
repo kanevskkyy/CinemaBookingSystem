@@ -10,6 +10,5 @@ namespace CinemaBookingSystemDAL.Interfaces
     public interface IHallRepository : IGenericRepository<Hall>
     {
         Task<Hall?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
-        Task<List<Hall>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default);
     }
 }
