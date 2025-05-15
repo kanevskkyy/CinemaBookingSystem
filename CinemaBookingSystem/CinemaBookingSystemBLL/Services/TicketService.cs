@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using CinemaBookingSystemBLL.DTO.Sessions;
 using CinemaBookingSystemBLL.DTO.Tickets;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
+using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
 
 namespace CinemaBookingSystemBLL.Services
@@ -19,11 +22,40 @@ namespace CinemaBookingSystemBLL.Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<PagedList<TicketResponseDTO>> GetPagedTicketsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var pagedTickets = await _unitOfWork.Tickets.GetPagedTicketsAsync(pageNumber, pageSize, cancellationToken);
+            var result = new List<TicketResponseDTO>();
+
+            foreach (var ticket in pagedTickets)
+            {
+                var user = await _unitOfWork.Users.GetByIdAsync(ticket.UserId, cancellationToken);
+                var session = await _unitOfWork.Sessions.GetByIdAsync(ticket.SessionId, cancellationToken);
+                var seat = await _unitOfWork.Seats.GetByIdAsync(ticket.SeatId, cancellationToken);
+                var movieTitle = await GetMovieTitleBySessionAsync(session, cancellationToken);
+
+                var dto = new TicketResponseDTO
+                {
+                    Id = ticket.Id,
+                    UserId = ticket.UserId,
+                    UserName = user.Name,
+                    SessionId = ticket.SessionId,
+                    SessionMovieTitle = movieTitle,
+                    SeatId = ticket.SeatId,
+                    SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}",
+                    PurchaseTime = ticket.PurchaseTime.ToUniversalTime()
+                };
+
+                result.Add(dto);
+            }
+
+            return new PagedList<TicketResponseDTO>(result, pagedTickets.TotalCount, pagedTickets.CurrentPage, pagedTickets.PageSize);
+        }
+
         public async Task<List<TicketResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var tickets = await _unitOfWork.Tickets.GetAllAsync(cancellationToken);
             var result = new List<TicketResponseDTO>();
-
             foreach (var ticket in tickets)
             {
                 var user = await _unitOfWork.Users.GetByIdAsync(ticket.UserId, cancellationToken);
@@ -31,10 +63,8 @@ namespace CinemaBookingSystemBLL.Services
                 var seat = await _unitOfWork.Seats.GetByIdAsync(ticket.SeatId, cancellationToken);
                 var movieTitle = await GetMovieTitleBySessionAsync(session, cancellationToken);
                 TicketResponseDTO ticketResponseDTO = new TicketResponseDTO { Id = ticket.Id, UserId = ticket.UserId, UserName = user.Name, SessionId = ticket.SessionId, SessionMovieTitle = movieTitle, SeatId = ticket.SeatId, SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}", PurchaseTime = ticket.PurchaseTime.ToUniversalTime() };
-
                 result.Add(ticketResponseDTO);
             }
-
             return result;
         }
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Seats;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
+using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
 
 namespace CinemaBookingSystemBLL.Services
@@ -24,6 +25,14 @@ namespace CinemaBookingSystemBLL.Services
             var seats = await _unitOfWork.Seats.GetAllAsync(cancellationToken);
             return seats.Select(p => new SeatResponseDTO { Id = p.Id, HallId = p.HallId, RowNumber = p.RowNumber, SeatNumber = p.SeatNumber}).ToList();
         }
+
+        public async Task<PagedList<SeatResponseDTO>> GetPagedSeatsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var paginated = await _unitOfWork.Seats.GetPagedSeatsAsync(pageNumber, pageSize, cancellationToken);
+            var seats = paginated.Select(seat => new SeatResponseDTO { Id = seat.Id, HallId = seat.HallId, RowNumber = seat.RowNumber, SeatNumber = seat.SeatNumber}).ToList();
+            return new PagedList<SeatResponseDTO>(seats, paginated.TotalCount, paginated.CurrentPage, paginated.PageSize);
+        }
+
 
         public async Task<SeatResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {

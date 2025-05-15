@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CinemaBookingSystemDAL.DbCreating;
 using CinemaBookingSystemDAL.Entities;
 using CinemaBookingSystemDAL.Interfaces;
+using CinemaBookingSystemDAL.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
@@ -13,6 +14,12 @@ namespace CinemaBookingSystemDAL.Repositories
     public class UserRepository : GenericRepository<User>, IUserRepository
     {
         public UserRepository(CinemaDbContext context) : base(context) { }
+
+        public async Task<PagedList<User>> GetPagedUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var source = _context.Users.AsQueryable();
+            return await PagedList<User>.ToPagedListAsync(source, pageNumber, pageSize, cancellationToken);
+        }
 
         public async Task<User?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken = default)
         {

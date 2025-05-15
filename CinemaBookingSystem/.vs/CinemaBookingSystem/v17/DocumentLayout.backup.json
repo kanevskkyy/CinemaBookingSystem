@@ -3,12 +3,32 @@
   "WorkspaceRootPath": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1E409B45-679B-4ABC-9C0F-A657E7607AE9}|CinemaBookingSystemAPI\\CinemaBookingSystemAPI.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystemapi\\controllers\\hallcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1E409B45-679B-4ABC-9C0F-A657E7607AE9}|CinemaBookingSystemAPI\\CinemaBookingSystemAPI.csproj|solutionrelative:cinemabookingsystemapi\\controllers\\hallcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1E409B45-679B-4ABC-9C0F-A657E7607AE9}|CinemaBookingSystemAPI\\CinemaBookingSystemAPI.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystemapi\\controllers\\ticketcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1E409B45-679B-4ABC-9C0F-A657E7607AE9}|CinemaBookingSystemAPI\\CinemaBookingSystemAPI.csproj|solutionrelative:cinemabookingsystemapi\\controllers\\ticketcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystembll\\dto\\halls\\hallcreatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|solutionrelative:cinemabookingsystembll\\dto\\halls\\hallcreatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{00D982C2-0F7E-4623-B1D1-00C0AA5AD9F3}|CinemaBookingSystemDAL\\CinemaBookingSystemDAL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystemdal\\repositories\\ticketrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00D982C2-0F7E-4623-B1D1-00C0AA5AD9F3}|CinemaBookingSystemDAL\\CinemaBookingSystemDAL.csproj|solutionrelative:cinemabookingsystemdal\\repositories\\ticketrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00D982C2-0F7E-4623-B1D1-00C0AA5AD9F3}|CinemaBookingSystemDAL\\CinemaBookingSystemDAL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystemdal\\interfaces\\iticketrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00D982C2-0F7E-4623-B1D1-00C0AA5AD9F3}|CinemaBookingSystemDAL\\CinemaBookingSystemDAL.csproj|solutionrelative:cinemabookingsystemdal\\interfaces\\iticketrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystembll\\services\\ticketservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|solutionrelative:cinemabookingsystembll\\services\\ticketservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystembll\\interfaces\\iticketservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|solutionrelative:cinemabookingsystembll\\interfaces\\iticketservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00D982C2-0F7E-4623-B1D1-00C0AA5AD9F3}|CinemaBookingSystemDAL\\CinemaBookingSystemDAL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystemdal\\interfaces\\isessionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00D982C2-0F7E-4623-B1D1-00C0AA5AD9F3}|CinemaBookingSystemDAL\\CinemaBookingSystemDAL.csproj|solutionrelative:cinemabookingsystemdal\\interfaces\\isessionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystembll\\services\\sessionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|solutionrelative:cinemabookingsystembll\\services\\sessionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,27 +43,92 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "HallController.cs",
-              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemAPI\\Controllers\\HallController.cs",
-              "RelativeDocumentMoniker": "CinemaBookingSystemAPI\\Controllers\\HallController.cs",
-              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemAPI\\Controllers\\HallController.cs",
-              "RelativeToolTip": "CinemaBookingSystemAPI\\Controllers\\HallController.cs",
-              "ViewState": "AgIAADEAAAAAAAAAAAAkwD8AAAA/AAAAAAAAAA==",
+              "Title": "TicketController.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemAPI\\Controllers\\TicketController.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemAPI\\Controllers\\TicketController.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemAPI\\Controllers\\TicketController.cs",
+              "RelativeToolTip": "CinemaBookingSystemAPI\\Controllers\\TicketController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAwBcAAABJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-15T09:13:30.442Z",
+              "WhenOpened": "2025-05-15T16:51:16.732Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ITicketService.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Interfaces\\ITicketService.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemBLL\\Interfaces\\ITicketService.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Interfaces\\ITicketService.cs",
+              "RelativeToolTip": "CinemaBookingSystemBLL\\Interfaces\\ITicketService.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAuwBQAAACNAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-15T16:46:59.774Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TicketService.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Services\\TicketService.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemBLL\\Services\\TicketService.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Services\\TicketService.cs",
+              "RelativeToolTip": "CinemaBookingSystemBLL\\Services\\TicketService.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAADwvw8AAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-15T16:44:16.054Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "HallCreateDTO.cs",
-              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\DTO\\Halls\\HallCreateDTO.cs",
-              "RelativeDocumentMoniker": "CinemaBookingSystemBLL\\DTO\\Halls\\HallCreateDTO.cs",
-              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\DTO\\Halls\\HallCreateDTO.cs",
-              "RelativeToolTip": "CinemaBookingSystemBLL\\DTO\\Halls\\HallCreateDTO.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAoAAAAAAAAAA==",
+              "Title": "TicketRepository.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemDAL\\Repositories\\TicketRepository.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemDAL\\Repositories\\TicketRepository.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemDAL\\Repositories\\TicketRepository.cs",
+              "RelativeToolTip": "CinemaBookingSystemDAL\\Repositories\\TicketRepository.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABQAAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-15T09:13:07.952Z",
+              "WhenOpened": "2025-05-15T16:43:18.906Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ITicketRepository.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemDAL\\Interfaces\\ITicketRepository.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemDAL\\Interfaces\\ITicketRepository.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemDAL\\Interfaces\\ITicketRepository.cs",
+              "RelativeToolTip": "CinemaBookingSystemDAL\\Interfaces\\ITicketRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA8AAACCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-15T16:42:57.714Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ISessionRepository.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemDAL\\Interfaces\\ISessionRepository.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemDAL\\Interfaces\\ISessionRepository.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemDAL\\Interfaces\\ISessionRepository.cs",
+              "RelativeToolTip": "CinemaBookingSystemDAL\\Interfaces\\ISessionRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-15T16:42:56.825Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SessionService.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Services\\SessionService.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemBLL\\Services\\SessionService.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Services\\SessionService.cs",
+              "RelativeToolTip": "CinemaBookingSystemBLL\\Services\\SessionService.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAuwBcAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-15T16:40:41.564Z",
               "EditorCaption": ""
             }
           ]

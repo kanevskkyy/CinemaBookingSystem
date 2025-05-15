@@ -18,10 +18,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(List<MovieResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetPagedMovies([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var movies = await _movieService.GetAllAsync(cancellationToken);
-            return Ok(movies);
+            var pagedMovies = await _movieService.GetPagedMoviesAsync(pageNumber, pageSize);
+            return Ok(pagedMovies);
         }
 
         [HttpGet("{id:int}")]
