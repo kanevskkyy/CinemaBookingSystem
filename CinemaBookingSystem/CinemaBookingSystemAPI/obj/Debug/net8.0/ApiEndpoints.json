@@ -470,12 +470,23 @@
   },
   {
     "ContainingType": "CinemaBookingSystemAPI.Controllers.MovieController",
-    "Method": "GetAll",
+    "Method": "GetPagedMovies",
     "RelativePath": "api/Movie",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": [
       {
         "Type": "System.Collections.Generic.List\u00601[[CinemaBookingSystemBLL.DTO.Movies.MovieResponseDTO, CinemaBookingSystemBLL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
@@ -717,12 +728,23 @@
   },
   {
     "ContainingType": "CinemaBookingSystemAPI.Controllers.SeatController",
-    "Method": "GetAll",
+    "Method": "GetPagedSeats",
     "RelativePath": "api/Seat",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": [
       {
         "Type": "System.Collections.Generic.List\u00601[[CinemaBookingSystemBLL.DTO.Seats.SeatResponseDTO, CinemaBookingSystemBLL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
@@ -998,12 +1020,23 @@
   },
   {
     "ContainingType": "CinemaBookingSystemAPI.Controllers.SessionController",
-    "Method": "GetAll",
+    "Method": "GetPagedSessions",
     "RelativePath": "api/Session",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": [
       {
         "Type": "System.Collections.Generic.List\u00601[[CinemaBookingSystemBLL.DTO.Sessions.SessionResponseDTO, CinemaBookingSystemBLL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
@@ -1305,12 +1338,23 @@
   },
   {
     "ContainingType": "CinemaBookingSystemAPI.Controllers.TicketController",
-    "Method": "GetAll",
+    "Method": "GetPagedSessions",
     "RelativePath": "api/Ticket",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": [
       {
         "Type": "System.Collections.Generic.List\u00601[[CinemaBookingSystemBLL.DTO.Tickets.TicketResponseDTO, CinemaBookingSystemBLL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
@@ -1566,12 +1610,23 @@
   },
   {
     "ContainingType": "CinemaBookingSystemAPI.Controllers.UserController",
-    "Method": "GetAll",
+    "Method": "GetPagedUsers",
     "RelativePath": "api/User",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": [
       {
         "Type": "System.Collections.Generic.List\u00601[[CinemaBookingSystemBLL.DTO.Users.UserResponseDTO, CinemaBookingSystemBLL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",

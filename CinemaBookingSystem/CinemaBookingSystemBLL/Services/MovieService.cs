@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
+using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
 
 namespace CinemaBookingSystemBLL.Services
@@ -81,6 +82,13 @@ namespace CinemaBookingSystemBLL.Services
             _unitOfWork.Movies.Delete(movie);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
+        }
+
+        public async Task<PagedList<MovieResponseDTO>> GetPagedMoviesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var pagedMovies = await _unitOfWork.Movies.GetPagedMoviesAsync(pageNumber, pageSize, cancellationToken);
+            var movieDtos = pagedMovies.Select(movie => new MovieResponseDTO { Id = movie.Id, Title = movie.Title, Description = movie.Description, Duration = movie.Duration, PosterUrl = movie.PosterUrl, GenreId = movie.GenreId, Rating = movie.Rating }).ToList();
+            return new PagedList<MovieResponseDTO>(movieDtos, pagedMovies.TotalCount, pagedMovies.CurrentPage, pagedMovies.PageSize);
         }
     }
 }

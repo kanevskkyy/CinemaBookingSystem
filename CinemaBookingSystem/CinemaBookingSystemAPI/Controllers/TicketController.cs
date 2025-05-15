@@ -1,5 +1,6 @@
 ﻿using CinemaBookingSystemBLL.DTO.Tickets;
 using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaBookingSystemAPI.Controllers
@@ -18,10 +19,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetPagedSessions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var tickets = await _ticketService.GetAllAsync(cancellationToken);
-            return Ok(tickets);
+            var pagedSessions = await _ticketService.GetPagedTicketsAsync(pageNumber, pageSize);
+            return Ok(pagedSessions);
         }
 
         [HttpGet("{id:int}")]

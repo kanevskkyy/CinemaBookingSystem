@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Sessions;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
+using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
+using static System.Collections.Specialized.BitVector32;
 
 namespace CinemaBookingSystemBLL.Services
 {
@@ -23,6 +25,21 @@ namespace CinemaBookingSystemBLL.Services
         {
             var movie = await _unitOfWork.Movies.GetByIdAsync(movieId, cancellationToken);
             return movie.Title;
+        }
+
+        public async Task<PagedList<SessionResponseDTO>> GetPagedSessionsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var pagedSessions = await _unitOfWork.Sessions.GetPagedSessionsAsync(pageNumber, pageSize, cancellationToken);
+            var sessionDtos = new List<SessionResponseDTO>();
+
+            foreach (var session in pagedSessions)
+            {
+                var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
+                var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
+                sessionDtos.Add(new SessionResponseDTO { Id = session.Id, MovieId = session.MovieId, MovieTitle = movieTitle, HallId = session.HallId, HallName = hallName, StartTime = session.StartTime, Price = session.Price });
+            }
+
+            return new PagedList<SessionResponseDTO>( sessionDtos, pagedSessions.TotalCount, pagedSessions.CurrentPage, pagedSessions.PageSize );
         }
 
         private async Task<string> GetHallNameAsync(int hallId, CancellationToken cancellationToken)

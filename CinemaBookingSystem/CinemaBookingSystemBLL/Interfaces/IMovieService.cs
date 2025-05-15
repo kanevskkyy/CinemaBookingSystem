@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Movies;
+using CinemaBookingSystemDAL.Pagination;
 
 namespace CinemaBookingSystemBLL.Interfaces
 {
@@ -16,6 +17,6 @@ namespace CinemaBookingSystemBLL.Interfaces
         Task<MovieResponseDTO> CreateAsync(MovieCreateDTO dto, CancellationToken cancellationToken = default);
         Task<MovieResponseDTO> UpdateAsync(int id, MovieUpdateDTO dto, CancellationToken cancellationToken = default);
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
-
+        Task<PagedList<MovieResponseDTO>> GetPagedMoviesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Users;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
+using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
 
 namespace CinemaBookingSystemBLL.Services
@@ -17,6 +18,15 @@ namespace CinemaBookingSystemBLL.Services
         public UserService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<PagedList<UserResponseDTO>> GetPagedUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var pagedUsers = await _unitOfWork.Users.GetPagedUsersAsync(pageNumber, pageSize, cancellationToken);
+
+            var result = pagedUsers.Select(u => new UserResponseDTO { Id = u.Id, Name = u.Name, Email = u.Email, Role = u.Role }).ToList();
+
+            return new PagedList<UserResponseDTO>(result, pagedUsers.TotalCount, pagedUsers.CurrentPage, pagedUsers.PageSize);
         }
 
         public async Task<List<UserResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Users;
+using CinemaBookingSystemDAL.Pagination;
 
 namespace CinemaBookingSystemBLL.Interfaces
 {
@@ -16,5 +17,6 @@ namespace CinemaBookingSystemBLL.Interfaces
         Task<UserResponseDTO?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<UserResponseDTO> UpdateAsync(int id, UserUpdateDTO dto, CancellationToken cancellationToken = default);
+        Task<PagedList<UserResponseDTO>> GetPagedUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     }
 }
