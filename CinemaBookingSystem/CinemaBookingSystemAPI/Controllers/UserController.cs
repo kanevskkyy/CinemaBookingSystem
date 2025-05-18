@@ -1,5 +1,7 @@
-﻿using CinemaBookingSystemBLL.DTO.Users;
+﻿using CinemaBookingSystemBLL.DTO.Movies;
+using CinemaBookingSystemBLL.DTO.Users;
 using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Services;
 using CinemaBookingSystemDAL.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +19,16 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(List<UserResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
+        {
+            var result = await _userService.GetAllAsync(cancellationToken);
+            return Ok(result);
+        }
+
+
+        [HttpGet("paginated")]
         [ProducesResponseType(typeof(List<UserResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PagedList<UserResponseDTO>>> GetPagedUsers(int pageNumber = 1, int pageSize = 10)
@@ -92,6 +104,15 @@ namespace CinemaBookingSystemAPI.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+
+        [HttpGet("filtered")]
+        [ProducesResponseType(typeof(List<UserResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetFilteredUsers([FromQuery] UserFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+        {
+            var result = await _userService.GetFilteredUsersAsync(filter, pageNumber, pageSize, cancellationToken);
+            return Ok(result);
         }
     }
 }

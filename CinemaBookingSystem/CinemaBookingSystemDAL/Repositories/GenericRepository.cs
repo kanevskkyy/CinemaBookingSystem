@@ -54,5 +54,10 @@ namespace CinemaBookingSystemDAL.Repositories
             _dbSet.Remove(entity);
             _context.SaveChanges();
         }
+
+        public IQueryable<T> GetAll()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }

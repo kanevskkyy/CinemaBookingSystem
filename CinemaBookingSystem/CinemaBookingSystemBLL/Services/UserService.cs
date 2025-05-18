@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Users;
+using Microsoft.EntityFrameworkCore;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
 using CinemaBookingSystemDAL.Pagination;
@@ -89,6 +90,61 @@ namespace CinemaBookingSystemBLL.Services
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new UserResponseDTO { Id = user.Id, Name = user.Name, Email = user.Email, Role = user.Role };
+        }
+
+        public async Task<PagedList<UserResponseDTO>> GetFilteredUsersAsync(UserFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var query = _unitOfWork.Users.GetAll();
+
+            if (!string.IsNullOrWhiteSpace(filter.Name)) query = query.Where(u => u.Name.ToLower().Contains(filter.Name.ToLower()));
+            if (!string.IsNullOrWhiteSpace(filter.Email)) query = query.Where(u => u.Email.ToLower().Contains(filter.Email.ToLower()));
+            if (!string.IsNullOrWhiteSpace(filter.Role))
+            {
+                string role = filter.Role.ToLower();
+                if (role == "customer" || role == "admin") query = query.Where(u => u.Role.ToLower() == role);
+            }
+
+            if (!string.IsNullOrEmpty(filter.SortBy))
+            {
+                switch (filter.SortBy.ToLower())
+                {
+                    case "name":
+                        if (filter.SortDescending) query = query.OrderByDescending(u => u.Name);
+                        else query = query.OrderBy(u => u.Name);
+                        break;
+
+                    case "email":
+                        if (filter.SortDescending) query = query.OrderByDescending(u => u.Email);
+                        else query = query.OrderBy(u => u.Email);
+                        break;
+
+                    case "role":
+                        if (filter.SortDescending) query = query.OrderByDescending(u => u.Role);
+                        else query = query.OrderBy(u => u.Role);
+                        break;
+
+                    default:
+                        if (filter.SortDescending) query = query.OrderByDescending(u => u.Id);
+                        else query = query.OrderBy(u => u.Id);
+                        break;
+                }
+            }
+            else query = query.OrderBy(u => u.Id);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(u => new UserResponseDTO
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Email = u.Email,
+                    Role = u.Role
+                })
+                .ToListAsync(cancellationToken);
+
+            return new PagedList<UserResponseDTO>(items, totalCount, pageNumber, pageSize);
         }
     }
 }

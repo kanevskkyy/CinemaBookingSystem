@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
@@ -90,5 +86,68 @@ namespace CinemaBookingSystemBLL.Services
             var movieDtos = pagedMovies.Select(movie => new MovieResponseDTO { Id = movie.Id, Title = movie.Title, Description = movie.Description, Duration = movie.Duration, PosterUrl = movie.PosterUrl, GenreId = movie.GenreId, Rating = movie.Rating }).ToList();
             return new PagedList<MovieResponseDTO>(movieDtos, pagedMovies.TotalCount, pagedMovies.CurrentPage, pagedMovies.PageSize);
         }
+
+        public async Task<PagedList<MovieResponseDTO>> GetFilteredMoviesAsync(MovieFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var query = _unitOfWork.Movies.GetAll();
+
+            if (!string.IsNullOrEmpty(filter.Title)) query = query.Where(m => m.Title.ToLower().Contains(filter.Title.ToLower()));
+            if (filter.GenreId.HasValue) query = query.Where(m => m.GenreId == filter.GenreId.Value);
+            if (filter.MinRating.HasValue) query = query.Where(m => m.Rating >= filter.MinRating.Value);
+            if (filter.MaxRating.HasValue) query = query.Where(m => m.Rating <= filter.MaxRating.Value);
+            if (filter.MinDuration.HasValue) query = query.Where(m => m.Duration >= filter.MinDuration.Value);
+            if (filter.MaxDuration.HasValue) query = query.Where(m => m.Duration <= filter.MaxDuration.Value);
+
+            if (!string.IsNullOrEmpty(filter.SortBy))
+            {
+                switch (filter.SortBy.ToLower())
+                {
+                    case "title":
+                        if (filter.SortDescending) query = query.OrderByDescending(m => m.Title);
+                        else query = query.OrderBy(m => m.Title);
+                        break;
+
+                    case "rating":
+                        if (filter.SortDescending) query = query.OrderByDescending(m => m.Rating);
+                        else query = query.OrderBy(m => m.Rating);
+                        break;
+
+                    case "duration":
+                        if (filter.SortDescending) query = query.OrderByDescending(m => m.Duration);
+                        else query = query.OrderBy(m => m.Duration);
+                        break;
+
+                    case "genreid":
+                        if (filter.SortDescending) query = query.OrderByDescending(m => m.GenreId);
+                        else query = query.OrderBy(m => m.GenreId);
+                        break;
+
+                    default:
+                        if (filter.SortDescending) query = query.OrderByDescending(m => m.Id);
+                        else query = query.OrderBy(m => m.Id);
+                        break;
+                }
+            }
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(movie => new MovieResponseDTO
+                {
+                    Id = movie.Id,
+                    Title = movie.Title,
+                    Description = movie.Description,
+                    Duration = movie.Duration,
+                    PosterUrl = movie.PosterUrl,
+                    GenreId = movie.GenreId,
+                    Rating = movie.Rating
+                })
+                .ToListAsync(cancellationToken);
+
+            return new PagedList<MovieResponseDTO>(items, totalCount, pageNumber, pageSize);
+        }
+
     }
 }

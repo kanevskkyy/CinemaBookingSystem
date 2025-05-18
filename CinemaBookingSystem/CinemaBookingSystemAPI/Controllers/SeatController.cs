@@ -17,6 +17,15 @@ namespace CinemaBookingSystemAPI.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(List<SeatResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GettAllAsync(CancellationToken cancellationToken)
+        {
+            var allSeats = await _seatService.GetAllAsync(cancellationToken);
+            return Ok(allSeats);
+        }
+
+        [HttpGet("paginated")]
+        [ProducesResponseType(typeof(List<SeatResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPagedSeats([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var pagedSeats = await _seatService.GetPagedSeatsAsync(pageNumber, pageSize);

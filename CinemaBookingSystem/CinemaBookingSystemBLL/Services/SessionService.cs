@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.DTO.Sessions;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
 using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
-using static System.Collections.Specialized.BitVector32;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemBLL.Services
 {
@@ -159,6 +160,69 @@ namespace CinemaBookingSystemBLL.Services
             _unitOfWork.Sessions.Delete(session);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
+        }
+
+
+        public async Task<PagedList<SessionResponseDTO>> GetFilteredSessionsAsync(SessionFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var query = _unitOfWork.Sessions.GetAll();
+
+            if (filter.MovieId.HasValue) query = query.Where(s => s.MovieId == filter.MovieId.Value);
+            if (filter.HallId.HasValue) query = query.Where(s => s.HallId == filter.HallId.Value);
+            if (filter.StartTimeFrom.HasValue) query = query.Where(s => s.StartTime >= filter.StartTimeFrom.Value);
+            if (filter.StartTimeTo.HasValue) query = query.Where(s => s.StartTime <= filter.StartTimeTo.Value);
+            if (filter.MinPrice.HasValue) query = query.Where(s => s.Price >= filter.MinPrice.Value);
+            if (filter.MaxPrice.HasValue) query = query.Where(s => s.Price <= filter.MaxPrice.Value);
+
+            if (!string.IsNullOrEmpty(filter.SortBy))
+            {
+                switch (filter.SortBy.ToLower())
+                {
+                    case "starttime":
+                        if (filter.SortDescending) query = query.OrderByDescending(s => s.StartTime);
+                        else query = query.OrderBy(s => s.StartTime);
+                        break;
+
+                    case "movieid":
+                        if (filter.SortDescending) query = query.OrderByDescending(s => s.MovieId);
+                        else query = query.OrderBy(s => s.MovieId);
+                        break;
+
+                    case "hallid":
+                        if (filter.SortDescending) query = query.OrderByDescending(s => s.HallId);
+                        else query = query.OrderBy(s => s.HallId);
+                        break;
+
+                    case "price":
+                        if (filter.SortDescending) query = query.OrderByDescending(s => s.Price);
+                        else query = query.OrderBy(s => s.Price);
+                        break;
+
+                    default:
+                        if (filter.SortDescending) query = query.OrderByDescending(s => s.Id);
+                        else query = query.OrderBy(s => s.Id);
+                        break;
+                }
+            }
+            else query = query.OrderBy(s => s.Id);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(s => new SessionResponseDTO
+                {
+                    Id = s.Id,
+                    MovieId = s.MovieId,
+                    HallId = s.HallId,
+                    StartTime = s.StartTime,
+                    Price = s.Price,
+                    MovieTitle = s.Movie.Title,
+                    HallName = s.Hall.Name
+                })
+                .ToListAsync(cancellationToken);
+
+            return new PagedList<SessionResponseDTO>(items, totalCount, pageNumber, pageSize);
         }
     }
 }

@@ -10,6 +10,7 @@ using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
 using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemBLL.Services
 {
@@ -148,6 +149,69 @@ namespace CinemaBookingSystemBLL.Services
             if (session == null) return "Unknown";
             var movie = await _unitOfWork.Movies.GetByIdAsync(session.MovieId, cancellationToken);
             return movie.Title;
+        }
+
+        public async Task<PagedList<TicketResponseDTO>> GetFilteredTicketsAsync(TicketFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var query = _unitOfWork.Tickets.GetAll();
+
+            if (filter.UserId.HasValue) query = query.Where(t => t.UserId == filter.UserId.Value);
+            if (filter.SessionId.HasValue) query = query.Where(t => t.SessionId == filter.SessionId.Value);
+            if (filter.SeatId.HasValue) query = query.Where(t => t.SeatId == filter.SeatId.Value);
+            if (filter.PurchaseTimeFrom.HasValue) query = query.Where(t => t.PurchaseTime >= filter.PurchaseTimeFrom.Value);
+            if (filter.PurchaseTimeTo.HasValue) query = query.Where(t => t.PurchaseTime <= filter.PurchaseTimeTo.Value);
+
+            if (!string.IsNullOrEmpty(filter.SortBy))
+            {
+                switch (filter.SortBy.ToLower())
+                {
+                    case "purchasetime":
+                        if (filter.SortDescending) query = query.OrderByDescending(t => t.PurchaseTime);
+                        else query = query.OrderBy(t => t.PurchaseTime);
+                        break;
+
+                    case "userid":
+                        if (filter.SortDescending) query = query.OrderByDescending(t => t.UserId);
+                        else query = query.OrderBy(t => t.UserId);
+                        break;
+
+                    case "sessionid":
+                        if (filter.SortDescending) query = query.OrderByDescending(t => t.SessionId);
+                        else query = query.OrderBy(t => t.SessionId);
+                        break;
+
+                    case "seatid":
+                        if (filter.SortDescending) query = query.OrderByDescending(t => t.SeatId);
+                        else query = query.OrderBy(t => t.SeatId);
+                        break;
+
+                    default:
+                        if (filter.SortDescending) query = query.OrderByDescending(t => t.Id);
+                        else query = query.OrderBy(t => t.Id);
+                        break;
+                }
+            }
+            else query = query.OrderBy(t => t.Id);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(t => new TicketResponseDTO
+                {
+                    Id = t.Id,
+                    UserId = t.UserId,
+                    SessionId = t.SessionId,
+                    SeatId = t.SeatId,
+                    SessionMovieTitle = t.Session.Movie.Title,
+                    PurchaseTime = t.PurchaseTime,
+                    UserName = t.User.Name,
+                    SeatInfo = $"Row: {t.Seat.RowNumber}, Seat: {t.Seat.SeatNumber}"
+                })
+                .ToListAsync(cancellationToken);
+
+            return new PagedList<TicketResponseDTO>(items, totalCount, pageNumber, pageSize);
         }
     }
 }
