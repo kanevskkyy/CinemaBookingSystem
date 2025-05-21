@@ -6,6 +6,9 @@ using CinemaBookingSystemBLL.Services;
 using CinemaBookingSystemDAL.Unit_of_Work;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentValidation.AspNetCore;
+using CinemaBookingSystemBLL.Validations.Genre;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 builder.Services.AddDbContext<CinemaDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -27,6 +31,8 @@ builder.Services.AddControllers()
     });
 
 
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<GenreCreateDTOValidator>();
 
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IHallService, HallService>();

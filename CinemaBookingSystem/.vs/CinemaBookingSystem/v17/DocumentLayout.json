@@ -1,12 +1,54 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystembll\\validations\\sessions\\sessioncreatedtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|solutionrelative:cinemabookingsystembll\\validations\\sessions\\sessioncreatedtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|d:\\cinemabookingsystem\\cinemabookingsystem\\cinemabookingsystembll\\validations\\seats\\seatcreatedtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F370D64B-86CC-435A-8BB6-0BAC97D430AD}|CinemaBookingSystemBLL\\CinemaBookingSystemBLL.csproj|solutionrelative:cinemabookingsystembll\\validations\\seats\\seatcreatedtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "SessionCreateDTOValidator.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Validations\\Sessions\\SessionCreateDTOValidator.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemBLL\\Validations\\Sessions\\SessionCreateDTOValidator.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Validations\\Sessions\\SessionCreateDTOValidator.cs",
+              "RelativeToolTip": "CinemaBookingSystemBLL\\Validations\\Sessions\\SessionCreateDTOValidator.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABMAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-21T15:47:58.194Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SeatCreateDTOValidator.cs",
+              "DocumentMoniker": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Validations\\Seats\\SeatCreateDTOValidator.cs",
+              "RelativeDocumentMoniker": "CinemaBookingSystemBLL\\Validations\\Seats\\SeatCreateDTOValidator.cs",
+              "ToolTip": "D:\\CinemaBookingSystem\\CinemaBookingSystem\\CinemaBookingSystemBLL\\Validations\\Seats\\SeatCreateDTOValidator.cs",
+              "RelativeToolTip": "CinemaBookingSystemBLL\\Validations\\Seats\\SeatCreateDTOValidator.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-21T15:47:28.003Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

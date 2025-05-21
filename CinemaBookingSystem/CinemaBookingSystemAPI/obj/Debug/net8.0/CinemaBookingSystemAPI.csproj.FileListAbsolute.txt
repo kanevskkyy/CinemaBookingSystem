@@ -142,3 +142,6 @@ D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\obj\Debug\net8
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\obj\Debug\net8.0\ref\CinemaBookingSystemAPI.dll
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\obj\Debug\net8.0\CinemaBookingSystemAPI.sourcelink.json
 D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\bin\Debug\net8.0\Bogus.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\bin\Debug\net8.0\FluentValidation.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\bin\Debug\net8.0\FluentValidation.AspNetCore.dll
+D:\CinemaBookingSystem\CinemaBookingSystem\CinemaBookingSystemAPI\bin\Debug\net8.0\FluentValidation.DependencyInjectionExtensions.dll
