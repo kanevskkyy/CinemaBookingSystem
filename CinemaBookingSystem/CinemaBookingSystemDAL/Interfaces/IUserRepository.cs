@@ -8,12 +8,12 @@ using CinemaBookingSystemDAL.Pagination;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface IUserRepository : IGenericRepository<User>
+    public interface IUserRepository : IGenericRepository<User, string>
     {
         Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<List<User>> GetAllWithTicketsAsync(CancellationToken cancellationToken = default);
-        Task<User?> GetWithTicketsAsync(int userId, CancellationToken cancellationToken = default);
+        Task<User?> GetWithTicketsAsync(string userId, CancellationToken cancellationToken = default);
         Task<PagedList<User>> GetPagedUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     }
 }

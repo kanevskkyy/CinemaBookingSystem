@@ -6,7 +6,8 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
     {
         public static List<Seat> Generate(CinemaDbContext context, List<Hall> hallList)
         {
-            if (context.Seats.Any()) return new List<Seat>();
+            if (context.Seats.Any()) return context.Seats.ToList();
+
             List<Seat> seatList = new List<Seat>();
 
             foreach (var hall in hallList)

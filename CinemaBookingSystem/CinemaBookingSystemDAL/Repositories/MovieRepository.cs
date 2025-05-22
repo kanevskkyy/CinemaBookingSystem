@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class MovieRepository : GenericRepository<Movie>, IMovieRepository
+    public class MovieRepository : GenericRepository<Movie, int>, IMovieRepository
     {
         public MovieRepository(CinemaDbContext context) : base(context) {}
         public async Task<List<Movie>> GetByGenreAsync(int genreId, CancellationToken cancellationToken = default)

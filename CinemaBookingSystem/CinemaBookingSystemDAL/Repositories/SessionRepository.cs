@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class SessionRepository : GenericRepository<Session>, ISessionRepository
+    public class SessionRepository : GenericRepository<Session, int>, ISessionRepository
     {
         public SessionRepository(CinemaDbContext context) : base(context) { }
 

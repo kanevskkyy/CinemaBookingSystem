@@ -7,7 +7,7 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
     {
         public static List<Session> Generate(CinemaDbContext context, List<Movie> movieList, List<Hall> hallList)
         {
-            if (context.Sessions.Any()) return new List<Session>();
+            if (context.Sessions.Any()) return context.Sessions.ToList();
 
             DateTime timeNow = DateTime.Now;
             var localTime = timeNow.ToUniversalTime();

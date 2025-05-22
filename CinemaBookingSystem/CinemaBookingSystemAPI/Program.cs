@@ -9,6 +9,8 @@ using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
 using CinemaBookingSystemBLL.Validations.Genre;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
+using CinemaBookingSystemDAL.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,12 +44,19 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<CinemaDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
-    CinemaDbContext.Seed(dbContext);
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<CinemaDbContext>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await CinemaDbContext.SeedAsync(context, userManager, roleManager);
 }
 
 // Configure the HTTP request pipeline.

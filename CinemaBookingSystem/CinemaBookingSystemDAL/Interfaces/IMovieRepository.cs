@@ -8,7 +8,7 @@ using CinemaBookingSystemDAL.Pagination;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface IMovieRepository : IGenericRepository<Movie>
+    public interface IMovieRepository : IGenericRepository<Movie, int>
     {
         Task<List<Movie>> GetByGenreAsync(int genreId, CancellationToken cancellationToken = default);
         Task<List<Movie>> GetTopRatedAsync(CancellationToken cancellationToken = default);

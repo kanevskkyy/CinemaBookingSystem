@@ -11,7 +11,7 @@ namespace CinemaBookingSystemDAL.Interfaces
 
     namespace CinemaBookingSystemDAL.Interfaces
     {
-        public interface ISessionRepository : IGenericRepository<Session>
+        public interface ISessionRepository : IGenericRepository<Session, int>
         {
             Task<List<Session>> GetByMovieIdAsync(int movieId, CancellationToken cancellationToken = default);
             Task<List<Session>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default);

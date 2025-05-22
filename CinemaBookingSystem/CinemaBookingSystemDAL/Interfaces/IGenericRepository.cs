@@ -8,10 +8,10 @@ using CinemaBookingSystemDAL.Entities;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface IGenericRepository<T> where T : class
+    public interface IGenericRepository<T, Key> where T : class
     {
         IQueryable<T> GetAll();
-        Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<T> GetByIdAsync(Key id, CancellationToken cancellationToken = default);
         Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
         Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default);

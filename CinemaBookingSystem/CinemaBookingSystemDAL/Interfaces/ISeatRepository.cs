@@ -8,7 +8,7 @@ using CinemaBookingSystemDAL.Pagination;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface ISeatRepository : IGenericRepository<Seat>
+    public interface ISeatRepository : IGenericRepository<Seat, int>
     {
         Task<List<Seat>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default);
         Task<Seat?> GetByRowAndNumberAsync(int hallId, int rowNumber, int seatNumber, CancellationToken cancellationToken = default);

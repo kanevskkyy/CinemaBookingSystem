@@ -8,7 +8,7 @@ namespace CinemaBookingSystemBLL.DTO.Tickets
 {
     public class TicketCreateDTO
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int SessionId { get; set; }
         public int SeatId { get; set; }
     }

@@ -7,7 +7,8 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
     {
         public static List<Hall> Generate(CinemaDbContext context)
         {
-            if (context.Halls.Any()) return new List<Hall>();
+            if (context.Halls.Any()) return context.Halls.ToList();
+
             var hallFaker = new Faker<Hall>("en")
                 .RuleFor(p => p.RowsAmount, k => k.Random.Number(10, 30))
                 .RuleFor(p => p.SeatsPerRow, k => k.Random.Number(15, 40));

@@ -11,12 +11,12 @@ namespace CinemaBookingSystemBLL.Interfaces
     public interface IUserService
     {
         Task<List<UserResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default);
-        Task<UserResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<UserResponseDTO?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
         Task<UserResponseDTO> CreateAsync(UserCreateDTO dto, CancellationToken cancellationToken = default);
-        Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+        Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
         Task<UserResponseDTO?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
-        Task<UserResponseDTO> UpdateAsync(int id, UserUpdateDTO dto, CancellationToken cancellationToken = default);
+        Task<UserResponseDTO> UpdateAsync(string id, UserUpdateDTO dto, CancellationToken cancellationToken = default);
         Task<PagedList<UserResponseDTO>> GetPagedUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         Task<PagedList<UserResponseDTO>> GetFilteredUsersAsync(UserFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     }

@@ -52,7 +52,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByUserId(int userId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetByUserId(string userId, CancellationToken cancellationToken)
         {
             var tickets = await _ticketService.GetByUserIdAsync(userId, cancellationToken);
             if (tickets == null || !tickets.Any())
