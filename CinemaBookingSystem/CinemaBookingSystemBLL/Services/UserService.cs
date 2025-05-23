@@ -93,7 +93,7 @@ namespace CinemaBookingSystemBLL.Services
             var user = new User { UserName = dto.Name, Email = dto.Email };
 
             var createResult = await _userManager.CreateAsync(user, dto.Password);
-            if (!createResult.Succeeded) throw new Exception("Something went wrong...");
+            if (!createResult.Succeeded) throw new Exception($"User creation failed. Something went wrong...");
 
             if (!string.IsNullOrEmpty(dto.Role))
             {

@@ -1,5 +1,6 @@
 ﻿using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaBookingSystemAPI.Controllers
@@ -72,22 +73,30 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(MovieResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] MovieCreateDTO dto, CancellationToken cancellationToken)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var created = await _movieService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id:int}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(int id, [FromBody] MovieUpdateDTO dto, CancellationToken cancellationToken)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var updated = await _movieService.UpdateAsync(id, dto, cancellationToken);
             if (updated == null) return NotFound();
 
@@ -95,11 +104,15 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var result = await _movieService.DeleteAsync(id, cancellationToken);
             if (!result)
                 return NotFound();

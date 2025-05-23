@@ -1,8 +1,10 @@
-﻿using CinemaBookingSystemBLL.DTO.Movies;
+﻿using System.Security.Claims;
+using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.DTO.Users;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemBLL.Services;
 using CinemaBookingSystemDAL.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaBookingSystemAPI.Controllers
@@ -19,30 +21,43 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(List<UserResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var result = await _userService.GetAllAsync(cancellationToken);
             return Ok(result);
         }
 
 
         [HttpGet("paginated")]
+        [Authorize]
         [ProducesResponseType(typeof(List<UserResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PagedList<UserResponseDTO>>> GetPagedUsers(int pageNumber = 1, int pageSize = 10)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var result = await _userService.GetPagedUsersAsync(pageNumber, pageSize);
             return Ok(result);
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!User.IsInRole("Admin") && userId != id) return Forbid();
+
             var user = await _userService.GetByIdAsync(id, cancellationToken);
             if (user == null)
                 return NotFound();
@@ -51,11 +66,15 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         [HttpGet("by-email/{email}")]
+        [Authorize]
         [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByEmail(string email, CancellationToken cancellationToken)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var user = await _userService.GetByEmailAsync(email, cancellationToken);
             if (user == null)
                 return NotFound();
@@ -63,54 +82,65 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(user);
         }
 
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] UserCreateDTO dto, CancellationToken cancellationToken)
         {
-            if (await _userService.ExistsByEmailAsync(dto.Email, cancellationToken))
-            {
-                return BadRequest("Email is already in use.");
-            }
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
+            if (await _userService.ExistsByEmailAsync(dto.Email, cancellationToken)) return BadRequest("Email is already in use.");
 
             var createdUser = await _userService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
         }
 
         [HttpPut("{id:int}")]
+        [Authorize]
         [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(string id, [FromBody] UserUpdateDTO dto, CancellationToken cancellationToken)
         {
-            var existingUser = await _userService.GetByIdAsync(id, cancellationToken);
-            if (existingUser == null)
-                return NotFound();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!User.IsInRole("Admin") && userId != id) return Forbid();
 
+            var existingUser = await _userService.GetByIdAsync(id, cancellationToken);
+            if (existingUser == null) return NotFound();
             var updatedUser = await _userService.UpdateAsync(id, dto, cancellationToken);
             return Ok(updatedUser);
         }
 
+
         [HttpDelete("{id:int}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!User.IsInRole("Admin") && userId != id) return Forbid();
+            
             var result = await _userService.DeleteAsync(id, cancellationToken);
-            if (!result)
-                return NotFound();
+            if (!result) return NotFound();
 
             return NoContent();
         }
 
         [HttpGet("filtered")]
+        [Authorize]
         [ProducesResponseType(typeof(List<UserResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFilteredUsers([FromQuery] UserFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var result = await _userService.GetFilteredUsersAsync(filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);
         }

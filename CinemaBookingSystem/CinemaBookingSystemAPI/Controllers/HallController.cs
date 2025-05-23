@@ -1,5 +1,6 @@
 ﻿using CinemaBookingSystemBLL.DTO.Halls;
 using CinemaBookingSystemBLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaBookingSystemAPI.Controllers
@@ -47,33 +48,45 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(HallResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] HallCreateDTO dto, CancellationToken cancellationToken)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var created = await _hallService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id:int}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(int id, [FromBody] HallUpdateDTO dto, CancellationToken cancellationToken)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var updated = await _hallService.UpdateAsync(id, dto, cancellationToken);
             if (updated == null) return NotFound();
             return NoContent();
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
+            if (!User.IsInRole("Admin"))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+
             var result = await _hallService.DeleteAsync(id, cancellationToken);
             if (!result) return NotFound();
             return NoContent();
