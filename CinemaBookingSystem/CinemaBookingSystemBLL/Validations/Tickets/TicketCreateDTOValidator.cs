@@ -12,8 +12,6 @@ namespace CinemaBookingSystemBLL.Validations.Tickets
     {
         public TicketCreateDTOValidator() 
         {
-            RuleFor(p => p.UserId).NotEmpty().WithMessage("UserId is necessary!");
-
             RuleFor(p => p.SessionId).GreaterThan(0).WithMessage("SessionId must be greater than 0");
 
             RuleFor(p => p.SeatId).GreaterThan(0).WithMessage("SeatId must be greater than 0");

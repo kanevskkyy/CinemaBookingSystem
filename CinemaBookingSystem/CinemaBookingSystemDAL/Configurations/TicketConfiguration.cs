@@ -18,6 +18,9 @@ namespace CinemaBookingSystemDAL.Configurations
             builder.Property(p => p.PurchaseTime)
                    .IsRequired();
 
+            builder.Property(p => p.IsPaid)
+                .IsRequired();
+
             builder.HasOne(p => p.User)
                    .WithMany(p => p.Tickets)
                    .HasForeignKey(p => p.UserId)

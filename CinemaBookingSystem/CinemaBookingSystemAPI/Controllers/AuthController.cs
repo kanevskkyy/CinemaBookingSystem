@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using CinemaBookingSystemBLL.DTO.Users;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CinemaBookingSystemAPI.Controllers
 {
@@ -38,6 +39,56 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(new { Token = token });
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(UserCreateDTO dto)
+        {
+            var user = new User
+            {
+                Email = dto.Email,
+                UserName = dto.Name
+            };
+
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new { Errors = errors });
+            }
+
+            await _userManager.AddToRoleAsync(user, "Customer");
+
+            string token = GenerateJwtToken(user);
+            return Ok(new { Token = token });
+        }
+
+        [HttpPost("admin/create-user")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateUserByAdmin(UserCreateDTO dto)
+        {
+            string role = dto.Role?.Trim();
+
+            if (role != "Admin" && role != "Customer")
+            {
+                return BadRequest(new { Error = "Role must be either 'Admin' or 'Customer'." });
+            }
+
+            User user = new User
+            {
+                Email = dto.Email,
+                UserName = dto.Name
+            };
+
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new { Errors = errors });
+            }
+
+            await _userManager.AddToRoleAsync(user, role);
+            return Ok(new { Message = "User created successfully" });
+        }
+
         private string GenerateJwtToken(User user)
         {
             var claims = new List<Claim>
@@ -66,32 +117,6 @@ namespace CinemaBookingSystemAPI.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(UserCreateDTO dto)
-        {
-            var user = new User
-            {
-                Email = dto.Email,
-                UserName = dto.Name
-            };
-
-            var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(e => e.Description);
-                return BadRequest(new { Errors = errors });
-            }
-
-            bool roleExists = await _userManager.IsInRoleAsync(user, dto.Role);
-            if (!roleExists)
-            {
-                await _userManager.AddToRoleAsync(user, dto.Role);
-            }
-
-            string token = GenerateJwtToken(user);
-            return Ok(new { Token = token });
         }
     }
 }

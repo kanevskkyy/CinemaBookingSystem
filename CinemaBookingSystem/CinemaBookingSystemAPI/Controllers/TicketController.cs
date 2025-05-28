@@ -1,4 +1,5 @@
-﻿using CinemaBookingSystemBLL.DTO.Tickets;
+﻿using System.Security.Claims;
+using CinemaBookingSystemBLL.DTO.Tickets;
 using CinemaBookingSystemBLL.DTO.Users;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemBLL.Services;
@@ -119,11 +120,22 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] TicketCreateDTO dto, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin"))
-                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-            var created = await _ticketService.CreateAsync(dto, cancellationToken);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+                var created = await _ticketService.CreateAsync(userId, dto, cancellationToken);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal server error" });
+            }
         }
 
         [HttpDelete("{id:int}")]
@@ -154,6 +166,19 @@ namespace CinemaBookingSystemAPI.Controllers
 
             var result = await _ticketService.GetFilteredTicketsAsync(filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);
+        }
+
+        [HttpPost("{id}/confirm-payment")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ConfirmPayment(int id)
+        {
+            var result = await _ticketService.ConfirmPaymentAsync(id);
+            if (!result)
+                return NotFound();
+
+            return Ok();
         }
     }
 }

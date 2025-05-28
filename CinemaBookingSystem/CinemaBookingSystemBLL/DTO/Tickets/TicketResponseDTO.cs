@@ -12,6 +12,7 @@ namespace CinemaBookingSystemBLL.DTO.Tickets
         public string UserId { get; set; }
         public string UserName { get; set; } = string.Empty;
         public int SessionId { get; set; }
+        public bool IsPaid { get; set; }
         public string SessionMovieTitle { get; set; } = string.Empty;
         public int SeatId { get; set; }
         public string SeatInfo { get; set; } = string.Empty;

@@ -13,6 +13,7 @@ namespace CinemaBookingSystemDAL.Entities
         public int SessionId { get; set; }
         public int SeatId { get; set; }
         public DateTime PurchaseTime { get; set; }
+        public bool IsPaid { get; set; } = false;
         public Session Session { get; set; }
         public User User { get; set; }
         public Seat Seat { get; set; }
