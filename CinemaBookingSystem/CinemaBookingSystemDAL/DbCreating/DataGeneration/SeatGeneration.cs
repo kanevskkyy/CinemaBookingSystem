@@ -16,12 +16,13 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
                 {
                     for (int seat = 1; seat <= hall.SeatsPerRow; seat++)
                     {
-                        seatList.Add(new Seat
+                        Seat tempSeat = new Seat
                         {
                             HallId = hall.Id,
                             RowNumber = row,
                             SeatNumber = seat
-                        });
+                        };
+                        seatList.Add(tempSeat);
                     }
                 }
             }

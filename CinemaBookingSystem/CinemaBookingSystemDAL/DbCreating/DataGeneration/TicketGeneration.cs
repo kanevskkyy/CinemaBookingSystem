@@ -19,14 +19,15 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
                 Seat seat = seatList[random.Next(seatList.Count)];
 
                 DateTime purchaseTime = new Faker().Date.Between(DateTime.Now.ToUniversalTime(), session.StartTime.AddMinutes(-1).ToUniversalTime());
-
-                ticketList.Add(new Ticket
+                Ticket tempTicket = new Ticket
                 {
                     UserId = user.Id,
                     SessionId = session.Id,
                     SeatId = seat.Id,
                     PurchaseTime = purchaseTime
-                });
+                };
+
+                ticketList.Add(tempTicket);
             }
 
             context.Tickets.AddRange(ticketList);

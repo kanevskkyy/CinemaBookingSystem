@@ -15,24 +15,24 @@ namespace CinemaBookingSystemAPI.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly IConfiguration _configuration;
-        private readonly SignInManager<User> _signInManager;
+        private UserManager<User> userManager;
+        private IConfiguration configuration;
+        private SignInManager<User> signInManager;
 
         public AuthController(UserManager<User> userManager, IConfiguration configuration, SignInManager<User> signInManager)
         {
-            _userManager = userManager;
-            _configuration = configuration;
-            _signInManager = signInManager;
+            this.userManager = userManager;
+            this.configuration = configuration;
+            this.signInManager = signInManager;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDTO dto)
         {
-            var user = await _userManager.FindByEmailAsync(dto.Email);
+            var user = await userManager.FindByEmailAsync(dto.Email);
             if (user == null) return Unauthorized("Invalid credentials");
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
+            var result = await signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
             if (!result.Succeeded) return Unauthorized("Invalid credentials");
 
             var token = GenerateJwtToken(user);
@@ -42,20 +42,20 @@ namespace CinemaBookingSystemAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserCreateDTO dto)
         {
-            var user = new User
+            User user = new User
             {
                 Email = dto.Email,
                 UserName = dto.Name
             };
 
-            var result = await _userManager.CreateAsync(user, dto.Password);
+            var result = await userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => e.Description);
                 return BadRequest(new { Errors = errors });
             }
 
-            await _userManager.AddToRoleAsync(user, "Customer");
+            await userManager.AddToRoleAsync(user, "Customer");
 
             string token = GenerateJwtToken(user);
             return Ok(new { Token = token });
@@ -67,10 +67,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             string role = dto.Role?.Trim();
 
-            if (role != "Admin" && role != "Customer")
-            {
-                return BadRequest(new { Error = "Role must be either 'Admin' or 'Customer'." });
-            }
+            if (role != "Admin" && role != "Customer") return BadRequest(new { Error = "Role must be either 'Admin' or 'Customer'." });
 
             User user = new User
             {
@@ -78,39 +75,40 @@ namespace CinemaBookingSystemAPI.Controllers
                 UserName = dto.Name
             };
 
-            var result = await _userManager.CreateAsync(user, dto.Password);
+            var result = await userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => e.Description);
                 return BadRequest(new { Errors = errors });
             }
 
-            await _userManager.AddToRoleAsync(user, role);
+            await userManager.AddToRoleAsync(user, role);
+            
             return Ok(new { Message = "User created successfully" });
         }
 
         private string GenerateJwtToken(User user)
         {
-            var claims = new List<Claim>
+            List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName ?? ""),
-                new Claim(ClaimTypes.Email, user.Email ?? "")
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email)
             };
 
-            var roles = _userManager.GetRolesAsync(user).Result;
+            var roles = userManager.GetRolesAsync(user).Result;
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = DateTime.Now.AddDays(7);
 
             var token = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Audience"],
+                configuration["Jwt:Issuer"],
+                configuration["Jwt:Audience"],
                 claims,
                 expires: expires,
                 signingCredentials: creds

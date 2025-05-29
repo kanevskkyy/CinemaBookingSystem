@@ -12,11 +12,13 @@ namespace CinemaBookingSystemDAL.Repositories
 {
     public class HallRepository : GenericRepository<Hall, int>, IHallRepository
     {
-        public HallRepository(CinemaDbContext context) : base(context) { }
+        public HallRepository(CinemaDbContext context) : base(context) { 
+
+        }
 
         public async Task<Hall?> GetByNameAsync(string hallName, CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Name == hallName, cancellationToken);
         }

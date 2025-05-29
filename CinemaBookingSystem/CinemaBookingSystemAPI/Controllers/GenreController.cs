@@ -8,10 +8,10 @@ namespace CinemaBookingSystemAPI.Controllers
     [ApiController]
     public class GenreController : ControllerBase
     {
-        private readonly IGenreService _genreService;
+        private IGenreService genreService;
         public GenreController(IGenreService genreService)
         {
-            _genreService = genreService;
+            this.genreService = genreService;
         }
 
         [HttpGet]
@@ -20,7 +20,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
             
-            var genres = await _genreService.GetAllAsync(cancellationToken);
+            var genres = await genreService.GetAllAsync(cancellationToken);
             return Ok(genres);
         }
 
@@ -30,7 +30,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-            var genre = await _genreService.GetByIdAsync(id, cancellationToken);
+            var genre = await genreService.GetByIdAsync(id, cancellationToken);
             if (genre == null) return NotFound();
             return Ok(genre);
         }
@@ -45,7 +45,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin"))
                 return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var created = await _genreService.CreateAsync(dto, cancellationToken);
+            var created = await genreService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
@@ -59,7 +59,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin"))
                 return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var updated = await _genreService.UpdateAsync(id, dto, cancellationToken);
+            var updated = await genreService.UpdateAsync(id, dto, cancellationToken);
             if (updated == null) return NotFound();
             return NoContent();
         }
@@ -71,10 +71,9 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin"))
-                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var result = await _genreService.DeleteAsync(id, cancellationToken);
+            var result = await genreService.DeleteAsync(id, cancellationToken);
             if (!result) return NotFound();
             return NoContent();
         }
@@ -83,7 +82,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetMovieCounts(CancellationToken cancellationToken)
         {
-            var counts = await _genreService.GetMovieCountsPerGenreAsync(cancellationToken);
+            var counts = await genreService.GetMovieCountsPerGenreAsync(cancellationToken);
             return Ok(counts);
         }
 
@@ -92,7 +91,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ExistsByName(string name, CancellationToken cancellationToken)
         {
-            var exists = await _genreService.ExistsByNameAsync(name, cancellationToken);
+            var exists = await genreService.ExistsByNameAsync(name, cancellationToken);
             return Ok(exists);
         }
     }

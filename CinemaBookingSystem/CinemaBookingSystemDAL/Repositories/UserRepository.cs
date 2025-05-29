@@ -13,30 +13,32 @@ namespace CinemaBookingSystemDAL.Repositories
 {
     public class UserRepository : GenericRepository<User, string>, IUserRepository
     {
-        public UserRepository(CinemaDbContext context) : base(context) { }
+        public UserRepository(CinemaDbContext context) : base(context) {
+        
+        }
 
         public async Task<PagedList<User>> GetPagedUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var source = _context.Users.AsQueryable();
+            var source = context.Users.AsQueryable();
             return await PagedList<User>.ToPagedListAsync(source, pageNumber, pageSize, cancellationToken);
         }
 
         public async Task<User?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Email == userEmail, cancellationToken);
         }
 
         public async Task<bool> ExistsByEmailAsync(string userEmail, CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AnyAsync(p => p.Email == userEmail, cancellationToken);
         }
 
         public async Task<List<User>> GetAllWithTicketsAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AsNoTracking()
                 .Include(p => p.Tickets)
                 .ToListAsync(cancellationToken);
@@ -44,7 +46,7 @@ namespace CinemaBookingSystemDAL.Repositories
 
         public async Task<User?> GetWithTicketsAsync(string userId, CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AsNoTracking()
                 .Include(p => p.Tickets)
                 .FirstOrDefaultAsync(p => p.Id == userId, cancellationToken);

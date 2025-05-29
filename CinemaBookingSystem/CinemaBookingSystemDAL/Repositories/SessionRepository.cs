@@ -13,18 +13,20 @@ namespace CinemaBookingSystemDAL.Repositories
 {
     public class SessionRepository : GenericRepository<Session, int>, ISessionRepository
     {
-        public SessionRepository(CinemaDbContext context) : base(context) { }
+        public SessionRepository(CinemaDbContext context) : base(context) { 
+        
+        }
 
         public async Task<PagedList<Session>> GetPagedSessionsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = _dbSet.AsQueryable();
+            var query = dbSet.AsQueryable();
             return await PagedList<Session>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
         }
 
 
         public async Task<List<Session>> GetByMovieIdAsync(int movieId, CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AsNoTracking()
                 .Where(p => p.MovieId == movieId)
                 .ToListAsync(cancellationToken);
@@ -32,7 +34,7 @@ namespace CinemaBookingSystemDAL.Repositories
 
         public async Task<List<Session>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AsNoTracking()
                 .Where(p => p.HallId == hallId)
                 .ToListAsync(cancellationToken);
@@ -40,7 +42,7 @@ namespace CinemaBookingSystemDAL.Repositories
 
         public async Task<List<Session>> GetByDateRangeAsync(DateTime start, DateTime end, CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AsNoTracking()
                 .Where(p => p.StartTime >= start.ToUniversalTime() && p.StartTime <= end.ToUniversalTime())
                 .ToListAsync(cancellationToken);

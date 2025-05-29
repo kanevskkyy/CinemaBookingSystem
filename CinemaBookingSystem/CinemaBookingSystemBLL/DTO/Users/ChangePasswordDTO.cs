@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace CinemaBookingSystemBLL.DTO.Users
 {
-    public class UserUpdateDTO
+    public class ChangePasswordDTO
     {
-        public string? Name { get; set; } = string.Empty;
+        public string CurrentPassword { get; set; }
+        public string NewPassword { get; set; }
     }
 }

@@ -13,11 +13,13 @@ namespace CinemaBookingSystemDAL.Repositories
 {
     public class SeatRepository : GenericRepository<Seat, int>, ISeatRepository
     {
-        public SeatRepository(CinemaDbContext context) : base(context) { }
+        public SeatRepository(CinemaDbContext context) : base(context) { 
+        
+        }
 
         public async Task<List<Seat>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AsNoTracking()
                 .Where(p => p.HallId == hallId)
                 .ToListAsync(cancellationToken);
@@ -25,13 +27,13 @@ namespace CinemaBookingSystemDAL.Repositories
 
         public async Task<PagedList<Seat>> GetPagedSeatsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = _dbSet.AsQueryable();
+            var query = dbSet.AsQueryable();
             return await PagedList<Seat>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
         }
 
         public async Task<Seat?> GetByRowAndNumberAsync(int hallId, int rowNumber, int columnNumber, CancellationToken cancellationToken = default)
         {
-            return await _dbSet
+            return await dbSet
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p =>
                     p.HallId == hallId &&

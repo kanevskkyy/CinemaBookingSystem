@@ -10,7 +10,7 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
             if (context.Sessions.Any()) return context.Sessions.ToList();
 
             DateTime timeNow = DateTime.Now;
-            var localTime = timeNow.ToUniversalTime();
+            DateTime localTime = timeNow.ToUniversalTime();
             var sessionFaker = new Faker<Session>("en")
                 .RuleFor(p => p.MovieId, k => k.PickRandom(movieList).Id)
                 .RuleFor(p => p.HallId, k => k.PickRandom(hallList).Id)

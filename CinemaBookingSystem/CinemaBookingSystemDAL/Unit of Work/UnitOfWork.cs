@@ -12,29 +12,29 @@ namespace CinemaBookingSystemDAL.Unit_of_Work
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly CinemaDbContext _context;
+        private readonly CinemaDbContext context;
 
         public UnitOfWork(CinemaDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
-        public IMovieRepository Movies => new MovieRepository(_context);
-        public IGenreRepository Genres => new GenreRepository(_context);
-        public IHallRepository Halls => new HallRepository(_context);
-        public ISeatRepository Seats => new SeatRepository(_context);
-        public ISessionRepository Sessions => new SessionRepository(_context);
-        public ITicketRepository Tickets => new TicketRepository(_context);
-        public IUserRepository Users => new UserRepository(_context);
+        public IMovieRepository Movies => new MovieRepository(context);
+        public IGenreRepository Genres => new GenreRepository(context);
+        public IHallRepository Halls => new HallRepository(context);
+        public ISeatRepository Seats => new SeatRepository(context);
+        public ISessionRepository Sessions => new SessionRepository(context);
+        public ITicketRepository Tickets => new TicketRepository(context);
+        public IUserRepository Users => new UserRepository(context);
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.SaveChangesAsync(cancellationToken);
+            return await context.SaveChangesAsync(cancellationToken);
         }
 
         public void Dispose()
         {
-            _context.Dispose();
+            context.Dispose();
         }
     }
 }

@@ -9,52 +9,108 @@ namespace CinemaBookingSystemBLL.Services
 {
     public class MovieService : IMovieService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private IUnitOfWork unitOfWork;
 
         public MovieService(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
+            this.unitOfWork = unitOfWork;
         }
 
         public async Task<List<MovieResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var movies = await _unitOfWork.Movies.GetAllAsync(cancellationToken);
-            return movies.Select(movie => new MovieResponseDTO { Id = movie.Id, Title = movie.Title, Description = movie.Description, Duration = movie.Duration, PosterUrl = movie.PosterUrl, GenreId = movie.GenreId, Rating = movie.Rating }).ToList();
+            var movies = await unitOfWork.Movies.GetAllAsync(cancellationToken);
+            return movies.Select(movie => new MovieResponseDTO { 
+                Id = movie.Id,
+                Title = movie.Title, 
+                Description = movie.Description, 
+                Duration = movie.Duration, 
+                PosterUrl = movie.PosterUrl, 
+                GenreId = movie.GenreId, 
+                Rating = movie.Rating 
+            }).ToList();
         }
 
         public async Task<MovieResponseDTO> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var movie = await _unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
+            var movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
 
             if (movie == null) return null;
-            else return new MovieResponseDTO{ Id = movie.Id, Title = movie.Title, Description = movie.Description, Duration = movie.Duration, PosterUrl = movie.PosterUrl, GenreId = movie.GenreId, Rating = movie.Rating };
+            else
+            {
+                MovieResponseDTO result = new MovieResponseDTO { 
+                    Id = movie.Id, 
+                    Title = movie.Title, 
+                    Description = movie.Description, 
+                    Duration = movie.Duration, 
+                    PosterUrl = movie.PosterUrl, 
+                    GenreId = movie.GenreId, 
+                    Rating = movie.Rating 
+                };
+                return result;
+            }
         }
 
         public async Task<List<MovieResponseDTO>> GetByGenreAsync(int genreId, CancellationToken cancellationToken = default)
         {
-            var movies = await _unitOfWork.Movies.GetByGenreAsync(genreId, cancellationToken);
-            return movies.Select(movie => new MovieResponseDTO { Id = movie.Id, Title = movie.Title, Description = movie.Description, Duration = movie.Duration, PosterUrl = movie.PosterUrl, GenreId = movie.GenreId, Rating = movie.Rating }).ToList();
+            var movies = await unitOfWork.Movies.GetByGenreAsync(genreId, cancellationToken);
+            
+            return movies.Select(movie => new MovieResponseDTO { 
+                Id = movie.Id, 
+                Title = movie.Title, 
+                Description = movie.Description, 
+                Duration = movie.Duration, 
+                PosterUrl = movie.PosterUrl, 
+                GenreId = movie.GenreId, 
+                Rating = movie.Rating 
+            }).ToList();
         }
 
         public async Task<List<MovieResponseDTO>> GetTopRatedAsync(CancellationToken cancellationToken = default)
         {
-            var movies = await _unitOfWork.Movies.GetTopRatedAsync(cancellationToken);
-            return movies.Select(movie => new MovieResponseDTO{ Id = movie.Id, Title = movie.Title, Description = movie.Description, Duration = movie.Duration, PosterUrl = movie.PosterUrl, GenreId = movie.GenreId, Rating = movie.Rating }).ToList();
+            var movies = await unitOfWork.Movies.GetTopRatedAsync(cancellationToken);
+            
+            return movies.Select(movie => new MovieResponseDTO{ 
+                Id = movie.Id, 
+                Title = movie.Title, 
+                Description = movie.Description, 
+                Duration = movie.Duration, 
+                PosterUrl = movie.PosterUrl, 
+                GenreId = movie.GenreId, 
+                Rating = movie.Rating 
+            }).ToList();
         }
 
         public async Task<MovieResponseDTO> CreateAsync(MovieCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            Movie movie = new Movie{ Title = dto.Title, Description = dto.Description, Duration = dto.Duration, PosterUrl = dto.PosterUrl, GenreId = dto.GenreId, Rating = dto.Rating };
+            Movie movie = new Movie{ 
+                Title = dto.Title, 
+                Description = dto.Description, 
+                Duration = dto.Duration, 
+                PosterUrl = dto.PosterUrl, 
+                GenreId = dto.GenreId, 
+                Rating = dto.Rating 
+            };
 
-            await _unitOfWork.Movies.CreateAsync(movie, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.Movies.CreateAsync(movie, cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return new MovieResponseDTO { Id = movie.Id, Title = movie.Title, Description = movie.Description, Duration = movie.Duration, PosterUrl = movie.PosterUrl, GenreId = movie.GenreId, Rating = movie.Rating };
+            MovieResponseDTO result = new MovieResponseDTO
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                Description = movie.Description,
+                Duration = movie.Duration,
+                PosterUrl = movie.PosterUrl,
+                GenreId = movie.GenreId,
+                Rating = movie.Rating
+            };
+
+            return result;
         }
 
         public async Task<MovieResponseDTO> UpdateAsync(int id, MovieUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            var movie = await _unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
+            var movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
             if (movie == null) return null;
 
             movie.Title = dto.Title;
@@ -64,32 +120,44 @@ namespace CinemaBookingSystemBLL.Services
             movie.GenreId = dto.GenreId;
             movie.Rating = dto.Rating;
 
-            _unitOfWork.Movies.Update(movie);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            unitOfWork.Movies.Update(movie);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return new MovieResponseDTO { Id = movie.Id, Title = movie.Title, Description = movie.Description, Duration = movie.Duration, PosterUrl = movie.PosterUrl, GenreId = movie.GenreId, Rating = movie.Rating };
+            MovieResponseDTO result = new MovieResponseDTO
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                Description = movie.Description,
+                Duration = movie.Duration,
+                PosterUrl = movie.PosterUrl,
+                GenreId = movie.GenreId,
+                Rating = movie.Rating
+            };
+
+            return result;
         }
 
         public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var movie = await _unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
+            var movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
             if (movie == null) return false;
 
-            _unitOfWork.Movies.Delete(movie);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            unitOfWork.Movies.Delete(movie);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
         }
 
         public async Task<PagedList<MovieResponseDTO>> GetPagedMoviesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var pagedMovies = await _unitOfWork.Movies.GetPagedMoviesAsync(pageNumber, pageSize, cancellationToken);
+            var pagedMovies = await unitOfWork.Movies.GetPagedMoviesAsync(pageNumber, pageSize, cancellationToken);
             var movieDtos = pagedMovies.Select(movie => new MovieResponseDTO { Id = movie.Id, Title = movie.Title, Description = movie.Description, Duration = movie.Duration, PosterUrl = movie.PosterUrl, GenreId = movie.GenreId, Rating = movie.Rating }).ToList();
+            
             return new PagedList<MovieResponseDTO>(movieDtos, pagedMovies.TotalCount, pagedMovies.CurrentPage, pagedMovies.PageSize);
         }
 
         public async Task<PagedList<MovieResponseDTO>> GetFilteredMoviesAsync(MovieFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = _unitOfWork.Movies.GetAll();
+            var query = unitOfWork.Movies.GetAll();
 
             if (!string.IsNullOrEmpty(filter.Title)) query = query.Where(m => m.Title.ToLower().Contains(filter.Title.ToLower()));
             if (filter.GenreId.HasValue) query = query.Where(m => m.GenreId == filter.GenreId.Value);
@@ -105,26 +173,31 @@ namespace CinemaBookingSystemBLL.Services
                     case "title":
                         if (filter.SortDescending) query = query.OrderByDescending(m => m.Title);
                         else query = query.OrderBy(m => m.Title);
+                        
                         break;
 
                     case "rating":
                         if (filter.SortDescending) query = query.OrderByDescending(m => m.Rating);
                         else query = query.OrderBy(m => m.Rating);
+                        
                         break;
 
                     case "duration":
                         if (filter.SortDescending) query = query.OrderByDescending(m => m.Duration);
                         else query = query.OrderBy(m => m.Duration);
+                        
                         break;
 
                     case "genreid":
                         if (filter.SortDescending) query = query.OrderByDescending(m => m.GenreId);
                         else query = query.OrderBy(m => m.GenreId);
+                        
                         break;
 
                     default:
                         if (filter.SortDescending) query = query.OrderByDescending(m => m.Id);
                         else query = query.OrderBy(m => m.Id);
+                        
                         break;
                 }
             }

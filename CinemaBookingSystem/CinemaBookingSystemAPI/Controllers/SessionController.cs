@@ -11,11 +11,11 @@ namespace CinemaBookingSystemAPI.Controllers
     [ApiController]
     public class SessionController : ControllerBase
     {
-        private readonly ISessionService _sessionService;
+        private ISessionService sessionService;
 
         public SessionController(ISessionService sessionService)
         {
-            _sessionService = sessionService;
+            this.sessionService = sessionService;
         }
 
         [HttpGet]
@@ -23,7 +23,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
         {
-            var allSessions = await _sessionService.GetAllAsync(cancellationToken);
+            var allSessions = await sessionService.GetAllAsync(cancellationToken);
             return Ok(allSessions);
         }
 
@@ -32,7 +32,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPagedSessions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var pagedSessions = await _sessionService.GetPagedSessionsAsync(pageNumber, pageSize);
+            var pagedSessions = await sessionService.GetPagedSessionsAsync(pageNumber, pageSize);
             return Ok(pagedSessions);
         }
 
@@ -42,9 +42,8 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-            var session = await _sessionService.GetByIdAsync(id, cancellationToken);
-            if (session == null)
-                return NotFound();
+            var session = await sessionService.GetByIdAsync(id, cancellationToken);
+            if (session == null) return NotFound();
 
             return Ok(session);
         }
@@ -55,9 +54,8 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByMovieId(int movieId, CancellationToken cancellationToken)
         {
-            var sessions = await _sessionService.GetByMovieIdAsync(movieId, cancellationToken);
-            if (sessions == null || !sessions.Any())
-                return NotFound();
+            var sessions = await sessionService.GetByMovieIdAsync(movieId, cancellationToken);
+            if (sessions == null || !sessions.Any()) return NotFound();
 
             return Ok(sessions);
         }
@@ -68,9 +66,8 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByHallId(int hallId, CancellationToken cancellationToken)
         {
-            var sessions = await _sessionService.GetByHallIdAsync(hallId, cancellationToken);
-            if (sessions == null || !sessions.Any())
-                return NotFound();
+            var sessions = await sessionService.GetByHallIdAsync(hallId, cancellationToken);
+            if (sessions == null || !sessions.Any()) return NotFound();
 
             return Ok(sessions);
         }
@@ -80,7 +77,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, CancellationToken cancellationToken)
         {
-            var sessions = await _sessionService.GetByDateRangeAsync(startDate, endDate, cancellationToken);
+            var sessions = await sessionService.GetByDateRangeAsync(startDate, endDate, cancellationToken);
             return Ok(sessions);
         }
 
@@ -91,10 +88,9 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] SessionCreateDTO dto, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin"))
-                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var created = await _sessionService.CreateAsync(dto, cancellationToken);
+            var created = await sessionService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
@@ -106,12 +102,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(int id, [FromBody] SessionUpdateDTO dto, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin"))
-                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var updated = await _sessionService.UpdateAsync(id, dto, cancellationToken);
-            if (updated == null)
-                return NotFound();
+            var updated = await sessionService.UpdateAsync(id, dto, cancellationToken);
+            if (updated == null) return NotFound();
 
             return NoContent();
         }
@@ -123,12 +117,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin"))
-                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var result = await _sessionService.DeleteAsync(id, cancellationToken);
-            if (!result)
-                return NotFound();
+            var result = await sessionService.DeleteAsync(id, cancellationToken);
+            if (!result) return NotFound();
 
             return NoContent();
         }
@@ -138,7 +130,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFilteredSession([FromQuery] SessionFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            var result = await _sessionService.GetFilteredSessionsAsync(filter, pageNumber, pageSize, cancellationToken);
+            var result = await sessionService.GetFilteredSessionsAsync(filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);
         }
 

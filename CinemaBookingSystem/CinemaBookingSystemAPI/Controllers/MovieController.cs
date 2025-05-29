@@ -9,11 +9,11 @@ namespace CinemaBookingSystemAPI.Controllers
     [ApiController]
     public class MovieController : ControllerBase
     {
-        private readonly IMovieService _movieService;
+        private IMovieService movieService;
 
         public MovieController(IMovieService movieService)
         {
-            _movieService = movieService;
+            this.movieService = movieService;
         }
 
         [HttpGet]
@@ -21,7 +21,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
         {
-            var allMovies = await _movieService.GetAllAsync(cancellationToken);
+            var allMovies = await movieService.GetAllAsync(cancellationToken);
             return Ok(allMovies);
         }
 
@@ -30,7 +30,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFilteredMovies([FromQuery] MovieFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            var result = await _movieService.GetFilteredMoviesAsync(filter, pageNumber, pageSize, cancellationToken);
+            var result = await movieService.GetFilteredMoviesAsync(filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);
         }
 
@@ -39,7 +39,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPagedMovies([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var pagedMovies = await _movieService.GetPagedMoviesAsync(pageNumber, pageSize);
+            var pagedMovies = await movieService.GetPagedMoviesAsync(pageNumber, pageSize);
             return Ok(pagedMovies);
         }
 
@@ -49,8 +49,8 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-            var movie = await _movieService.GetByIdAsync(id, cancellationToken);
-            if (movie == null)  return NotFound();
+            var movie = await movieService.GetByIdAsync(id, cancellationToken);
+            if (movie == null) return NotFound();
             return Ok(movie);
         }
 
@@ -59,7 +59,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByGenre(int genreId, CancellationToken cancellationToken)
         {
-            var movies = await _movieService.GetByGenreAsync(genreId, cancellationToken);
+            var movies = await movieService.GetByGenreAsync(genreId, cancellationToken);
             return Ok(movies);
         }
 
@@ -68,7 +68,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetTopRated(CancellationToken cancellationToken)
         {
-            var movies = await _movieService.GetTopRatedAsync(cancellationToken);
+            var movies = await movieService.GetTopRatedAsync(cancellationToken);
             return Ok(movies);
         }
 
@@ -79,10 +79,9 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] MovieCreateDTO dto, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin"))
-                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var created = await _movieService.CreateAsync(dto, cancellationToken);
+            var created = await movieService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
@@ -94,10 +93,9 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(int id, [FromBody] MovieUpdateDTO dto, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin"))
-                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var updated = await _movieService.UpdateAsync(id, dto, cancellationToken);
+            var updated = await movieService.UpdateAsync(id, dto, cancellationToken);
             if (updated == null) return NotFound();
 
             return NoContent();
@@ -110,12 +108,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin"))
-                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var result = await _movieService.DeleteAsync(id, cancellationToken);
-            if (!result)
-                return NotFound();
+            var result = await movieService.DeleteAsync(id, cancellationToken);
+            if (!result) return NotFound();
 
             return NoContent();
         }

@@ -18,12 +18,13 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 
             for (int i = 0; i < 10; i++)
             {
-                hallsList.Add(new Hall
+                Hall tempHall = new Hall
                 {
                     Name = $"Hall {hallCount++}",
                     RowsAmount = hallFaker.Generate().RowsAmount,
                     SeatsPerRow = hallFaker.Generate().SeatsPerRow
-                });
+                };
+                hallsList.Add(tempHall);
             }
 
             context.Halls.AddRange(hallsList);

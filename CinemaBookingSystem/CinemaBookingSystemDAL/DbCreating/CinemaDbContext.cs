@@ -10,7 +10,10 @@ namespace CinemaBookingSystemDAL.DbCreating
 {
     public class CinemaDbContext : IdentityDbContext<User>
     {
-        public CinemaDbContext(DbContextOptions<CinemaDbContext> options) : base(options) { }
+        public CinemaDbContext(DbContextOptions<CinemaDbContext> options) : base(options)
+        {
+
+        }
 
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Hall> Halls { get; set; }

@@ -2,24 +2,24 @@
 {
     public class ErrorHandlingMiddleware
     {
-        private readonly RequestDelegate _next; 
-        private readonly ILogger<ErrorHandlingMiddleware> _logger;
+        private readonly RequestDelegate requestDelegate; 
+        private readonly ILogger<ErrorHandlingMiddleware> logger;
 
-        public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
+        public ErrorHandlingMiddleware(RequestDelegate request, ILogger<ErrorHandlingMiddleware> logger)
         {
-            _next = next;
-            _logger = logger;
+            requestDelegate = request;
+            this.logger = logger;
         }
         public async Task InvokeAsync(HttpContext context)
         {
             try
             {
-                await _next(context);
+                await requestDelegate(context);
             }
             catch (Exception ex)
             {
                 
-                _logger.LogError(ex, "Unhandled exception caught.");
+                logger.LogError(ex, "Unhandled exception caught.");
                 context.Response.StatusCode = ex switch
                 {
                     InvalidOperationException => StatusCodes.Status400BadRequest,
