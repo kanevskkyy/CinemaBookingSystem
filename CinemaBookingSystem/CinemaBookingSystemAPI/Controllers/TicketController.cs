@@ -58,14 +58,17 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(ticket);
         }
 
-        [HttpGet("by-user/{userId:int}")]
+        [HttpGet("by-user/{userId}")]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByUserId(string userId, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            string currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (currentUserId == null || (!User.IsInRole("Admin") && currentUserId != userId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
 
             var tickets = await ticketService.GetByUserIdAsync(userId, cancellationToken);
             if (tickets == null || !tickets.Any()) return NotFound();

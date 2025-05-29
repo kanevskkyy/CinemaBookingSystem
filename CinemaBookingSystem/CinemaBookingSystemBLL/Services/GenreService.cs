@@ -22,10 +22,12 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<GenreResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var genres = await unifOfWork.Genres.GetAllAsync(cancellationToken);
-            return genres.Select(p => new GenreResponseDTO
-            { 
-                Id = p.Id, 
-                Name = p.Name 
+            var orderedGenres = genres.OrderBy(g => g.Id);
+
+            return orderedGenres.Select(p => new GenreResponseDTO
+            {
+                Id = p.Id,
+                Name = p.Name
             }).ToList();
         }
 

@@ -22,11 +22,14 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<HallResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var halls = await unitOfWork.Halls.GetAllAsync(cancellationToken);
-            return halls.Select(p => new HallResponseDTO { 
-                Id = p.Id, 
-                Name = p.Name, 
-                RowsAmount = p.RowsAmount, 
-                SeatsPerRow = p.SeatsPerRow 
+            var orderedHalls = halls.OrderBy(h => h.Id);
+
+            return orderedHalls.Select(p => new HallResponseDTO
+            {
+                Id = p.Id,
+                Name = p.Name,
+                RowsAmount = p.RowsAmount,
+                SeatsPerRow = p.SeatsPerRow
             }).ToList();
         }
 

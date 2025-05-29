@@ -19,14 +19,17 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<MovieResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var movies = await unitOfWork.Movies.GetAllAsync(cancellationToken);
-            return movies.Select(movie => new MovieResponseDTO { 
+            var orderedMovies = movies.OrderBy(m => m.Id);
+
+            return orderedMovies.Select(movie => new MovieResponseDTO
+            {
                 Id = movie.Id,
-                Title = movie.Title, 
-                Description = movie.Description, 
-                Duration = movie.Duration, 
-                PosterUrl = movie.PosterUrl, 
-                GenreId = movie.GenreId, 
-                Rating = movie.Rating 
+                Title = movie.Title,
+                Description = movie.Description,
+                Duration = movie.Duration,
+                PosterUrl = movie.PosterUrl,
+                GenreId = movie.GenreId,
+                Rating = movie.Rating
             }).ToList();
         }
 
@@ -68,8 +71,9 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<MovieResponseDTO>> GetTopRatedAsync(CancellationToken cancellationToken = default)
         {
             var movies = await unitOfWork.Movies.GetTopRatedAsync(cancellationToken);
-            
-            return movies.Select(movie => new MovieResponseDTO{ 
+
+            var orderedMovies = movies.OrderBy(m => m.Id);
+            return orderedMovies.Select(movie => new MovieResponseDTO{ 
                 Id = movie.Id, 
                 Title = movie.Title, 
                 Description = movie.Description, 

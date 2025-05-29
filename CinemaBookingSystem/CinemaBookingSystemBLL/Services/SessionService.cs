@@ -62,9 +62,10 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<SessionResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var sessions = await unitOfWork.Sessions.GetAllAsync(cancellationToken);
+            var orderedSessions = sessions.OrderBy(m => m.Id);
             List<SessionResponseDTO> result = new List<SessionResponseDTO>();
 
-            foreach (var session in sessions)
+            foreach (var session in orderedSessions)
             {
                 var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
                 var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
@@ -109,9 +110,10 @@ namespace CinemaBookingSystemBLL.Services
             var sessions = await unitOfWork.Sessions.GetByMovieIdAsync(movieId, cancellationToken);
             var movieTitle = await GetMovieTitleAsync(movieId, cancellationToken);
 
+            var orderedSessions = sessions.OrderBy(m => m.Id);
             List<SessionResponseDTO> result = new List<SessionResponseDTO>();
 
-            foreach (var session in sessions)
+            foreach (var session in orderedSessions)
             {
                 var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
                 SessionResponseDTO sessionResponseDTO = new SessionResponseDTO { 
@@ -132,20 +134,20 @@ namespace CinemaBookingSystemBLL.Services
         {
             var sessions = await unitOfWork.Sessions.GetByHallIdAsync(hallId, cancellationToken);
             var hallName = await GetHallNameAsync(hallId, cancellationToken);
-
+            var orderedSessions = sessions.OrderBy(m => m.Id);
             var result = new List<SessionResponseDTO>();
 
-            foreach (var p in sessions)
+            foreach (var session in orderedSessions)
             {
-                var movieTitle = await GetMovieTitleAsync(p.MovieId, cancellationToken);
+                var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
                 SessionResponseDTO sessionResponseDTO = new SessionResponseDTO { 
-                    Id = p.Id, 
-                    MovieId = p.MovieId, 
+                    Id = session.Id, 
+                    MovieId = session.MovieId, 
                     MovieTitle = movieTitle, 
-                    HallId = p.HallId, 
+                    HallId = session.HallId, 
                     HallName = hallName, 
-                    StartTime = p.StartTime, 
-                    Price = p.Price 
+                    StartTime = session.StartTime, 
+                    Price = session.Price 
                 };
                 result.Add(sessionResponseDTO);
             }
@@ -156,9 +158,10 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<SessionResponseDTO>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
         {
             var sessions = await unitOfWork.Sessions.GetByDateRangeAsync(startDate, endDate, cancellationToken);
-            var result = new List<SessionResponseDTO>();
+            var orderedSessions = sessions.OrderBy(m => m.Id);
+            List<SessionResponseDTO> result = new List<SessionResponseDTO>();
 
-            foreach (var session in sessions)
+            foreach (var session in orderedSessions)
             {
                 var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
                 var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
