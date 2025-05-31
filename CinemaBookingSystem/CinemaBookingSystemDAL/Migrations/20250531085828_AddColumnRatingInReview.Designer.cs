@@ -3,6 +3,7 @@ using System;
 using CinemaBookingSystemDAL.DbCreating;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CinemaBookingSystemDAL.Migrations
 {
     [DbContext(typeof(CinemaDbContext))]
-    partial class CinemaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250531085828_AddColumnRatingInReview")]
+    partial class AddColumnRatingInReview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,9 +39,6 @@ namespace CinemaBookingSystemDAL.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Genres");
                 });
@@ -63,9 +63,6 @@ namespace CinemaBookingSystemDAL.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Halls");
                 });
@@ -105,9 +102,6 @@ namespace CinemaBookingSystemDAL.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.HasIndex("Title")
-                        .IsUnique();
-
                     b.ToTable("Movies");
                 });
 
@@ -145,10 +139,7 @@ namespace CinemaBookingSystemDAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews", t =>
-                        {
-                            t.HasCheckConstraint("CK_Review_Rating_Range", "\"Rating\" >= 1 AND \"Rating\" <= 5");
-                        });
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Seat", b =>

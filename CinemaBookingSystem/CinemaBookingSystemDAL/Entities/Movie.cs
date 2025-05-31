@@ -19,5 +19,6 @@ namespace CinemaBookingSystemDAL.Entities
 
         public double Rating { get; set; }
         public ICollection<Session> Sessions { get; set; } = new List<Session>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

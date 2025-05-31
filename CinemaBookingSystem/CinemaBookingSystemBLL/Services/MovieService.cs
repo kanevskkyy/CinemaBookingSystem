@@ -86,6 +86,9 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<MovieResponseDTO> CreateAsync(MovieCreateDTO dto, CancellationToken cancellationToken = default)
         {
+            var existsMovie = await unitOfWork.Movies.FindAsync(p => p.Title == dto.Title, cancellationToken);
+            if (existsMovie.Any()) throw new ArgumentException("Movie with this title already exists");
+
             Movie movie = new Movie{ 
                 Title = dto.Title, 
                 Description = dto.Description, 
@@ -116,6 +119,9 @@ namespace CinemaBookingSystemBLL.Services
         {
             var movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
             if (movie == null) return null;
+
+            var existsMovie = await unitOfWork.Movies.FindAsync(p => p.Id != id && p.Title == movie.Title, cancellationToken);
+            if (existsMovie.Any()) throw new ArgumentException("Film with this title already exists!");
 
             movie.Title = dto.Title;
             movie.Description = dto.Description;

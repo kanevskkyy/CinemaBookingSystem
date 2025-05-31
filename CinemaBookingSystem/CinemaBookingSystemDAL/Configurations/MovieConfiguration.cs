@@ -19,6 +19,9 @@ namespace CinemaBookingSystemDAL.Configurations
                 .HasMaxLength(90)
                 .IsRequired();
 
+            builder.HasIndex(p => p.Title)
+                .IsUnique();
+
             builder.Property(p => p.Description)
                 .HasMaxLength(3000)
                 .IsRequired();
@@ -35,7 +38,7 @@ namespace CinemaBookingSystemDAL.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(p => p.Genre)
-            .WithMany(g => g.Movies)
+            .WithMany(p => p.Movies)
             .HasForeignKey(p => p.GenreId)
             .OnDelete(DeleteBehavior.Cascade);
 

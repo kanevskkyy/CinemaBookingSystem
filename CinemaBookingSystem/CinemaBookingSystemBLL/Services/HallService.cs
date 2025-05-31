@@ -71,6 +71,9 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<HallResponseDTO> CreateAsync(HallCreateDTO dto, CancellationToken cancellationToken = default)
         {
+            var existsHall = await unitOfWork.Halls.FindAsync(p => p.Name == dto.Name, cancellationToken);
+            if (existsHall.Any()) throw new ArgumentException("Hall with this name already exists");
+
             Hall hall = new Hall { 
                 Name = dto.Name, 
                 RowsAmount = dto.RowAmount, 
@@ -92,6 +95,9 @@ namespace CinemaBookingSystemBLL.Services
         {
             var hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
             if (hall == null) return null;
+
+            var existingHalls = await unitOfWork.Halls.FindAsync(h => h.Name == dto.Name && h.Id != id, cancellationToken);
+            if (existingHalls.Any()) throw new ArgumentException("Hall with this name already exists");
 
             hall.Name = dto.Name;
             hall.RowsAmount = dto.RowsAmount;

@@ -17,6 +17,8 @@ namespace CinemaBookingSystemDAL.Unit_of_Work
         ISessionRepository Sessions { get; }
         ITicketRepository Tickets { get; }
         IUserRepository Users { get; }
+        IReviewRepository Review { get; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -72,7 +72,7 @@ builder.Services.AddControllers()
 
 
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<GenreCreateDTOValidator>();
+builder.Services.AddValidatorsFromAssembly(typeof(GenreCreateDTOValidator).Assembly);
 
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IHallService, HallService>();
@@ -81,6 +81,7 @@ builder.Services.AddScoped<ISeatService, SeatService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<CinemaDbContext>()

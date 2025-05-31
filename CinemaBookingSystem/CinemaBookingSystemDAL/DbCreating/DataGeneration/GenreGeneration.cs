@@ -6,7 +6,7 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
     {
         public static List<Genre> Generate(CinemaDbContext context)
         {
-            if (context.Genres.Any()) context.Genres.ToList();
+            if (context.Genres.Any()) return context.Genres.ToList();
 
             List<Genre> genreList = new List<Genre>();
             List<string> genreTypes = new List<string> { "Action", "Comedy", "Drama", "Horror", "Science Fiction", "Romance", "Thriller", "Fantasy", "Adventure", "Documentary" };
