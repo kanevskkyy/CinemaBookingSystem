@@ -74,7 +74,8 @@ namespace CinemaBookingSystemBLL.Services
             var existsHall = await unitOfWork.Halls.FindAsync(p => p.Name == dto.Name, cancellationToken);
             if (existsHall.Any()) throw new ArgumentException("Hall with this name already exists");
 
-            Hall hall = new Hall { 
+            Hall hall = new Hall 
+            { 
                 Name = dto.Name, 
                 RowsAmount = dto.RowAmount, 
                 SeatsPerRow = dto.SeatsPerRow 

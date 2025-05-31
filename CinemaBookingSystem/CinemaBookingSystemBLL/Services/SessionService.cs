@@ -35,9 +35,10 @@ namespace CinemaBookingSystemBLL.Services
 
             foreach (var session in pagedSessions)
             {
-                var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
-                var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
-                SessionResponseDTO temp = new SessionResponseDTO { 
+                string movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
+                string hallName = await GetHallNameAsync(session.HallId, cancellationToken);
+                SessionResponseDTO temp = new SessionResponseDTO
+                { 
                     Id = session.Id, 
                     MovieId = session.MovieId, 
                     MovieTitle = movieTitle, 
@@ -50,7 +51,7 @@ namespace CinemaBookingSystemBLL.Services
                 sessionDtos.Add(temp);
             }
 
-            return new PagedList<SessionResponseDTO>( sessionDtos, pagedSessions.TotalCount, pagedSessions.CurrentPage, pagedSessions.PageSize );
+            return new PagedList<SessionResponseDTO>(sessionDtos, pagedSessions.TotalCount, pagedSessions.CurrentPage, pagedSessions.PageSize );
         }
 
         private async Task<string> GetHallNameAsync(int hallId, CancellationToken cancellationToken)
@@ -67,10 +68,11 @@ namespace CinemaBookingSystemBLL.Services
 
             foreach (var session in orderedSessions)
             {
-                var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
-                var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
+                string movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
+                string hallName = await GetHallNameAsync(session.HallId, cancellationToken);
                 
-                SessionResponseDTO tempSessionDTO = new SessionResponseDTO { 
+                SessionResponseDTO tempSessionDTO = new SessionResponseDTO 
+                { 
                     Id = session.Id, 
                     MovieId = session.MovieId, 
                     MovieTitle = movieTitle, 
@@ -93,7 +95,8 @@ namespace CinemaBookingSystemBLL.Services
             var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
             var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
             
-            SessionResponseDTO sessionResponseDTO = new SessionResponseDTO { 
+            SessionResponseDTO sessionResponseDTO = new SessionResponseDTO 
+            { 
                 Id = session.Id, 
                 MovieId = session.MovieId, 
                 MovieTitle = movieTitle, 
@@ -115,8 +118,9 @@ namespace CinemaBookingSystemBLL.Services
 
             foreach (var session in orderedSessions)
             {
-                var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
-                SessionResponseDTO sessionResponseDTO = new SessionResponseDTO { 
+                string hallName = await GetHallNameAsync(session.HallId, cancellationToken);
+                SessionResponseDTO sessionResponseDTO = new SessionResponseDTO
+                { 
                     Id = session.Id, 
                     MovieId = session.MovieId, 
                     MovieTitle = movieTitle, 
@@ -132,15 +136,16 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<SessionResponseDTO>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default)
         {
-            var sessions = await unitOfWork.Sessions.GetByHallIdAsync(hallId, cancellationToken);
-            var hallName = await GetHallNameAsync(hallId, cancellationToken);
+            List<Session> sessions = await unitOfWork.Sessions.GetByHallIdAsync(hallId, cancellationToken);
+            string hallName = await GetHallNameAsync(hallId, cancellationToken);
             var orderedSessions = sessions.OrderBy(m => m.Id);
-            var result = new List<SessionResponseDTO>();
+            List<SessionResponseDTO> result = new List<SessionResponseDTO>();
 
             foreach (var session in orderedSessions)
             {
                 var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
-                SessionResponseDTO sessionResponseDTO = new SessionResponseDTO { 
+                SessionResponseDTO sessionResponseDTO = new SessionResponseDTO 
+                { 
                     Id = session.Id, 
                     MovieId = session.MovieId, 
                     MovieTitle = movieTitle, 
@@ -163,9 +168,10 @@ namespace CinemaBookingSystemBLL.Services
 
             foreach (var session in orderedSessions)
             {
-                var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
-                var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
-                SessionResponseDTO sessionResponseDTO = new SessionResponseDTO { 
+                string movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
+                string hallName = await GetHallNameAsync(session.HallId, cancellationToken);
+                SessionResponseDTO sessionResponseDTO = new SessionResponseDTO 
+                { 
                     Id = session.Id, 
                     MovieId = session.MovieId, 
                     MovieTitle = movieTitle, 
@@ -182,19 +188,22 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<SessionResponseDTO> CreateAsync(SessionCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            Session session = new Session { 
+            Session session = new Session 
+            { 
                 MovieId = dto.MovieId, 
                 HallId = dto.HallId, 
                 StartTime = dto.StartTime, 
                 Price = dto.Price
             };
+
             await unitOfWork.Sessions.CreateAsync(session, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
-            var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
+            string movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
+            string hallName = await GetHallNameAsync(session.HallId, cancellationToken);
             
-            SessionResponseDTO sessionResponseDTO = new SessionResponseDTO { 
+            SessionResponseDTO sessionResponseDTO = new SessionResponseDTO 
+            { 
                 Id = session.Id, 
                 MovieId = session.MovieId, 
                 MovieTitle = movieTitle, 
@@ -217,10 +226,11 @@ namespace CinemaBookingSystemBLL.Services
             unitOfWork.Sessions.Update(session);
             await unitOfWork.SaveChangesAsync(cancellationToken);
             
-            var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
-            var hallName = await GetHallNameAsync(session.HallId, cancellationToken);
+            string movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
+            string hallName = await GetHallNameAsync(session.HallId, cancellationToken);
             
-            SessionResponseDTO sessionResponseDTO = new SessionResponseDTO { 
+            SessionResponseDTO sessionResponseDTO = new SessionResponseDTO 
+            { 
                 Id = session.Id, 
                 MovieId = session.MovieId, 
                 MovieTitle = movieTitle, 
@@ -234,7 +244,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var session = await unitOfWork.Sessions.GetByIdAsync(id, cancellationToken);
+            Session session = await unitOfWork.Sessions.GetByIdAsync(id, cancellationToken);
             if (session == null) return false;
 
             unitOfWork.Sessions.Delete(session);
@@ -291,10 +301,8 @@ namespace CinemaBookingSystemBLL.Services
             }
             else query = query.OrderBy(s => s.Id);
 
-            var totalCount = await query.CountAsync(cancellationToken);
-            var items = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+
+            var dtoQuery = query
                 .Select(s => new SessionResponseDTO
                 {
                     Id = s.Id,
@@ -304,10 +312,10 @@ namespace CinemaBookingSystemBLL.Services
                     Price = s.Price,
                     MovieTitle = s.Movie.Title,
                     HallName = s.Hall.Name
-                })
-                .ToListAsync(cancellationToken);
+                });
 
-            return new PagedList<SessionResponseDTO>(items, totalCount, pageNumber, pageSize);
+            PagedList<SessionResponseDTO> pagedList = await PagedList<SessionResponseDTO>.ToPagedListAsync(dtoQuery,pageNumber, pageSize, cancellationToken);
+            return pagedList;
         }
     }
 }

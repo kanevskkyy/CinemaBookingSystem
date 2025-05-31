@@ -26,7 +26,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> ChangePasswordAsync(string userId, ChangePasswordDTO dto, CancellationToken cancellationToken)
         {
-            var user = await userManager.FindByIdAsync(userId);
+            User user = await userManager.FindByIdAsync(userId);
             if (user == null) return false;
 
             var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
@@ -79,7 +79,6 @@ namespace CinemaBookingSystemBLL.Services
             return result;
         }
 
-
         public async Task<UserResponseDTO?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
             var user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
@@ -102,7 +101,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
         {
-            var user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
+            User user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
             if (user == null) return false;
 
             unitOfWork.Users.Delete(user);
@@ -112,7 +111,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<UserResponseDTO?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            var user = await unitOfWork.Users.GetByEmailAsync(email, cancellationToken);
+            User user = await unitOfWork.Users.GetByEmailAsync(email, cancellationToken);
             if (user == null) return null;
 
             var roles = await userManager.GetRolesAsync(user);
@@ -135,7 +134,7 @@ namespace CinemaBookingSystemBLL.Services
         }
         public async Task<UserResponseDTO> UpdateAsync(string id, UserUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            var user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
+            User user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
             if (user == null) throw new KeyNotFoundException("User not found");
 
             user.UserName = dto.Name;
@@ -144,7 +143,7 @@ namespace CinemaBookingSystemBLL.Services
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             var roles = await userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault();
+            string role = roles.FirstOrDefault();
 
             UserResponseDTO result = new UserResponseDTO
             {
@@ -162,11 +161,8 @@ namespace CinemaBookingSystemBLL.Services
         {
             var query = unitOfWork.Users.GetAll();
 
-            if (!string.IsNullOrWhiteSpace(filter.Name))
-                query = query.Where(u => u.UserName.ToLower().Contains(filter.Name.ToLower()));
-            if (!string.IsNullOrWhiteSpace(filter.Email))
-                query = query.Where(u => u.Email.ToLower().Contains(filter.Email.ToLower()));
-
+            if (!string.IsNullOrWhiteSpace(filter.Name)) query = query.Where(u => u.UserName.ToLower().Contains(filter.Name.ToLower()));
+            if (!string.IsNullOrWhiteSpace(filter.Email)) query = query.Where(u => u.Email.ToLower().Contains(filter.Email.ToLower()));
            
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
@@ -187,8 +183,8 @@ namespace CinemaBookingSystemBLL.Services
             }
             else query = query.OrderBy(u => u.Id);
 
-            var totalCount = await query.CountAsync(cancellationToken);
-            var users = await query.ToListAsync(cancellationToken);
+            int totalCount = await query.CountAsync(cancellationToken);
+            List<User> users = await query.ToListAsync(cancellationToken);
 
             List<UserResponseDTO> filteredList = new List<UserResponseDTO>();
 
@@ -219,8 +215,9 @@ namespace CinemaBookingSystemBLL.Services
                 else filteredList.OrderBy(u => u.Role).ToList();
             }
 
-            var pagedItems = filteredList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-
+            var pagedItems = filteredList.Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
             return new PagedList<UserResponseDTO>(pagedItems, filteredList.Count, pageNumber, pageSize);
         }
     }

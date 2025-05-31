@@ -25,7 +25,8 @@ namespace CinemaBookingSystemBLL.Services
             var seats = await unitOfWork.Seats.GetAllAsync(cancellationToken);
             var orderedSeats = seats.OrderBy(m => m.Id);
 
-            return orderedSeats.Select(p => new SeatResponseDTO { 
+            return orderedSeats.Select(p => new SeatResponseDTO 
+            { 
                 Id = p.Id, 
                 HallId = p.HallId, 
                 RowNumber = p.RowNumber, 
@@ -36,7 +37,8 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<PagedList<SeatResponseDTO>> GetPagedSeatsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             var paginated = await unitOfWork.Seats.GetPagedSeatsAsync(pageNumber, pageSize, cancellationToken);
-            var seats = paginated.Select(seat => new SeatResponseDTO { 
+            var seats = paginated.Select(seat => new SeatResponseDTO
+            { 
                 Id = seat.Id, 
                 HallId = seat.HallId, 
                 RowNumber = seat.RowNumber, 
@@ -54,7 +56,8 @@ namespace CinemaBookingSystemBLL.Services
             if (seat == null) return null;
             else
             {
-                SeatResponseDTO result = new SeatResponseDTO { 
+                SeatResponseDTO result = new SeatResponseDTO 
+                { 
                     Id = seat.Id, 
                     HallId = seat.HallId, 
                     RowNumber = seat.RowNumber, 
@@ -68,7 +71,8 @@ namespace CinemaBookingSystemBLL.Services
         {
             var seats = await unitOfWork.Seats.GetByHallIdAsync(hallId, cancellationToken);
             
-            return seats.Select(p => new SeatResponseDTO { 
+            return seats.Select(p => new SeatResponseDTO
+            { 
                 Id = p.Id, 
                 HallId = p.HallId, 
                 RowNumber = p.RowNumber, 
@@ -96,7 +100,8 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<SeatResponseDTO> CreateAsync(SeatCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            Seat seat = new Seat { 
+            Seat seat = new Seat
+            { 
                 HallId = dto.HallId, 
                 RowNumber = dto.RowNumber, 
                 SeatNumber = dto.SeatNumber 
@@ -104,7 +109,8 @@ namespace CinemaBookingSystemBLL.Services
             await unitOfWork.Seats.CreateAsync(seat, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
            
-            SeatResponseDTO result = new SeatResponseDTO { 
+            SeatResponseDTO result = new SeatResponseDTO 
+            { 
                 Id = seat.Id, 
                 HallId = seat.HallId, 
                 RowNumber = seat.RowNumber, 

@@ -35,7 +35,9 @@ namespace CinemaBookingSystemBLL.Services
         {
             var genre = await unifOfWork.Genres.GetByIdAsync(id, cancellationToken);
             if (genre == null) return null;
-            GenreResponseDTO result = new GenreResponseDTO {
+            
+            GenreResponseDTO result = new GenreResponseDTO 
+            {
                 Id = genre.Id,
                 Name = genre.Name
             };
@@ -46,14 +48,18 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<GenreResponseDTO> CreateAsync(GenreCreateDTO dto, CancellationToken cancellationToken = default)
         {
             var existingGenre = await unifOfWork.Genres.FindAsync(g => g.Name == dto.Name, cancellationToken);
-            if (existingGenre != null) throw new ArgumentException("Genre with this name already exists!");
+            if (existingGenre.Any()) throw new ArgumentException("Genre with this name already exists!");
 
-            Genre genre = new Genre { 
+            Genre genre = new Genre 
+            { 
                 Name = dto.Name 
             };
+            
             await unifOfWork.Genres.CreateAsync(genre, cancellationToken);
             await unifOfWork.SaveChangesAsync(cancellationToken);
-            GenreResponseDTO result = new GenreResponseDTO { 
+            
+            GenreResponseDTO result = new GenreResponseDTO
+            { 
                 Id = genre.Id, 
                 Name = genre.Name 
             };
@@ -67,7 +73,7 @@ namespace CinemaBookingSystemBLL.Services
             if (genre == null) return null;
 
             var existingGenre = await unifOfWork.Genres.FindAsync(g => g.Name == dto.Name && g.Id != id, cancellationToken);
-            if (existingGenre != null) throw new ArgumentException("Genre with this name already exists!");
+            if (existingGenre.Any()) throw new ArgumentException("Genre with this name already exists!");
 
             genre.Name = dto.Name;
             unifOfWork.Genres.Update(genre);

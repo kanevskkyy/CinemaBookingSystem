@@ -40,7 +40,8 @@ namespace CinemaBookingSystemBLL.Services
             if (movie == null) return null;
             else
             {
-                MovieResponseDTO result = new MovieResponseDTO { 
+                MovieResponseDTO result = new MovieResponseDTO 
+                { 
                     Id = movie.Id, 
                     Title = movie.Title, 
                     Description = movie.Description, 
@@ -57,7 +58,8 @@ namespace CinemaBookingSystemBLL.Services
         {
             var movies = await unitOfWork.Movies.GetByGenreAsync(genreId, cancellationToken);
             
-            return movies.Select(movie => new MovieResponseDTO { 
+            return movies.Select(movie => new MovieResponseDTO
+            { 
                 Id = movie.Id, 
                 Title = movie.Title, 
                 Description = movie.Description, 
@@ -73,7 +75,8 @@ namespace CinemaBookingSystemBLL.Services
             var movies = await unitOfWork.Movies.GetTopRatedAsync(cancellationToken);
 
             var orderedMovies = movies.OrderBy(m => m.Id);
-            return orderedMovies.Select(movie => new MovieResponseDTO{ 
+            return orderedMovies.Select(movie => new MovieResponseDTO
+            { 
                 Id = movie.Id, 
                 Title = movie.Title, 
                 Description = movie.Description, 
@@ -89,7 +92,8 @@ namespace CinemaBookingSystemBLL.Services
             var existsMovie = await unitOfWork.Movies.FindAsync(p => p.Title == dto.Title, cancellationToken);
             if (existsMovie.Any()) throw new ArgumentException("Movie with this title already exists");
 
-            Movie movie = new Movie{ 
+            Movie movie = new Movie
+            { 
                 Title = dto.Title, 
                 Description = dto.Description, 
                 Duration = dto.Duration, 
@@ -212,11 +216,8 @@ namespace CinemaBookingSystemBLL.Services
                 }
             }
 
-            var totalCount = await query.CountAsync(cancellationToken);
-
-            var items = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+            int totalCount = await query.CountAsync(cancellationToken);
+            var dtoQuery = query
                 .Select(movie => new MovieResponseDTO
                 {
                     Id = movie.Id,
@@ -226,10 +227,10 @@ namespace CinemaBookingSystemBLL.Services
                     PosterUrl = movie.PosterUrl,
                     GenreId = movie.GenreId,
                     Rating = movie.Rating
-                })
-                .ToListAsync(cancellationToken);
+                });
 
-            return new PagedList<MovieResponseDTO>(items, totalCount, pageNumber, pageSize);
+            var pagedResult = await PagedList<MovieResponseDTO>.ToPagedListAsync(dtoQuery, pageNumber, pageSize, cancellationToken);
+            return pagedResult;
         }
 
     }

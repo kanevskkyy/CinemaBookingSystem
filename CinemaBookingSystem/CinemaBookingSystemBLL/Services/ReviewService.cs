@@ -27,34 +27,63 @@ namespace CinemaBookingSystemBLL.Services
             var reviews = await unitOfWork.Review.GetAllAsync(cancellationToken);
             var ordered = reviews.OrderBy(r => r.Id);
 
-            return ordered.Select(MapToResponseDto).ToList();
+            return ordered.Select(review => new ReviewResponseDTO
+            {
+                Id = review.Id,
+                MovieId = review.MovieId,
+                UserId = review.UserId,
+                Text = review.Text,
+                Rating = review.Rating,
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            }).ToList();
         }
 
         public async Task<ReviewResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
             if (review == null) return null;
-            return MapToResponseDto(review);
+            
+            ReviewResponseDTO result = new ReviewResponseDTO
+            {
+                Id = review.Id,
+                MovieId = review.MovieId,
+                UserId = review.UserId,
+                Text = review.Text,
+                Rating = review.Rating,
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            };
+            
+            return result;
         }
 
         public async Task<List<ReviewResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
-            var reviews = await unitOfWork.Review
-                .GetAll()
-                .Where(r => r.UserId == userId)
-                .ToListAsync(cancellationToken);
+            var reviews = await unitOfWork.Review.GetByUserIdAsync(userId, cancellationToken);
 
-            return reviews.Select(MapToResponseDto).ToList();
+            return reviews.Select(review => new ReviewResponseDTO
+            {
+                Id = review.Id,
+                MovieId = review.MovieId,
+                UserId = review.UserId,
+                Text = review.Text,
+                Rating = review.Rating,
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            }).ToList();
         }
 
         public async Task<List<ReviewResponseDTO>> GetByMovieIdAsync(int movieId, CancellationToken cancellationToken = default)
         {
-            var reviews = await unitOfWork.Review
-                .GetAll()
-                .Where(r => r.MovieId == movieId)
-                .ToListAsync(cancellationToken);
+            var reviews = await unitOfWork.Review.GetByMovieIdAsync(movieId, cancellationToken);
 
-            return reviews.Select(MapToResponseDto).ToList();
+            return reviews.Select(review => new ReviewResponseDTO
+            {
+                Id = review.Id,
+                MovieId = review.MovieId,
+                UserId = review.UserId,
+                Text = review.Text,
+                Rating = review.Rating,
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            }).ToList();
         }
 
         public async Task<ReviewResponseDTO> CreateAsync(CreateReviewDTO dto, CancellationToken cancellationToken = default)
@@ -65,12 +94,23 @@ namespace CinemaBookingSystemBLL.Services
                 UserId = dto.UserId,
                 Text = dto.Text,
                 Rating = dto.Rating,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow.ToUniversalTime()
             };
 
             await unitOfWork.Review.CreateAsync(review, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            return MapToResponseDto(review);
+            
+            ReviewResponseDTO result = new ReviewResponseDTO
+            {
+                Id = review.Id,
+                MovieId = review.MovieId,
+                UserId = review.UserId,
+                Text = review.Text,
+                Rating = review.Rating,
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            };
+            
+            return result;
         }
 
         public async Task<ReviewResponseDTO?> UpdateAsync(int id, UpdateReviewDTO dto, CancellationToken cancellationToken = default)
@@ -84,7 +124,16 @@ namespace CinemaBookingSystemBLL.Services
             unitOfWork.Review.Update(review);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return MapToResponseDto(review);
+            ReviewResponseDTO result = new ReviewResponseDTO
+            {
+                Id = review.Id,
+                MovieId = review.MovieId,
+                UserId = review.UserId,
+                Text = review.Text,
+                Rating = review.Rating,
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            };
+            return result;
         }
 
         public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -109,69 +158,71 @@ namespace CinemaBookingSystemBLL.Services
             if (filter.CreatedAfter.HasValue) query = query.Where(r => r.CreatedAt >= filter.CreatedAfter.Value);
             if (filter.CreatedBefore.HasValue) query = query.Where(r => r.CreatedAt <= filter.CreatedBefore.Value);
 
-            query = query.OrderByDescending(r => r.CreatedAt);
+            query = query.OrderByDescending(r => r.CreatedAt.ToUniversalTime());
 
             int totalCount = await query.CountAsync(cancellationToken);
-            var items = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync(cancellationToken);
+            var items = await PagedList<Review>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
 
-            var dtos = items.Select(MapToResponseDto).ToList();
-            return new PagedList<ReviewResponseDTO>(dtos, totalCount, pageNumber, pageSize);
-        }
-
-        public async Task<List<ReviewResponseDTO>> GetTop10BestReviewsAsync(CancellationToken cancellationToken = default)
-        {
-            var reviews = await unitOfWork.Review
-                .GetAll()
-                .OrderByDescending(r => r.Rating)
-                .ThenBy(r => r.CreatedAt)
-                .Take(10)
-                .ToListAsync(cancellationToken);
-
-            return reviews.Select(MapToResponseDto).ToList();
-        }
-
-        public async Task<List<ReviewResponseDTO>> GetTop10WorstReviewsAsync(CancellationToken cancellationToken = default)
-        {
-            var reviews = await unitOfWork.Review
-                .GetAll()
-                .OrderBy(r => r.Rating)
-                .ThenBy(r => r.CreatedAt)
-                .Take(10)
-                .ToListAsync(cancellationToken);
-
-            return reviews.Select(MapToResponseDto).ToList();
-        }
-
-        private ReviewResponseDTO MapToResponseDto(Review review)
-        {
-            ReviewResponseDTO reviewResponseDTO = new ReviewResponseDTO
+            var result = items.Select(review => new ReviewResponseDTO
             {
                 Id = review.Id,
                 MovieId = review.MovieId,
                 UserId = review.UserId,
                 Text = review.Text,
                 Rating = review.Rating,
-                CreatedAt = review.CreatedAt
-            };
-            return reviewResponseDTO;
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            }).ToList();
+
+            return new PagedList<ReviewResponseDTO>(result, totalCount, pageNumber, pageSize);
+        }
+
+        public async Task<List<ReviewResponseDTO>> GetTop10BestReviewsAsync(CancellationToken cancellationToken = default)
+        {
+            var reviews = await unitOfWork.Review.GetTop10BestReviewsAsync(cancellationToken);
+
+            return reviews.Select(review => new ReviewResponseDTO
+            {
+                Id = review.Id,
+                MovieId = review.MovieId,
+                UserId = review.UserId,
+                Text = review.Text,
+                Rating = review.Rating,
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            }).ToList();
+        }
+
+        public async Task<List<ReviewResponseDTO>> GetTop10WorstReviewsAsync(CancellationToken cancellationToken = default)
+        {
+            var reviews = await unitOfWork.Review.GetTop10WorstReviewsAsync(cancellationToken);
+
+            return reviews.Select(review => new ReviewResponseDTO
+            {
+                Id = review.Id,
+                MovieId = review.MovieId,
+                UserId = review.UserId,
+                Text = review.Text,
+                Rating = review.Rating,
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            }).ToList();
         }
 
         public async Task<PagedList<ReviewResponseDTO>> GetPagedReviewsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             var query = unitOfWork.Review.GetAll();
             int totalCount = await query.CountAsync(cancellationToken);
-            
-            var items = await query
-                .OrderByDescending(r => r.CreatedAt)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync(cancellationToken);
+            var pagedItems = await PagedList<Review>.ToPagedListAsync(query.OrderByDescending(r => r.CreatedAt), pageNumber, pageSize, cancellationToken);
 
-            var dtos = items.Select(MapToResponseDto).ToList();
-            return new PagedList<ReviewResponseDTO>(dtos, totalCount, pageNumber, pageSize);
+            var reviews = pagedItems.Select(review => new ReviewResponseDTO
+            {
+                Id = review.Id,
+                MovieId = review.MovieId,
+                UserId = review.UserId,
+                Text = review.Text,
+                Rating = review.Rating,
+                CreatedAt = review.CreatedAt.ToUniversalTime()
+            }).ToList();
+
+            return new PagedList<ReviewResponseDTO>(reviews, totalCount, pageNumber, pageSize);
         }
     }
 }
