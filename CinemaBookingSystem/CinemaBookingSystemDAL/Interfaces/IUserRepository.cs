@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CinemaBookingSystemDAL.Entities;
-using CinemaBookingSystemDAL.Pagination;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
@@ -14,6 +13,5 @@ namespace CinemaBookingSystemDAL.Interfaces
         Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<List<User>> GetAllWithTicketsAsync(CancellationToken cancellationToken = default);
         Task<User?> GetWithTicketsAsync(string userId, CancellationToken cancellationToken = default);
-        Task<PagedList<User>> GetPagedUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     }
 }

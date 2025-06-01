@@ -7,9 +7,10 @@ using CinemaBookingSystemBLL.DTO.Users;
 using Microsoft.EntityFrameworkCore;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
-using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
 using Microsoft.AspNetCore.Identity;
+using CinemaBookingSystemBLL.Pagination;
+using CinemaBookingSystemBLL.Filters;
 
 namespace CinemaBookingSystemBLL.Services
 {
@@ -35,10 +36,11 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<UserResponseDTO>> GetPagedUsersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var pagedUsers = await unitOfWork.Users.GetPagedUsersAsync(pageNumber, pageSize, cancellationToken);
+            var query = unitOfWork.Users.GetAll();
+            PagedList<User> pagedUsers = await PagedList<User>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
             List<User> userList = pagedUsers.ToList();
-            List<UserResponseDTO> result = new List<UserResponseDTO>();
 
+            List<UserResponseDTO> result = new List<UserResponseDTO>();
             foreach (User user in userList)
             {
                 var roles = await userManager.GetRolesAsync(user);

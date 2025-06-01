@@ -1,4 +1,5 @@
 ﻿using CinemaBookingSystemBLL.DTO.Movies;
+using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

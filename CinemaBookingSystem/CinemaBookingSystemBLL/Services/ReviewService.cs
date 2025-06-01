@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Review;
+using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemDAL.Entities;
-using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -148,7 +150,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<ReviewResponseDTO>> GetFilteredReviewsAsync(FilterReviewDto filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Review.GetAll().AsQueryable();
+            var query = unitOfWork.Review.GetAll();
 
             if (!string.IsNullOrEmpty(filter.UserId)) query = query.Where(r => r.UserId == filter.UserId);
             if (filter.MovieId.HasValue) query = query.Where(r => r.MovieId == filter.MovieId.Value);
@@ -160,9 +162,7 @@ namespace CinemaBookingSystemBLL.Services
 
             query = query.OrderByDescending(r => r.CreatedAt.ToUniversalTime());
 
-            int totalCount = await query.CountAsync(cancellationToken);
-            var items = await PagedList<Review>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
-
+            PagedList<Review> items = await PagedList<Review>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
             var result = items.Select(review => new ReviewResponseDTO
             {
                 Id = review.Id,
@@ -173,7 +173,7 @@ namespace CinemaBookingSystemBLL.Services
                 CreatedAt = review.CreatedAt.ToUniversalTime()
             }).ToList();
 
-            return new PagedList<ReviewResponseDTO>(result, totalCount, pageNumber, pageSize);
+            return new PagedList<ReviewResponseDTO>(result, items.TotalCount, items.CurrentPage, items.PageSize);
         }
 
         public async Task<List<ReviewResponseDTO>> GetTop10BestReviewsAsync(CancellationToken cancellationToken = default)
@@ -208,11 +208,10 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<ReviewResponseDTO>> GetPagedReviewsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Review.GetAll();
-            int totalCount = await query.CountAsync(cancellationToken);
-            var pagedItems = await PagedList<Review>.ToPagedListAsync(query.OrderByDescending(r => r.CreatedAt), pageNumber, pageSize, cancellationToken);
+            var query = unitOfWork.Review.GetAll().OrderByDescending(r => r.CreatedAt);
+            PagedList<Review> pagedReviews = await PagedList<Review>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
 
-            var reviews = pagedItems.Select(review => new ReviewResponseDTO
+            List<ReviewResponseDTO> reviewDtos = pagedReviews.Select(review => new ReviewResponseDTO
             {
                 Id = review.Id,
                 MovieId = review.MovieId,
@@ -222,7 +221,7 @@ namespace CinemaBookingSystemBLL.Services
                 CreatedAt = review.CreatedAt.ToUniversalTime()
             }).ToList();
 
-            return new PagedList<ReviewResponseDTO>(reviews, totalCount, pageNumber, pageSize);
+            return new PagedList<ReviewResponseDTO>(reviewDtos, pagedReviews.TotalCount, pagedReviews.CurrentPage, pagedReviews.PageSize);
         }
     }
 }

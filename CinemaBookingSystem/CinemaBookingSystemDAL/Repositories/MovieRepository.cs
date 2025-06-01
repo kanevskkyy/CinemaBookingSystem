@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CinemaBookingSystemDAL.DbCreating;
 using CinemaBookingSystemDAL.Entities;
 using CinemaBookingSystemDAL.Interfaces;
-using CinemaBookingSystemDAL.Pagination;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
@@ -22,12 +22,6 @@ namespace CinemaBookingSystemDAL.Repositories
                 .AsNoTracking()
                 .Where(p => p.GenreId == genreId)
                 .ToListAsync(cancellationToken);
-        }
-
-        public async Task<PagedList<Movie>> GetPagedMoviesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
-        {
-            var query = dbSet.AsQueryable();
-            return await PagedList<Movie>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
         }
 
         public async Task<List<Movie>> GetTopRatedAsync(CancellationToken cancellationToken = default)

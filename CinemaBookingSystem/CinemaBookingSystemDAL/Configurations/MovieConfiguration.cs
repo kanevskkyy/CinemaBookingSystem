@@ -22,6 +22,12 @@ namespace CinemaBookingSystemDAL.Configurations
             builder.HasIndex(p => p.Title)
                 .IsUnique();
 
+            builder.HasIndex(p => p.GenreId);
+
+            builder.HasIndex(p => p.Duration);
+            
+            builder.HasIndex(p => p.Rating);
+
             builder.Property(p => p.Description)
                 .HasMaxLength(3000)
                 .IsRequired();

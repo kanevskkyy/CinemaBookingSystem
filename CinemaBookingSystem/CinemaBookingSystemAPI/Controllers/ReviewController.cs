@@ -1,7 +1,8 @@
 ﻿using System.Security.Claims;
 using CinemaBookingSystemBLL.DTO.Review;
+using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
-using CinemaBookingSystemDAL.Pagination;
+using CinemaBookingSystemBLL.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

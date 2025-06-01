@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Seats;
 using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemDAL.Entities;
-using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
 
 namespace CinemaBookingSystemBLL.Services
@@ -36,18 +36,19 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<SeatResponseDTO>> GetPagedSeatsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var paginated = await unitOfWork.Seats.GetPagedSeatsAsync(pageNumber, pageSize, cancellationToken);
-            var seats = paginated.Select(seat => new SeatResponseDTO
-            { 
-                Id = seat.Id, 
-                HallId = seat.HallId, 
-                RowNumber = seat.RowNumber, 
+            var query = unitOfWork.Seats.GetAll();
+            PagedList<Seat> pagedSeats = await PagedList<Seat>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
+
+            List<SeatResponseDTO> seatDtos = pagedSeats.Select(seat => new SeatResponseDTO
+            {
+                Id = seat.Id,
+                HallId = seat.HallId,
+                RowNumber = seat.RowNumber,
                 SeatNumber = seat.SeatNumber
             }).ToList();
-            
-            return new PagedList<SeatResponseDTO>(seats, paginated.TotalCount, paginated.CurrentPage, paginated.PageSize);
-        }
 
+            return new PagedList<SeatResponseDTO>(seatDtos, pagedSeats.TotalCount, pagedSeats.CurrentPage, pagedSeats.PageSize);
+        }
 
         public async Task<SeatResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {

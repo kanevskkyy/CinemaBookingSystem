@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CinemaBookingSystemBLL.DTO.Sessions
+namespace CinemaBookingSystemBLL.Filters
 {
     public class SessionFilterDTO
     {

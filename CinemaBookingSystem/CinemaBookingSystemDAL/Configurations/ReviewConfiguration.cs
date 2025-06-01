@@ -19,6 +19,16 @@ namespace CinemaBookingSystemDAL.Configurations
                 .IsRequired()
                 .HasMaxLength(1000);
 
+            builder.HasIndex(p => p.UserId);
+
+            builder.HasIndex(p => p.CreatedAt);
+
+            builder.HasIndex(p => p.Text);
+
+            builder.HasIndex(p => p.Rating);
+
+            builder.HasIndex(p => p.MovieId);
+
             builder.Property(p => p.CreatedAt)
                 .IsRequired();
 

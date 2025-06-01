@@ -18,6 +18,14 @@ namespace CinemaBookingSystemDAL.Configurations
             builder.Property(p => p.StartTime)
                    .IsRequired();
 
+            builder.HasIndex(p => p.MovieId);
+
+            builder.HasIndex(p => p.HallId);
+
+            builder.HasIndex(p => p.StartTime);
+
+            builder.HasIndex(p => p.Price);
+
             builder.Property(p => p.Price)
                    .IsRequired();
 

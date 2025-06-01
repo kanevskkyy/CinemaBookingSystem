@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using CinemaBookingSystemBLL.DTO.Tickets;
 using CinemaBookingSystemBLL.DTO.Users;
+using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemBLL.Services;
 using Microsoft.AspNetCore.Authorization;

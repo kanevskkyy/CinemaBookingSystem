@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Movies;
-using CinemaBookingSystemDAL.Pagination;
+using CinemaBookingSystemBLL.Filters;
+using CinemaBookingSystemBLL.Pagination;
 
 namespace CinemaBookingSystemBLL.Interfaces
 {

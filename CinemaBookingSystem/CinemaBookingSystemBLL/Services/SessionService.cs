@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.DTO.Sessions;
+using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemDAL.Entities;
-using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,28 +31,28 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<SessionResponseDTO>> GetPagedSessionsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var pagedSessions = await unitOfWork.Sessions.GetPagedSessionsAsync(pageNumber, pageSize, cancellationToken);
-            List<SessionResponseDTO> sessionDtos = new List<SessionResponseDTO>();
+            var query = unitOfWork.Sessions.GetAll();
+            PagedList<Session> pagedSessions = await PagedList<Session>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
+            List<SessionResponseDTO> sessionDto = new List<SessionResponseDTO>();
 
             foreach (var session in pagedSessions)
             {
                 string movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
                 string hallName = await GetHallNameAsync(session.HallId, cancellationToken);
-                SessionResponseDTO temp = new SessionResponseDTO
-                { 
-                    Id = session.Id, 
-                    MovieId = session.MovieId, 
-                    MovieTitle = movieTitle, 
-                    HallId = session.HallId, 
-                    HallName = hallName, 
-                    StartTime = session.StartTime, 
-                    Price = session.Price 
-                };
 
-                sessionDtos.Add(temp);
+                sessionDto.Add(new SessionResponseDTO
+                {
+                    Id = session.Id,
+                    MovieId = session.MovieId,
+                    MovieTitle = movieTitle,
+                    HallId = session.HallId,
+                    HallName = hallName,
+                    StartTime = session.StartTime,
+                    Price = session.Price
+                });
             }
 
-            return new PagedList<SessionResponseDTO>(sessionDtos, pagedSessions.TotalCount, pagedSessions.CurrentPage, pagedSessions.PageSize );
+            return new PagedList<SessionResponseDTO>(sessionDto, pagedSessions.TotalCount, pagedSessions.CurrentPage, pagedSessions.PageSize);
         }
 
         private async Task<string> GetHallNameAsync(int hallId, CancellationToken cancellationToken)
@@ -143,7 +144,7 @@ namespace CinemaBookingSystemBLL.Services
 
             foreach (var session in orderedSessions)
             {
-                var movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
+                string movieTitle = await GetMovieTitleAsync(session.MovieId, cancellationToken);
                 SessionResponseDTO sessionResponseDTO = new SessionResponseDTO 
                 { 
                     Id = session.Id, 
@@ -300,7 +301,6 @@ namespace CinemaBookingSystemBLL.Services
                 }
             }
             else query = query.OrderBy(s => s.Id);
-
 
             var dtoQuery = query
                 .Select(s => new SessionResponseDTO

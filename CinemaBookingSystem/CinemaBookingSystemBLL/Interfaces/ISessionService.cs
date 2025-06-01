@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.DTO.Sessions;
+using CinemaBookingSystemBLL.Filters;
+using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemDAL.Entities;
-using CinemaBookingSystemDAL.Pagination;
 
 namespace CinemaBookingSystemBLL.Interfaces
 {

@@ -6,9 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using CinemaBookingSystemBLL.DTO.Sessions;
 using CinemaBookingSystemBLL.DTO.Tickets;
+using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemDAL.Entities;
-using CinemaBookingSystemDAL.Pagination;
 using CinemaBookingSystemDAL.Unit_of_Work;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,8 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<TicketResponseDTO>> GetPagedTicketsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var pagedTickets = await unitOfWork.Tickets.GetPagedTicketsAsync(pageNumber, pageSize, cancellationToken);
+            var query = unitOfWork.Tickets.GetAll();
+            PagedList<Ticket> pagedTickets = await PagedList<Ticket>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
             List<TicketResponseDTO> result = new List<TicketResponseDTO>();
 
             foreach (var ticket in pagedTickets)
@@ -36,7 +38,7 @@ namespace CinemaBookingSystemBLL.Services
                 Seat seat = await unitOfWork.Seats.GetByIdAsync(ticket.SeatId, cancellationToken);
                 string movieTitle = await GetMovieTitleBySessionAsync(session, cancellationToken);
 
-                TicketResponseDTO tempResponseDTO = new TicketResponseDTO
+                result.Add(new TicketResponseDTO
                 {
                     Id = ticket.Id,
                     UserId = ticket.UserId,
@@ -47,9 +49,7 @@ namespace CinemaBookingSystemBLL.Services
                     SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}",
                     PurchaseTime = ticket.PurchaseTime.ToUniversalTime(),
                     IsPaid = ticket.IsPaid
-                };
-
-                result.Add(tempResponseDTO);
+                });
             }
 
             return new PagedList<TicketResponseDTO>(result, pagedTickets.TotalCount, pagedTickets.CurrentPage, pagedTickets.PageSize);
