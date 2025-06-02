@@ -11,18 +11,21 @@ using CinemaBookingSystemDAL.Unit_of_Work;
 using Microsoft.AspNetCore.Identity;
 using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemBLL.Filters;
+using AutoMapper;
 
 namespace CinemaBookingSystemBLL.Services
 {
     public class UserService : IUserService
     {
         private IUnitOfWork unitOfWork;
-        private UserManager<User> userManager; 
+        private UserManager<User> userManager;
+        private IMapper mapper;
 
-        public UserService(IUnitOfWork unitOfWork, UserManager<User> userManager)
+        public UserService(IUnitOfWork unitOfWork, UserManager<User> userManager, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
             this.userManager = userManager;
+            this.mapper = mapper;
         }
 
         public async Task<bool> ChangePasswordAsync(string userId, ChangePasswordDTO dto, CancellationToken cancellationToken)
@@ -38,7 +41,7 @@ namespace CinemaBookingSystemBLL.Services
         {
             var query = unitOfWork.Users.GetAll();
             PagedList<User> pagedUsers = await PagedList<User>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
-            List<User> userList = pagedUsers.ToList();
+            List<User> userList = pagedUsers.Items;
 
             List<UserResponseDTO> result = new List<UserResponseDTO>();
             foreach (User user in userList)
@@ -46,13 +49,8 @@ namespace CinemaBookingSystemBLL.Services
                 var roles = await userManager.GetRolesAsync(user);
                 string role = roles.FirstOrDefault();
 
-                UserResponseDTO temp = new UserResponseDTO
-                {
-                    Id = user.Id,
-                    Name = user.UserName,
-                    Email = user.Email,
-                    Role = role
-                };
+                UserResponseDTO temp = mapper.Map<UserResponseDTO>(user);
+                temp.Role = role;
                 result.Add(temp);
             }
 
@@ -69,13 +67,8 @@ namespace CinemaBookingSystemBLL.Services
                 var roles = await userManager.GetRolesAsync(user);
                 string role = roles.FirstOrDefault();
 
-                UserResponseDTO temp = new UserResponseDTO
-                {
-                    Id = user.Id,
-                    Name = user.UserName,
-                    Email = user.Email,
-                    Role = role
-                };
+                UserResponseDTO temp = mapper.Map<UserResponseDTO>(user);
+                temp.Role = role;
                 result.Add(temp);
             }
             return result;
@@ -83,19 +76,14 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<UserResponseDTO?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            var user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
+            User user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
             if (user == null) return null;
 
             var roles = await userManager.GetRolesAsync(user);
             string role = roles.FirstOrDefault();
-            
-            UserResponseDTO result = new UserResponseDTO
-            {
-                Id = user.Id,
-                Name = user.UserName,
-                Email = user.Email,
-                Role = role
-            };
+
+            UserResponseDTO result = mapper.Map<UserResponseDTO>(user);
+            result.Role = role;
 
             return result;
         }
@@ -119,13 +107,8 @@ namespace CinemaBookingSystemBLL.Services
             var roles = await userManager.GetRolesAsync(user);
             string role = roles.FirstOrDefault();
 
-            UserResponseDTO result = new UserResponseDTO
-            {
-                Id = user.Id,
-                Name = user.UserName,
-                Email = user.Email,
-                Role = role
-            };
+            UserResponseDTO result = mapper.Map<UserResponseDTO>(user);
+            result.Role = role;
 
             return result;
         }
@@ -147,13 +130,8 @@ namespace CinemaBookingSystemBLL.Services
             var roles = await userManager.GetRolesAsync(user);
             string role = roles.FirstOrDefault();
 
-            UserResponseDTO result = new UserResponseDTO
-            {
-                Id = user.Id,
-                Name = user.UserName,
-                Email = user.Email,
-                Role = role
-            };
+            UserResponseDTO result = mapper.Map<UserResponseDTO>(user);
+            result.Role = role;
 
             return result;
         }
@@ -193,20 +171,15 @@ namespace CinemaBookingSystemBLL.Services
             foreach (User user in users)
             {
                 var roles = await userManager.GetRolesAsync(user);
-                var userRole = roles.FirstOrDefault()?.ToLower();
+                string userRole = roles.FirstOrDefault()?.ToLower();
 
                 if (!string.IsNullOrWhiteSpace(filter.Role))
                 {
                     if (userRole != filter.Role.ToLower()) continue;
                 }
 
-                UserResponseDTO temp = new UserResponseDTO
-                {
-                    Id = user.Id,
-                    Name = user.UserName,
-                    Email = user.Email,
-                    Role = userRole
-                };
+                UserResponseDTO temp = mapper.Map<UserResponseDTO>(user);
+                temp.Role = userRole;
 
                 filteredList.Add(temp);
             }

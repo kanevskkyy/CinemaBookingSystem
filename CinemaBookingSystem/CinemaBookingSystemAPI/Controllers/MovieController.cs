@@ -1,6 +1,7 @@
 ﻿using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,13 +37,14 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         [HttpGet("paginated")]
-        [ProducesResponseType(typeof(List<MovieResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedList<MovieResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPagedMovies([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var pagedMovies = await movieService.GetPagedMoviesAsync(pageNumber, pageSize);
             return Ok(pagedMovies);
         }
+
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(MovieResponseDTO), StatusCodes.Status200OK)]

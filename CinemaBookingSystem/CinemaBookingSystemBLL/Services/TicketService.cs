@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using CinemaBookingSystemBLL.DTO.Sessions;
 using CinemaBookingSystemBLL.DTO.Tickets;
 using CinemaBookingSystemBLL.Filters;
@@ -19,96 +20,37 @@ namespace CinemaBookingSystemBLL.Services
     public class TicketService : ITicketService
     {
         private IUnitOfWork unitOfWork;
+        private IMapper mapper;
 
-        public TicketService(IUnitOfWork unitOfWork)
+        public TicketService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
         }
 
         public async Task<PagedList<TicketResponseDTO>> GetPagedTicketsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Tickets.GetAll();
+            var query = unitOfWork.Tickets.GetAllWithDetails();
             PagedList<Ticket> pagedTickets = await PagedList<Ticket>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
-            List<TicketResponseDTO> result = new List<TicketResponseDTO>();
 
-            foreach (var ticket in pagedTickets)
-            {
-                User user = await unitOfWork.Users.GetByIdAsync(ticket.UserId, cancellationToken);
-                Session session = await unitOfWork.Sessions.GetByIdAsync(ticket.SessionId, cancellationToken);
-                Seat seat = await unitOfWork.Seats.GetByIdAsync(ticket.SeatId, cancellationToken);
-                string movieTitle = await GetMovieTitleBySessionAsync(session, cancellationToken);
-
-                result.Add(new TicketResponseDTO
-                {
-                    Id = ticket.Id,
-                    UserId = ticket.UserId,
-                    UserName = user.UserName,
-                    SessionId = ticket.SessionId,
-                    SessionMovieTitle = movieTitle,
-                    SeatId = ticket.SeatId,
-                    SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}",
-                    PurchaseTime = ticket.PurchaseTime.ToUniversalTime(),
-                    IsPaid = ticket.IsPaid
-                });
-            }
+            List<TicketResponseDTO> result = mapper.Map<List<TicketResponseDTO>>(pagedTickets.Items);
 
             return new PagedList<TicketResponseDTO>(result, pagedTickets.TotalCount, pagedTickets.CurrentPage, pagedTickets.PageSize);
         }
 
         public async Task<List<TicketResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var tickets = await unitOfWork.Tickets.GetAllAsync(cancellationToken);
-            var orderedTickets = tickets.OrderBy(m => m.Id);
-            List<TicketResponseDTO> result = new List<TicketResponseDTO>();
-            
-            foreach (var ticket in orderedTickets)
-            {
-                User user = await unitOfWork.Users.GetByIdAsync(ticket.UserId, cancellationToken);
-                Session session = await unitOfWork.Sessions.GetByIdAsync(ticket.SessionId, cancellationToken);
-                Seat seat = await unitOfWork.Seats.GetByIdAsync(ticket.SeatId, cancellationToken);
-                string movieTitle = await GetMovieTitleBySessionAsync(session, cancellationToken);
-                
-                TicketResponseDTO ticketResponseDTO = new TicketResponseDTO 
-                {
-                    Id = ticket.Id, 
-                    UserId = ticket.UserId, 
-                    UserName = user.UserName, 
-                    SessionId = ticket.SessionId, 
-                    SessionMovieTitle = movieTitle, 
-                    SeatId = ticket.SeatId, 
-                    SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}", 
-                    PurchaseTime = ticket.PurchaseTime.ToUniversalTime(),
-                    IsPaid = ticket.IsPaid
-                };
+            List<Ticket> tickets = await unitOfWork.Tickets.GetAllWithDetails().ToListAsync(cancellationToken);
 
-                result.Add(ticketResponseDTO);
-            }
-            return result;
+            return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
 
         public async Task<TicketResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(id, cancellationToken);
+            Ticket ticket = await unitOfWork.Tickets.GetByIdWithDetailsAsync(id, cancellationToken);
             if (ticket == null) return null;
 
-            User user = await unitOfWork.Users.GetByIdAsync(ticket.UserId, cancellationToken);
-            Session session = await unitOfWork.Sessions.GetByIdAsync(ticket.SessionId, cancellationToken);
-            Seat seat = await unitOfWork.Seats.GetByIdAsync(ticket.SeatId, cancellationToken);
-            string movieTitle = await GetMovieTitleBySessionAsync(session, cancellationToken);
-            
-            TicketResponseDTO ticketResponseDTO = new TicketResponseDTO 
-            { 
-                Id = ticket.Id, 
-                UserId = ticket.UserId, 
-                UserName = user.UserName, 
-                SessionId = ticket.SessionId, 
-                SessionMovieTitle = movieTitle, 
-                SeatId = ticket.SeatId, 
-                SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}", 
-                PurchaseTime = ticket.PurchaseTime.ToUniversalTime(),
-                IsPaid = ticket.IsPaid
-            };
-            return ticketResponseDTO;
+            return mapper.Map<TicketResponseDTO>(ticket);
         }
 
         public async Task<TicketResponseDTO> CreateAsync(string userId, TicketCreateDTO dto, CancellationToken cancellationToken = default)
@@ -125,30 +67,15 @@ namespace CinemaBookingSystemBLL.Services
             await unitOfWork.Tickets.CreateAsync(ticket, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            Ticket createdTicket = await unitOfWork.Tickets.GetByIdAsync(ticket.Id, cancellationToken);
+            Ticket createdTicket = await unitOfWork.Tickets.GetByIdWithDetailsAsync(ticket.Id, cancellationToken);
+
             if (createdTicket == null) throw new InvalidOperationException("Failed to retrieve the created ticket.");
 
-            User user = await unitOfWork.Users.GetByIdAsync(createdTicket.UserId, cancellationToken);
-            Session session = await unitOfWork.Sessions.GetByIdAsync(createdTicket.SessionId, cancellationToken);
-            Seat seat = await unitOfWork.Seats.GetByIdAsync(createdTicket.SeatId, cancellationToken);
-            Movie movie = await unitOfWork.Movies.GetByIdAsync(session.MovieId, cancellationToken);
-
-            return new TicketResponseDTO
-            {
-                Id = createdTicket.Id,
-                UserId = createdTicket.UserId,
-                UserName = user.UserName,
-                SessionId = createdTicket.SessionId,
-                SessionMovieTitle = movie.Title,
-                SeatId = createdTicket.SeatId,
-                SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}",
-                PurchaseTime = createdTicket.PurchaseTime,
-                IsPaid = createdTicket.IsPaid
-            };
+            return mapper.Map<TicketResponseDTO>(createdTicket);
         }
         public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var ticket = await unitOfWork.Tickets.GetByIdAsync(id, cancellationToken);
+            Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(id, cancellationToken);
             if (ticket == null) return false;
 
             unitOfWork.Tickets.Delete(ticket);
@@ -158,99 +85,24 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<TicketResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
-            var tickets = await unitOfWork.Tickets.GetByUserIdAsync(userId, cancellationToken);
-            var orderedTickets = tickets.OrderBy(m => m.Id);
+            List<Ticket> tickets = await unitOfWork.Tickets.GetByUserIdAsync(userId, cancellationToken);
 
-            List<TicketResponseDTO> result = new List<TicketResponseDTO>();
-            foreach (var ticket in orderedTickets)
-            {
-                User user = await unitOfWork.Users.GetByIdAsync(ticket.UserId, cancellationToken);
-                Session session = await unitOfWork.Sessions.GetByIdAsync(ticket.SessionId, cancellationToken);
-                Seat seat = await unitOfWork.Seats.GetByIdAsync(ticket.SeatId, cancellationToken);
-                string movieTitle = await GetMovieTitleBySessionAsync(session, cancellationToken);
-
-                TicketResponseDTO ticketResponseDTO = new TicketResponseDTO
-                {
-                    Id = ticket.Id,
-                    UserId = ticket.UserId,
-                    UserName = user.UserName,
-                    SessionId = ticket.SessionId,
-                    SessionMovieTitle = movieTitle,
-                    SeatId = ticket.SeatId,
-                    SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}",
-                    PurchaseTime = ticket.PurchaseTime.ToUniversalTime()
-                };
-
-                result.Add(ticketResponseDTO);
-            }
-            return result;
+            return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
+
 
         public async Task<List<TicketResponseDTO>> GetBySessionIdAsync(int sessionId, CancellationToken cancellationToken = default)
         {
-            var tickets = await unitOfWork.Tickets.GetBySessionIdAsync(sessionId, cancellationToken);
-            var orderedTickets = tickets.OrderBy(m => m.Id);
+            List<Ticket> tickets = await unitOfWork.Tickets.GetBySessionIdAsync(sessionId, cancellationToken);
 
-            List<TicketResponseDTO> result = new List<TicketResponseDTO>();
-            foreach (var ticket in orderedTickets)
-            {
-                User user = await unitOfWork.Users.GetByIdAsync(ticket.UserId, cancellationToken);
-                Session session = await unitOfWork.Sessions.GetByIdAsync(ticket.SessionId, cancellationToken);
-                Seat seat = await unitOfWork.Seats.GetByIdAsync(ticket.SeatId, cancellationToken);
-                string movieTitle = await GetMovieTitleBySessionAsync(session, cancellationToken);
-
-                TicketResponseDTO ticketResponseDTO = new TicketResponseDTO
-                {
-                    Id = ticket.Id,
-                    UserId = ticket.UserId,
-                    UserName = user.UserName,
-                    SessionId = ticket.SessionId,
-                    SessionMovieTitle = movieTitle,
-                    SeatId = ticket.SeatId,
-                    SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}",
-                    PurchaseTime = ticket.PurchaseTime.ToUniversalTime()
-                };
-
-                result.Add(ticketResponseDTO);
-            }
-            return result;
+            return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
 
         public async Task<List<TicketResponseDTO>> GetBySeatIdAsync(int seatId, CancellationToken cancellationToken = default)
         {
-            var tickets = await unitOfWork.Tickets.GetBySeatIdAsync(seatId, cancellationToken);
-            var orderedTickets = tickets.OrderBy(m => m.Id);
+            List<Ticket> tickets = await unitOfWork.Tickets.GetBySeatIdAsync(seatId, cancellationToken);
 
-            List<TicketResponseDTO> result = new List<TicketResponseDTO>();
-            foreach (var ticket in orderedTickets)
-            {
-                User user = await unitOfWork.Users.GetByIdAsync(ticket.UserId, cancellationToken);
-                Session session = await unitOfWork.Sessions.GetByIdAsync(ticket.SessionId, cancellationToken);
-                Seat seat = await unitOfWork.Seats.GetByIdAsync(ticket.SeatId, cancellationToken);
-                string movieTitle = await GetMovieTitleBySessionAsync(session, cancellationToken);
-
-                TicketResponseDTO ticketResponseDTO = new TicketResponseDTO
-                {
-                    Id = ticket.Id,
-                    UserId = ticket.UserId,
-                    UserName = user.UserName,
-                    SessionId = ticket.SessionId,
-                    SessionMovieTitle = movieTitle,
-                    SeatId = ticket.SeatId,
-                    SeatInfo = $"Row {seat.RowNumber} Seat {seat.SeatNumber}",
-                    PurchaseTime = ticket.PurchaseTime.ToUniversalTime()
-                };
-
-                result.Add(ticketResponseDTO);
-            }
-            return result;
-        }
-
-        private async Task<string> GetMovieTitleBySessionAsync(Session? session, CancellationToken cancellationToken)
-        {
-            if (session == null) return "Unknown";
-            Movie movie = await unitOfWork.Movies.GetByIdAsync(session.MovieId, cancellationToken);
-            return movie.Title;
+            return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
 
         public async Task<PagedList<TicketResponseDTO>> GetFilteredTicketsAsync(TicketFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
@@ -300,25 +152,25 @@ namespace CinemaBookingSystemBLL.Services
             }
             else query = query.OrderBy(t => t.Id);
 
-            var dtoQuery = query
-                .Select(t => new TicketResponseDTO
-                {
-                    Id = t.Id,
-                    UserId = t.UserId,
-                    SessionId = t.SessionId,
-                    SeatId = t.SeatId,
-                    SessionMovieTitle = t.Session.Movie.Title,
-                    PurchaseTime = t.PurchaseTime,
-                    UserName = t.User.UserName,
-                    SeatInfo = $"Row: {t.Seat.RowNumber}, Seat: {t.Seat.SeatNumber}"
-                });
+            var projectedQuery = query.Select(t => new TicketResponseDTO
+            {
+                Id = t.Id,
+                UserId = t.UserId,
+                UserName = t.User.UserName,
+                SessionId = t.SessionId,
+                SessionMovieTitle = t.Session.Movie.Title,
+                SeatId = t.SeatId,
+                SeatInfo = $"Row {t.Seat.RowNumber} Seat {t.Seat.SeatNumber}",
+                PurchaseTime = t.PurchaseTime,
+                IsPaid = t.IsPaid
+            });
 
-            PagedList<TicketResponseDTO> pagedList = await PagedList<TicketResponseDTO>.ToPagedListAsync(dtoQuery, pageNumber, pageSize, cancellationToken);
+            PagedList<TicketResponseDTO> pagedList = await PagedList<TicketResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
             return pagedList;
         }
         public async Task<bool> ConfirmPaymentAsync(int ticketId, CancellationToken cancellationToken = default)
         {
-            var ticket = await unitOfWork.Tickets.GetByIdAsync(ticketId, cancellationToken);
+            Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(ticketId, cancellationToken);
             if (ticket == null) return false;
 
             ticket.IsPaid = true;

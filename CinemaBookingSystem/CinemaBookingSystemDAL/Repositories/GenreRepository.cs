@@ -23,6 +23,7 @@ namespace CinemaBookingSystemDAL.Repositories
                 .AsNoTracking()
                 .Include(p => p.Movies)
                 .Select(p => new { p.Name, MovieCount = p.Movies.Count })
+                .OrderBy(p => p.Name)
                 .ToDictionaryAsync(p => p.Name, g => g.MovieCount, cancellationToken);
         }
 

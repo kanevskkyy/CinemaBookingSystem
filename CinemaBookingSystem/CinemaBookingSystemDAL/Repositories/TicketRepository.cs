@@ -16,11 +16,38 @@ namespace CinemaBookingSystemDAL.Repositories
         
         }
 
+        public async Task<Ticket?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await context.Tickets
+                .AsNoTracking()
+                .Include(t => t.User)
+                .Include(t => t.Session)
+                .ThenInclude(s => s.Movie)
+                .Include(t => t.Seat)
+                .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+        }
+
+        public IQueryable<Ticket> GetAllWithDetails()
+        {
+            return dbSet
+                .AsNoTracking()
+                .Include(t => t.User)
+                .Include(t => t.Session)
+                .ThenInclude(s => s.Movie)
+                .Include(t => t.Seat)
+                .OrderBy(p => p.Id);
+        }
+
         public async Task<List<Ticket>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AsNoTracking()
-                .Where(p => p.UserId == userId)
+                .Where(t => t.UserId == userId)
+                .Include(t => t.User)
+                .Include(t => t.Session)
+                .ThenInclude(s => s.Movie)
+                .Include(t => t.Seat)
+                .OrderBy(p => p.Id)
                 .ToListAsync(cancellationToken);
         }
 
@@ -28,7 +55,13 @@ namespace CinemaBookingSystemDAL.Repositories
         {
             return await dbSet
                 .AsNoTracking()
-                .Where(p => p.SessionId == sessionId)
+                .Where(t => t.SessionId == sessionId)
+                .Include(t => t.User)
+                .Include(t => t.Session)
+                .ThenInclude(s => s.Movie)
+                .Include(t => t.Seat)
+                .OrderBy(t => t.Id)
+                .OrderBy(p => p.Id)
                 .ToListAsync(cancellationToken);
         }
 
@@ -36,7 +69,12 @@ namespace CinemaBookingSystemDAL.Repositories
         {
             return await dbSet
                 .AsNoTracking()
-                .Where(p => p.SeatId == seatId)
+                .Where(t => t.SeatId == seatId)
+                .Include(t => t.User)
+                .Include(t => t.Session)
+                .ThenInclude(s => s.Movie)
+                .Include(t => t.Seat)
+                .OrderBy(t => t.Id)
                 .ToListAsync(cancellationToken);
         }
     }

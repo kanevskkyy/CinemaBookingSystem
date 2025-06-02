@@ -1,13 +1,8 @@
 ﻿using CinemaBookingSystemBLL.DTO.Authorization;
-using CinemaBookingSystemDAL.Entities;
-using Microsoft.AspNetCore.Identity;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using CinemaBookingSystemBLL.DTO.Users;
 using Microsoft.AspNetCore.Authorization;
+using CinemaBookingSystemBLL.Interfaces;
 
 namespace CinemaBookingSystemAPI.Controllers
 {
@@ -15,106 +10,50 @@ namespace CinemaBookingSystemAPI.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private UserManager<User> userManager;
-        private IConfiguration configuration;
-        private SignInManager<User> signInManager;
-
-        public AuthController(UserManager<User> userManager, IConfiguration configuration, SignInManager<User> signInManager)
+        private IAuthService service;
+        public AuthController(IAuthService authService)
         {
-            this.userManager = userManager;
-            this.configuration = configuration;
-            this.signInManager = signInManager;
+            service = authService;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDTO dto)
+        public async Task<IActionResult> Login([FromBody] LoginDTO dto)
         {
-            var user = await userManager.FindByEmailAsync(dto.Email);
-            if (user == null) return Unauthorized("Invalid credentials");
-
-            var result = await signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-            if (!result.Succeeded) return Unauthorized("Invalid credentials");
-
-            var token = GenerateJwtToken(user);
-            return Ok(new { Token = token });
+            var (accessToken, refreshToken) = await service.LoginAsync(dto);
+            return Ok(new { 
+                Token = accessToken, 
+                RefreshToken = refreshToken 
+            });
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserCreateDTO dto)
+        public async Task<IActionResult> Register([FromBody] UserCreateDTO dto)
         {
-            User user = new User
-            {
-                Email = dto.Email,
-                UserName = dto.Name
-            };
-
-            var result = await userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(e => e.Description);
-                return BadRequest(new { Errors = errors });
-            }
-
-            await userManager.AddToRoleAsync(user, "Customer");
-
-            string token = GenerateJwtToken(user);
-            return Ok(new { Token = token });
+            var (accessToken, refreshToken) = await service.RegisterAsync(dto);
+            return Ok(new { 
+                Token = accessToken, 
+                RefreshToken = refreshToken 
+            });
         }
 
-        [HttpPost("admin/create-user")]
+        [HttpPost("create")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateUserByAdmin(UserCreateDTO dto)
+        public async Task<IActionResult> CreateUserByAdmin([FromBody] UserCreateDTO dto)
         {
-            string role = dto.Role?.Trim();
-
-            if (role != "Admin" && role != "Customer") return BadRequest(new { Error = "Role must be either 'Admin' or 'Customer'." });
-
-            User user = new User
-            {
-                Email = dto.Email,
-                UserName = dto.Name
-            };
-
-            var result = await userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(e => e.Description);
-                return BadRequest(new { Errors = errors });
-            }
-
-            await userManager.AddToRoleAsync(user, role);
-            
-            return Ok(new { Message = "User created successfully" });
+            var result = await service.CreateUserByAdminAsync(dto);
+            return Ok(new { 
+                Message = result 
+            });
         }
 
-        private string GenerateJwtToken(User user)
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] TokenRefreshRequest dto)
         {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email)
-            };
-
-            var roles = userManager.GetRolesAsync(user).Result;
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddDays(7);
-
-            var token = new JwtSecurityToken(
-                configuration["Jwt:Issuer"],
-                configuration["Jwt:Audience"],
-                claims,
-                expires: expires,
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var (accessToken, refreshToken) = await service.RefreshTokenAsync(dto);
+            return Ok(new { 
+                Token = accessToken, 
+                RefreshToken = refreshToken 
+            });
         }
     }
 }

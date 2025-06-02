@@ -11,5 +11,6 @@ namespace CinemaBookingSystemDAL.Entities
     {
         public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

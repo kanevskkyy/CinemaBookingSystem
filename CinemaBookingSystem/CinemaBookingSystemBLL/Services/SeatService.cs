@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using CinemaBookingSystemBLL.DTO.Seats;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemBLL.Pagination;
@@ -14,10 +15,12 @@ namespace CinemaBookingSystemBLL.Services
     public class SeatService : ISeatService
     {
         private IUnitOfWork unitOfWork;
+        private IMapper mapper;
 
-        public SeatService(IUnitOfWork unitOfWork)
+        public SeatService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
         }
 
         public async Task<List<SeatResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -25,125 +28,66 @@ namespace CinemaBookingSystemBLL.Services
             var seats = await unitOfWork.Seats.GetAllAsync(cancellationToken);
             var orderedSeats = seats.OrderBy(m => m.Id);
 
-            return orderedSeats.Select(p => new SeatResponseDTO 
-            { 
-                Id = p.Id, 
-                HallId = p.HallId, 
-                RowNumber = p.RowNumber, 
-                SeatNumber = p.SeatNumber
-            }).ToList();
+            return mapper.Map<List<SeatResponseDTO>>(orderedSeats);
         }
 
         public async Task<PagedList<SeatResponseDTO>> GetPagedSeatsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             var query = unitOfWork.Seats.GetAll();
             PagedList<Seat> pagedSeats = await PagedList<Seat>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
-
-            List<SeatResponseDTO> seatDtos = pagedSeats.Select(seat => new SeatResponseDTO
-            {
-                Id = seat.Id,
-                HallId = seat.HallId,
-                RowNumber = seat.RowNumber,
-                SeatNumber = seat.SeatNumber
-            }).ToList();
+            List<SeatResponseDTO> seatDtos = mapper.Map<List<SeatResponseDTO>>(pagedSeats.Items);
 
             return new PagedList<SeatResponseDTO>(seatDtos, pagedSeats.TotalCount, pagedSeats.CurrentPage, pagedSeats.PageSize);
         }
 
         public async Task<SeatResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var seat = await unitOfWork.Seats.GetByIdAsync(id, cancellationToken);
-
+            Seat seat = await unitOfWork.Seats.GetByIdAsync(id, cancellationToken);
             if (seat == null) return null;
-            else
-            {
-                SeatResponseDTO result = new SeatResponseDTO 
-                { 
-                    Id = seat.Id, 
-                    HallId = seat.HallId, 
-                    RowNumber = seat.RowNumber, 
-                    SeatNumber = seat.SeatNumber 
-                };
-                return result;
-            }
+
+            return mapper.Map<SeatResponseDTO>(seat);
         }
 
         public async Task<List<SeatResponseDTO>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default)
         {
             var seats = await unitOfWork.Seats.GetByHallIdAsync(hallId, cancellationToken);
-            
-            return seats.Select(p => new SeatResponseDTO
-            { 
-                Id = p.Id, 
-                HallId = p.HallId, 
-                RowNumber = p.RowNumber, 
-                SeatNumber = p.SeatNumber 
-            }).ToList();
+            return mapper.Map<List<SeatResponseDTO>>(seats);
         }
 
         public async Task<SeatResponseDTO?> GetByRowAndNumberAsync(int hallId, int rowNumber, int seatNumber, CancellationToken cancellationToken = default)
         {
-            var seat = await unitOfWork.Seats.GetByRowAndNumberAsync(hallId, rowNumber, seatNumber, cancellationToken);
-            
+            Seat? seat = await unitOfWork.Seats.GetByRowAndNumberAsync(hallId, rowNumber, seatNumber, cancellationToken);
             if (seat == null) return null;
-            else
-            {
-                SeatResponseDTO result = new SeatResponseDTO
-                {
-                    Id = seat.Id,
-                    HallId = seat.HallId,
-                    RowNumber = seat.RowNumber,
-                    SeatNumber = seat.SeatNumber
-                };
-                return result;
-            }
+
+            return mapper.Map<SeatResponseDTO>(seat);
         }
 
         public async Task<SeatResponseDTO> CreateAsync(SeatCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            Seat seat = new Seat
-            { 
-                HallId = dto.HallId, 
-                RowNumber = dto.RowNumber, 
-                SeatNumber = dto.SeatNumber 
-            };
+            Seat seat = mapper.Map<Seat>(dto);
+
             await unitOfWork.Seats.CreateAsync(seat, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-           
-            SeatResponseDTO result = new SeatResponseDTO 
-            { 
-                Id = seat.Id, 
-                HallId = seat.HallId, 
-                RowNumber = seat.RowNumber, 
-                SeatNumber = seat.SeatNumber 
-            };
-            return result;
+
+            return mapper.Map<SeatResponseDTO>(seat);
         }
 
         public async Task<SeatResponseDTO?> UpdateAsync(int id, SeatUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            var seat = await unitOfWork.Seats.GetByIdAsync(id, cancellationToken);
+            Seat seat = await unitOfWork.Seats.GetByIdAsync(id, cancellationToken);
             if (seat == null) return null;
 
-            seat.RowNumber = dto.RowNumber;
-            seat.SeatNumber = dto.SeatNumber;
+            mapper.Map(dto, seat);
 
             unitOfWork.Seats.Update(seat);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            SeatResponseDTO result = new SeatResponseDTO
-            {
-                Id = seat.Id,
-                HallId = seat.HallId,
-                RowNumber = seat.RowNumber,
-                SeatNumber = seat.SeatNumber
-            };
-            return result;
+            return mapper.Map<SeatResponseDTO>(seat);
         }
 
         public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var seat = await unitOfWork.Seats.GetByIdAsync(id, cancellationToken);
+            Seat seat = await unitOfWork.Seats.GetByIdAsync(id, cancellationToken);
             if (seat == null) return false;
 
             unitOfWork.Seats.Delete(seat);

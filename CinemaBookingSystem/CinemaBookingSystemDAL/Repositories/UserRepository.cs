@@ -34,6 +34,7 @@ namespace CinemaBookingSystemDAL.Repositories
             return await dbSet
                 .AsNoTracking()
                 .Include(p => p.Tickets)
+                .OrderBy(p => p.Id)
                 .ToListAsync(cancellationToken);
         }
 
@@ -42,6 +43,7 @@ namespace CinemaBookingSystemDAL.Repositories
             return await dbSet
                 .AsNoTracking()
                 .Include(p => p.Tickets)
+                .OrderBy(p => p.Id)
                 .FirstOrDefaultAsync(p => p.Id == userId, cancellationToken);
         }
     }

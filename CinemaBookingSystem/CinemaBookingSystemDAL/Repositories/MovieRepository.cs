@@ -21,6 +21,7 @@ namespace CinemaBookingSystemDAL.Repositories
             return await dbSet
                 .AsNoTracking()
                 .Where(p => p.GenreId == genreId)
+                .OrderBy(p => p.Id)
                 .ToListAsync(cancellationToken);
         }
 

@@ -15,7 +15,7 @@ namespace CinemaBookingSystemBLL.Validations.Halls
             RuleFor(p => p.Name).NotEmpty().WithMessage("Name cannot be empty!")
                 .MaximumLength(60).WithMessage("Hall name length must not exceed 60 characters.");
 
-            RuleFor(p => p.RowAmount).GreaterThan(0).WithMessage("Row amount must be greater than 0");
+            RuleFor(p => p.RowsAmount).GreaterThan(0).WithMessage("Row amount must be greater than 0");
 
             RuleFor(p => p.SeatsPerRow).GreaterThan(0).WithMessage("Seats per row must be greater than 0");
         }

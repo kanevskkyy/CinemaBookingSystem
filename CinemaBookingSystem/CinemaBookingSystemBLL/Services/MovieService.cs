@@ -5,15 +5,19 @@ using CinemaBookingSystemDAL.Entities;
 using CinemaBookingSystemDAL.Unit_of_Work;
 using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemBLL.Filters;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using System.Runtime.CompilerServices;
 
 namespace CinemaBookingSystemBLL.Services
 {
     public class MovieService : IMovieService
     {
         private IUnitOfWork unitOfWork;
-
-        public MovieService(IUnitOfWork unitOfWork)
+        private IMapper mapper;
+        public MovieService(IUnitOfWork unitOfWork, IMapper mapper)
         {
+            this.mapper = mapper;
             this.unitOfWork = unitOfWork;
         }
 
@@ -22,70 +26,28 @@ namespace CinemaBookingSystemBLL.Services
             var movies = await unitOfWork.Movies.GetAllAsync(cancellationToken);
             var orderedMovies = movies.OrderBy(m => m.Id);
 
-            return orderedMovies.Select(movie => new MovieResponseDTO
-            {
-                Id = movie.Id,
-                Title = movie.Title,
-                Description = movie.Description,
-                Duration = movie.Duration,
-                PosterUrl = movie.PosterUrl,
-                GenreId = movie.GenreId,
-                Rating = movie.Rating
-            }).ToList();
+            return mapper.Map<List<MovieResponseDTO>>(orderedMovies);
         }
 
         public async Task<MovieResponseDTO> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
+            Movie movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
 
             if (movie == null) return null;
-            else
-            {
-                MovieResponseDTO result = new MovieResponseDTO 
-                { 
-                    Id = movie.Id, 
-                    Title = movie.Title, 
-                    Description = movie.Description, 
-                    Duration = movie.Duration, 
-                    PosterUrl = movie.PosterUrl, 
-                    GenreId = movie.GenreId, 
-                    Rating = movie.Rating 
-                };
-                return result;
-            }
+            else return mapper.Map<MovieResponseDTO>(movie);
         }
 
         public async Task<List<MovieResponseDTO>> GetByGenreAsync(int genreId, CancellationToken cancellationToken = default)
         {
-            var movies = await unitOfWork.Movies.GetByGenreAsync(genreId, cancellationToken);
-            
-            return movies.Select(movie => new MovieResponseDTO
-            { 
-                Id = movie.Id, 
-                Title = movie.Title, 
-                Description = movie.Description, 
-                Duration = movie.Duration, 
-                PosterUrl = movie.PosterUrl, 
-                GenreId = movie.GenreId, 
-                Rating = movie.Rating 
-            }).ToList();
+            List<Movie> movies = await unitOfWork.Movies.GetByGenreAsync(genreId, cancellationToken);
+
+            return mapper.Map<List<MovieResponseDTO>>(movies);
         }
 
         public async Task<List<MovieResponseDTO>> GetTopRatedAsync(CancellationToken cancellationToken = default)
         {
-            var movies = await unitOfWork.Movies.GetTopRatedAsync(cancellationToken);
-
-            var orderedMovies = movies.OrderBy(m => m.Id);
-            return orderedMovies.Select(movie => new MovieResponseDTO
-            { 
-                Id = movie.Id, 
-                Title = movie.Title, 
-                Description = movie.Description, 
-                Duration = movie.Duration, 
-                PosterUrl = movie.PosterUrl, 
-                GenreId = movie.GenreId, 
-                Rating = movie.Rating 
-            }).ToList();
+            List<Movie> movies = await unitOfWork.Movies.GetTopRatedAsync(cancellationToken);
+            return mapper.Map<List<MovieResponseDTO>>(movies);
         }
 
         public async Task<MovieResponseDTO> CreateAsync(MovieCreateDTO dto, CancellationToken cancellationToken = default)
@@ -93,68 +55,33 @@ namespace CinemaBookingSystemBLL.Services
             var existsMovie = await unitOfWork.Movies.FindAsync(p => p.Title == dto.Title, cancellationToken);
             if (existsMovie.Any()) throw new ArgumentException("Movie with this title already exists");
 
-            Movie movie = new Movie
-            { 
-                Title = dto.Title, 
-                Description = dto.Description, 
-                Duration = dto.Duration, 
-                PosterUrl = dto.PosterUrl, 
-                GenreId = dto.GenreId, 
-                Rating = dto.Rating 
-            };
+            Movie movie = mapper.Map<Movie>(dto);
 
             await unitOfWork.Movies.CreateAsync(movie, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            MovieResponseDTO result = new MovieResponseDTO
-            {
-                Id = movie.Id,
-                Title = movie.Title,
-                Description = movie.Description,
-                Duration = movie.Duration,
-                PosterUrl = movie.PosterUrl,
-                GenreId = movie.GenreId,
-                Rating = movie.Rating
-            };
-
-            return result;
+            return mapper.Map<MovieResponseDTO>(movie);
         }
 
         public async Task<MovieResponseDTO> UpdateAsync(int id, MovieUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            var movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
+            Movie movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
             if (movie == null) return null;
 
             var existsMovie = await unitOfWork.Movies.FindAsync(p => p.Id != id && p.Title == movie.Title, cancellationToken);
             if (existsMovie.Any()) throw new ArgumentException("Film with this title already exists!");
 
-            movie.Title = dto.Title;
-            movie.Description = dto.Description;
-            movie.Duration = dto.Duration;
-            movie.PosterUrl = dto.PosterUrl;
-            movie.GenreId = dto.GenreId;
-            movie.Rating = dto.Rating;
+            mapper.Map(dto, movie);
 
             unitOfWork.Movies.Update(movie);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            MovieResponseDTO result = new MovieResponseDTO
-            {
-                Id = movie.Id,
-                Title = movie.Title,
-                Description = movie.Description,
-                Duration = movie.Duration,
-                PosterUrl = movie.PosterUrl,
-                GenreId = movie.GenreId,
-                Rating = movie.Rating
-            };
-
-            return result;
+            return mapper.Map<MovieResponseDTO>(movie);
         }
 
         public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
+            Movie movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
             if (movie == null) return false;
 
             unitOfWork.Movies.Delete(movie);
@@ -166,17 +93,7 @@ namespace CinemaBookingSystemBLL.Services
         {
             var query = unitOfWork.Movies.GetAll();
             PagedList<Movie> pagedMovies = await PagedList<Movie>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
-
-            List<MovieResponseDTO> movieDtos = pagedMovies.Select(movie => new MovieResponseDTO
-            {
-                Id = movie.Id,
-                Title = movie.Title,
-                Description = movie.Description,
-                Duration = movie.Duration,
-                PosterUrl = movie.PosterUrl,
-                GenreId = movie.GenreId,
-                Rating = movie.Rating
-            }).ToList();
+            List<MovieResponseDTO> movieDtos = mapper.Map<List<MovieResponseDTO>>(pagedMovies.Items);
 
             return new PagedList<MovieResponseDTO>(movieDtos, pagedMovies.TotalCount, pagedMovies.CurrentPage, pagedMovies.PageSize);
         }
@@ -229,20 +146,10 @@ namespace CinemaBookingSystemBLL.Services
             }
             else query = query.OrderBy(m => m.Id);
 
-            var dtoQuery = query.Select(movie => new MovieResponseDTO
-                {
-                    Id = movie.Id,
-                    Title = movie.Title,
-                    Description = movie.Description,
-                    Duration = movie.Duration,
-                    PosterUrl = movie.PosterUrl,
-                    GenreId = movie.GenreId,
-                    Rating = movie.Rating
-                });
-            
+            var dtoQuery = query.ProjectTo<MovieResponseDTO>(mapper.ConfigurationProvider);
+
             var pagedResult = await PagedList<MovieResponseDTO>.ToPagedListAsync(dtoQuery, pageNumber, pageSize, cancellationToken);
             return pagedResult;
         }
-
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using CinemaBookingSystemBLL.DTO.Genres;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
@@ -12,99 +13,76 @@ namespace CinemaBookingSystemBLL.Services
 {
     public class GenreService : IGenreService
     {
-        private IUnitOfWork unifOfWork;
+        private IMapper mapper;
+        private IUnitOfWork unitOfWork;
 
-        public GenreService(IUnitOfWork unitOfWork)
+        public GenreService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            unifOfWork = unitOfWork;
+            this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
         }
 
         public async Task<List<GenreResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var genres = await unifOfWork.Genres.GetAllAsync(cancellationToken);
-            var orderedGenres = genres.OrderBy(g => g.Id);
-
-            return orderedGenres.Select(p => new GenreResponseDTO
-            {
-                Id = p.Id,
-                Name = p.Name
-            }).ToList();
+            var genres = await unitOfWork.Genres.GetAllAsync(cancellationToken);
+            return mapper.Map<List<GenreResponseDTO>>(genres);
         }
 
         public async Task<GenreResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var genre = await unifOfWork.Genres.GetByIdAsync(id, cancellationToken);
+            Genre genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
             if (genre == null) return null;
             
-            GenreResponseDTO result = new GenreResponseDTO 
-            {
-                Id = genre.Id,
-                Name = genre.Name
-            };
-
-            return result;
+            return mapper.Map<GenreResponseDTO>(genre);
         }
 
         public async Task<GenreResponseDTO> CreateAsync(GenreCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            var existingGenre = await unifOfWork.Genres.FindAsync(g => g.Name == dto.Name, cancellationToken);
+            var existingGenre = await unitOfWork.Genres.FindAsync(g => g.Name == dto.Name, cancellationToken);
             if (existingGenre.Any()) throw new ArgumentException("Genre with this name already exists!");
 
-            Genre genre = new Genre 
-            { 
-                Name = dto.Name 
-            };
-            
-            await unifOfWork.Genres.CreateAsync(genre, cancellationToken);
-            await unifOfWork.SaveChangesAsync(cancellationToken);
-            
-            GenreResponseDTO result = new GenreResponseDTO
-            { 
-                Id = genre.Id, 
-                Name = genre.Name 
-            };
+            Genre genre = mapper.Map<Genre>(dto);
 
-            return result;
+            await unitOfWork.Genres.CreateAsync(genre, cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return mapper.Map<GenreResponseDTO>(genre);
         }
 
         public async Task<GenreResponseDTO?> UpdateAsync(int id, GenreUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            var genre = await unifOfWork.Genres.GetByIdAsync(id, cancellationToken);
+            Genre genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
             if (genre == null) return null;
 
-            var existingGenre = await unifOfWork.Genres.FindAsync(g => g.Name == dto.Name && g.Id != id, cancellationToken);
+            var existingGenre = await unitOfWork.Genres.FindAsync(g => g.Name == dto.Name && g.Id != id, cancellationToken);
             if (existingGenre.Any()) throw new ArgumentException("Genre with this name already exists!");
 
-            genre.Name = dto.Name;
-            unifOfWork.Genres.Update(genre);
-            await unifOfWork.SaveChangesAsync(cancellationToken);
+            mapper.Map(dto, genre);
 
-            GenreResponseDTO result = new GenreResponseDTO
-            {
-                Id = genre.Id,
-                Name = genre.Name
-            };
+            unitOfWork.Genres.Update(genre);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return result;
+            return mapper.Map<GenreResponseDTO>(genre);
         }
+
 
         public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var genre = await unifOfWork.Genres.GetByIdAsync(id, cancellationToken);
+            Genre genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
             if (genre == null) return false;
 
-            unifOfWork.Genres.Delete(genre);
-            await unifOfWork.SaveChangesAsync(cancellationToken);
+            unitOfWork.Genres.Delete(genre);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
         }
         public async Task<Dictionary<string, int>> GetMovieCountsPerGenreAsync(CancellationToken cancellationToken = default)
         {
-            return await unifOfWork.Genres.GetMovieCountsPerGenreAsync(cancellationToken);
+            return await unitOfWork.Genres.GetMovieCountsPerGenreAsync(cancellationToken);
         }
 
         public async Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default)
         {
-            return await unifOfWork.Genres.ExistsByNameAsync(name, cancellationToken);
+            return await unitOfWork.Genres.ExistsByNameAsync(name, cancellationToken);
         }
     }
 }

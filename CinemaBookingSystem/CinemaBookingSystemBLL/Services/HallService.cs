@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using CinemaBookingSystemBLL.DTO.Halls;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
@@ -13,10 +14,12 @@ namespace CinemaBookingSystemBLL.Services
     public class HallService : IHallService
     {
         private IUnitOfWork unitOfWork;
+        private IMapper mapper;
 
-        public HallService(IUnitOfWork unitOfWork)
+        public HallService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
         }
 
         public async Task<List<HallResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -24,49 +27,23 @@ namespace CinemaBookingSystemBLL.Services
             var halls = await unitOfWork.Halls.GetAllAsync(cancellationToken);
             var orderedHalls = halls.OrderBy(h => h.Id);
 
-            return orderedHalls.Select(p => new HallResponseDTO
-            {
-                Id = p.Id,
-                Name = p.Name,
-                RowsAmount = p.RowsAmount,
-                SeatsPerRow = p.SeatsPerRow
-            }).ToList();
+            return mapper.Map<List<HallResponseDTO>>(orderedHalls);
         }
 
         public async Task<HallResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
+            Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
 
             if (hall == null) return null;
-            else
-            {
-                HallResponseDTO result = new HallResponseDTO
-                {
-                    Id = hall.Id,
-                    Name = hall.Name,
-                    RowsAmount = hall.RowsAmount,
-                    SeatsPerRow = hall.SeatsPerRow
-                };
-                return result;
-            }
+            else return mapper.Map<HallResponseDTO>(hall);
         }
 
         public async Task<HallResponseDTO?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
-            var hall = await unitOfWork.Halls.GetByNameAsync(name, cancellationToken);
-            
+            Hall? hall = await unitOfWork.Halls.GetByNameAsync(name, cancellationToken);
+
             if (hall == null) return null;
-            else
-            {
-                HallResponseDTO result = new HallResponseDTO
-                {
-                    Id = hall.Id,
-                    Name = hall.Name,
-                    RowsAmount = hall.RowsAmount,
-                    SeatsPerRow = hall.SeatsPerRow
-                };
-                return result;
-            }
+            else return mapper.Map<HallResponseDTO>(hall);
         }
 
         public async Task<HallResponseDTO> CreateAsync(HallCreateDTO dto, CancellationToken cancellationToken = default)
@@ -74,52 +51,32 @@ namespace CinemaBookingSystemBLL.Services
             var existsHall = await unitOfWork.Halls.FindAsync(p => p.Name == dto.Name, cancellationToken);
             if (existsHall.Any()) throw new ArgumentException("Hall with this name already exists");
 
-            Hall hall = new Hall 
-            { 
-                Name = dto.Name, 
-                RowsAmount = dto.RowAmount, 
-                SeatsPerRow = dto.SeatsPerRow 
-            };
+            Hall hall = mapper.Map<Hall>(dto);
             await unitOfWork.Halls.CreateAsync(hall, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            HallResponseDTO result = new HallResponseDTO { 
-                Id = hall.Id, 
-                Name = hall.Name, 
-                RowsAmount = hall.RowsAmount, 
-                SeatsPerRow = hall.SeatsPerRow 
-            };
-            return result;
+            return mapper.Map<HallResponseDTO>(hall);
         }
 
         public async Task<HallResponseDTO?> UpdateAsync(int id, HallUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            var hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
+            Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
             if (hall == null) return null;
 
             var existingHalls = await unitOfWork.Halls.FindAsync(h => h.Name == dto.Name && h.Id != id, cancellationToken);
             if (existingHalls.Any()) throw new ArgumentException("Hall with this name already exists");
 
-            hall.Name = dto.Name;
-            hall.RowsAmount = dto.RowsAmount;
-            hall.SeatsPerRow = dto.SeatsPerRow;
+            mapper.Map(dto, hall);
 
             unitOfWork.Halls.Update(hall);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            HallResponseDTO result = new HallResponseDTO 
-            { 
-                Id = hall.Id, 
-                Name = hall.Name, 
-                RowsAmount = hall.RowsAmount, 
-                SeatsPerRow = hall.SeatsPerRow 
-            };
 
-            return result;
+            return mapper.Map<HallResponseDTO>(hall);
         }
 
         public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
+            Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
             if (hall == null) return false;
 
             unitOfWork.Halls.Delete(hall);

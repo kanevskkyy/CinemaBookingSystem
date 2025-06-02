@@ -21,6 +21,7 @@ namespace CinemaBookingSystemDAL.Repositories
         {
             return await dbSet
                 .AsNoTracking()
+                .OrderBy(p => p.CreatedAt)
                 .Where(r => r.UserId == userId)
                 .ToListAsync(cancellationToken);
         }
@@ -29,6 +30,7 @@ namespace CinemaBookingSystemDAL.Repositories
         {
             return await dbSet
                 .AsNoTracking()
+                .OrderBy(p => p.CreatedAt)
                 .Where(r => r.MovieId == movieId)
                 .ToListAsync(cancellationToken);
         }
