@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.DTO.Sessions;
@@ -70,8 +65,22 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<SessionResponseDTO> CreateAsync(SessionCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            Session session = mapper.Map<Session>(dto);
+            var movie = await unitOfWork.Movies.GetByIdAsync(dto.MovieId, cancellationToken);
+            if (movie == null) throw new ArgumentException("Movie not found.");
 
+            var sessionsInHall = await unitOfWork.Sessions.GetAllAsync();
+            
+            DateTime newStart = dto.StartTime.ToUniversalTime();
+            DateTime newEnd = newStart.AddMinutes(movie.Duration).ToUniversalTime();
+            foreach (var existingSession in sessionsInHall)
+            {
+                Movie existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
+                DateTime existingStart = existingSession.StartTime.ToUniversalTime();
+                DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration).ToUniversalTime();
+                if (newStart < existingEnd && existingStart < newEnd) throw new InvalidOperationException("This hall already has a session during this time.");
+            }
+
+            Session session = mapper.Map<Session>(dto);
             await unitOfWork.Sessions.CreateAsync(session, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -94,8 +103,25 @@ namespace CinemaBookingSystemBLL.Services
             Session session = await unitOfWork.Sessions.GetByIdAsync(id, cancellationToken);
             if (session == null) return null;
 
-            mapper.Map(dto, session);
+            Movie movie = await unitOfWork.Movies.GetByIdAsync(session.MovieId, cancellationToken);
+            if (movie == null) throw new ArgumentException("Movie not found.");
 
+            DateTime newStart = dto.StartTime.ToUniversalTime();
+            DateTime newEnd = newStart.AddMinutes(movie.Duration).ToUniversalTime();
+            var sessionsInHall = await unitOfWork.Sessions
+                .FindAsync(s => s.HallId == session.HallId && s.Id != id, cancellationToken);
+
+            foreach (var existingSession in sessionsInHall)
+            {
+                Movie existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
+                DateTime existingStart = existingSession.StartTime.ToUniversalTime();
+                DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration).ToUniversalTime();
+
+                if (newStart < existingEnd && existingStart < newEnd) throw new InvalidOperationException("This hall already has a session during this time.");
+            }
+
+            session.StartTime = dto.StartTime;
+            session.Price = dto.Price;
             unitOfWork.Sessions.Update(session);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 

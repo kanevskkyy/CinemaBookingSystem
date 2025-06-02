@@ -46,7 +46,10 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<(string AccessToken, string RefreshToken)> RegisterAsync(UserCreateDTO dto)
         {
-            var user = new User
+            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
+            if (existingUser != null) throw new InvalidOperationException("A user with this email already exists.");
+
+            User user = new User
             {
                 Email = dto.Email,
                 UserName = dto.Name
@@ -65,21 +68,22 @@ namespace CinemaBookingSystemBLL.Services
             return (accessToken, refreshToken.Token);
         }
 
+
         public async Task<string> CreateUserByAdminAsync(UserCreateDTO dto)
         {
-            if (dto.Role != "Admin" && dto.Role != "Customer")
-                throw new ArgumentException("Role must be either 'Admin' or 'Customer'.");
+            if (dto.Role != "Admin" && dto.Role != "Customer") throw new ArgumentException("Role must be either 'Admin' or 'Customer'.");
 
-            var user = new User
+            User user = new User
             {
                 Email = dto.Email,
                 UserName = dto.Name
             };
 
-            var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded)
-                throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+            User? existingUser = await _userManager.FindByEmailAsync(dto.Email);
+            if (existingUser != null) throw new InvalidOperationException("A user with this email already exists.");
 
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded) throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
             await _userManager.AddToRoleAsync(user, dto.Role);
 
             return "User created successfully";
@@ -91,15 +95,14 @@ namespace CinemaBookingSystemBLL.Services
             if (principal == null)
                 throw new SecurityTokenException("Invalid token");
 
-            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            string userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var savedToken = await _context.RefreshTokens
                 .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken && rt.UserId == userId);
 
-            if (savedToken == null || savedToken.ExpiryDate <= DateTime.UtcNow)
-                throw new SecurityTokenException("Invalid or expired refresh token");
+            if (savedToken == null || savedToken.ExpiryDate <= DateTime.UtcNow) throw new SecurityTokenException("Invalid or expired refresh token");
 
-            var user = await _userManager.FindByIdAsync(userId);
+            User? user = await _userManager.FindByIdAsync(userId);
             var newAccessToken = await GenerateJwtToken(user);
             var newRefreshToken = GenerateRefreshToken();
 
@@ -112,7 +115,7 @@ namespace CinemaBookingSystemBLL.Services
 
         private async Task<string> GenerateJwtToken(User user)
         {
-            var claims = new List<Claim>
+            List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),

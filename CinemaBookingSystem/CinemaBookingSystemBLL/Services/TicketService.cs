@@ -55,14 +55,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<TicketResponseDTO> CreateAsync(string userId, TicketCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            Ticket ticket = new Ticket
-            {
-                UserId = userId,
-                SessionId = dto.SessionId,
-                SeatId = dto.SeatId,
-                PurchaseTime = DateTime.UtcNow.ToUniversalTime(),
-                IsPaid = false
-            };
+            Ticket ticket = mapper.Map<Ticket>(dto);
 
             await unitOfWork.Tickets.CreateAsync(ticket, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
