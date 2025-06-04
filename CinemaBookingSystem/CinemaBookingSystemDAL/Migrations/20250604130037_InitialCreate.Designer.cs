@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CinemaBookingSystemDAL.Migrations
 {
     [DbContext(typeof(CinemaDbContext))]
-    [Migration("20250531105214_CreateUniqueToSomeTables")]
-    partial class CreateUniqueToSomeTables
+    [Migration("20250604130037_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -106,12 +106,43 @@ namespace CinemaBookingSystemDAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Duration");
+
                     b.HasIndex("GenreId");
+
+                    b.HasIndex("Rating");
 
                     b.HasIndex("Title")
                         .IsUnique();
 
                     b.ToTable("Movies");
+                });
+
+            modelBuilder.Entity("CinemaBookingSystemDAL.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Review", b =>
@@ -144,11 +175,20 @@ namespace CinemaBookingSystemDAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedAt");
+
                     b.HasIndex("MovieId");
+
+                    b.HasIndex("Rating");
+
+                    b.HasIndex("Text");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", t =>
+                        {
+                            t.HasCheckConstraint("CK_Review_Rating_Range", "\"Rating\" >= 1 AND \"Rating\" <= 5");
+                        });
                 });
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Seat", b =>
@@ -201,6 +241,10 @@ namespace CinemaBookingSystemDAL.Migrations
 
                     b.HasIndex("MovieId");
 
+                    b.HasIndex("Price");
+
+                    b.HasIndex("StartTime");
+
                     b.ToTable("Sessions");
                 });
 
@@ -229,6 +273,8 @@ namespace CinemaBookingSystemDAL.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PurchaseTime");
 
                     b.HasIndex("SeatId");
 
@@ -446,6 +492,17 @@ namespace CinemaBookingSystemDAL.Migrations
                     b.Navigation("Genre");
                 });
 
+            modelBuilder.Entity("CinemaBookingSystemDAL.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("CinemaBookingSystemDAL.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Review", b =>
                 {
                     b.HasOne("CinemaBookingSystemDAL.Entities.Movie", "Movie")
@@ -604,6 +661,8 @@ namespace CinemaBookingSystemDAL.Migrations
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.User", b =>
                 {
+                    b.Navigation("RefreshTokens");
+
                     b.Navigation("Reviews");
 
                     b.Navigation("Tickets");

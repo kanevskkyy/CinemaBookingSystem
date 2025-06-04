@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CinemaBookingSystemDAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreatingOfDatabase : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -186,6 +186,27 @@ namespace CinemaBookingSystemDAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Token = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Movies",
                 columns: table => new
                 {
@@ -231,6 +252,36 @@ namespace CinemaBookingSystemDAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Reviews",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Text = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Rating = table.Column<int>(type: "integer", nullable: false, defaultValue: 1),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    MovieId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
+                    table.CheckConstraint("CK_Review_Rating_Range", "\"Rating\" >= 1 AND \"Rating\" <= 5");
+                    table.ForeignKey(
+                        name: "FK_Reviews_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Movies_MovieId",
+                        column: x => x.MovieId,
+                        principalTable: "Movies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Sessions",
                 columns: table => new
                 {
@@ -267,7 +318,8 @@ namespace CinemaBookingSystemDAL.Migrations
                     UserId = table.Column<string>(type: "text", nullable: false),
                     SessionId = table.Column<int>(type: "integer", nullable: false),
                     SeatId = table.Column<int>(type: "integer", nullable: false),
-                    PurchaseTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    PurchaseTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsPaid = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -330,9 +382,67 @@ namespace CinemaBookingSystemDAL.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Genres_Name",
+                table: "Genres",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Halls_Name",
+                table: "Halls",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Movies_Duration",
+                table: "Movies",
+                column: "Duration");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Movies_GenreId",
                 table: "Movies",
                 column: "GenreId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Movies_Rating",
+                table: "Movies",
+                column: "Rating");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Movies_Title",
+                table: "Movies",
+                column: "Title",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_CreatedAt",
+                table: "Reviews",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_MovieId",
+                table: "Reviews",
+                column: "MovieId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_Rating",
+                table: "Reviews",
+                column: "Rating");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_Text",
+                table: "Reviews",
+                column: "Text");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_UserId",
+                table: "Reviews",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Seats_HallId",
@@ -348,6 +458,21 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "IX_Sessions_MovieId",
                 table: "Sessions",
                 column: "MovieId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_Price",
+                table: "Sessions",
+                column: "Price");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_StartTime",
+                table: "Sessions",
+                column: "StartTime");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tickets_PurchaseTime",
+                table: "Tickets",
+                column: "PurchaseTime");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_SeatId",
@@ -382,6 +507,12 @@ namespace CinemaBookingSystemDAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "Tickets");

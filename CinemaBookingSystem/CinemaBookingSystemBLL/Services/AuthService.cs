@@ -56,8 +56,7 @@ namespace CinemaBookingSystemBLL.Services
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded)
-                throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+            if (!result.Succeeded) throw new Exception("Something went wrong...");
 
             await _userManager.AddToRoleAsync(user, "Customer");
 
@@ -83,8 +82,7 @@ namespace CinemaBookingSystemBLL.Services
             if (existingUser != null) throw new InvalidOperationException("A user with this email already exists.");
 
             var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded) throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
-            await _userManager.AddToRoleAsync(user, dto.Role);
+            if (!result.Succeeded) throw new Exception("Something went wrong..."); await _userManager.AddToRoleAsync(user, dto.Role);
 
             return "User created successfully";
         }
@@ -92,8 +90,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(TokenRefreshRequest request)
         {
             var principal = GetPrincipalFromExpiredToken(request.AccessToken);
-            if (principal == null)
-                throw new SecurityTokenException("Invalid token");
+            if (principal == null) throw new SecurityTokenException("Invalid token");
 
             string userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -168,7 +165,7 @@ namespace CinemaBookingSystemBLL.Services
 
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
         {
-            var validationParameters = new TokenValidationParameters
+            TokenValidationParameters validationParameters = new TokenValidationParameters
             {
                 ValidateAudience = true,
                 ValidateIssuer = true,

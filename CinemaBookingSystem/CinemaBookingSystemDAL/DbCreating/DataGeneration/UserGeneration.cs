@@ -26,7 +26,7 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 
             foreach (var user in fakeUsers)
             {
-                string password = new Faker().Internet.Password(10, false, null, "!1Aa");
+                string password = new Faker().Internet.Password(10, false, "", "!1Aa");
 
                 var result = await userManager.CreateAsync(user, password);
                 if (result.Succeeded)
