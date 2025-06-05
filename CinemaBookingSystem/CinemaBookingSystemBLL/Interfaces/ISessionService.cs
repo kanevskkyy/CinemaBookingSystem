@@ -14,13 +14,13 @@ namespace CinemaBookingSystemBLL.Interfaces
     public interface ISessionService
     {
         Task<List<SessionResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default);
-        Task<SessionResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<SessionResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<SessionResponseDTO> CreateAsync(SessionCreateDTO dto, CancellationToken cancellationToken = default);
-        Task<SessionResponseDTO?> UpdateAsync(int id, SessionUpdateDTO dto, CancellationToken cancellationToken = default);
-        Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+        Task<SessionResponseDTO?> UpdateAsync(Guid id, SessionUpdateDTO dto, CancellationToken cancellationToken = default);
+        Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 
-        Task<List<SessionResponseDTO>> GetByMovieIdAsync(int movieId, CancellationToken cancellationToken = default);
-        Task<List<SessionResponseDTO>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default);
+        Task<List<SessionResponseDTO>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default);
+        Task<List<SessionResponseDTO>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default);
         Task<List<SessionResponseDTO>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
         Task<PagedList<SessionResponseDTO>> GetPagedSessionsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         Task<PagedList<SessionResponseDTO>> GetFilteredSessionsAsync(SessionFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);

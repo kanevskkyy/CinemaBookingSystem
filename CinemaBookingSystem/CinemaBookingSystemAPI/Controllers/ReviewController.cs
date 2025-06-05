@@ -27,10 +27,10 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:Guid}")]
         [ProducesResponseType(typeof(ReviewResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var review = await reviewService.GetByIdAsync(id, cancellationToken);
             if (review == null) return NotFound();
@@ -49,9 +49,9 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("by-movie/{movieId}")]
+        [HttpGet("by-movie/{movieId:Guid}")]
         [ProducesResponseType(typeof(List<ReviewResponseDTO>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetByMovieId(int movieId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetByMovieId(Guid movieId, CancellationToken cancellationToken)
         {
             var result = await reviewService.GetByMovieIdAsync(movieId, cancellationToken);
             return Ok(result);
@@ -70,12 +70,12 @@ namespace CinemaBookingSystemAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(typeof(ReviewResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateReviewDTO dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateReviewDTO dto, CancellationToken cancellationToken)
         {
             var existing = await reviewService.GetByIdAsync(id, cancellationToken);
             if (existing == null) return NotFound();
@@ -87,12 +87,12 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(updated);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
             var existing = await reviewService.GetByIdAsync(id, cancellationToken);
             if (existing == null) return NotFound();

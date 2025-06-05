@@ -8,6 +8,6 @@ namespace CinemaBookingSystemBLL.DTO.Genres
 {
     public class GenreUpdateDTO
     {
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; }
     }
 }

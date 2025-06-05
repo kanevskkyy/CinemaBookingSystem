@@ -20,7 +20,8 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDTO dto)
         {
             var (accessToken, refreshToken) = await service.LoginAsync(dto);
-            return Ok(new { 
+            return Ok(new 
+            { 
                 Token = accessToken, 
                 RefreshToken = refreshToken 
             });
@@ -30,7 +31,8 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> Register([FromBody] UserCreateDTO dto)
         {
             var (accessToken, refreshToken) = await service.RegisterAsync(dto);
-            return Ok(new { 
+            return Ok(new 
+            { 
                 Token = accessToken, 
                 RefreshToken = refreshToken 
             });
@@ -41,7 +43,8 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> CreateUserByAdmin([FromBody] UserCreateDTO dto)
         {
             var result = await service.CreateUserByAdminAsync(dto);
-            return Ok(new { 
+            return Ok(new
+            { 
                 Message = result 
             });
         }
@@ -50,7 +53,8 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] TokenRefreshRequest dto)
         {
             var (accessToken, refreshToken) = await service.RefreshTokenAsync(dto);
-            return Ok(new { 
+            return Ok(new
+            { 
                 Token = accessToken, 
                 RefreshToken = refreshToken 
             });

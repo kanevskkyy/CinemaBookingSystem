@@ -8,8 +8,8 @@ namespace CinemaBookingSystemBLL.Filters
 {
     public class SessionFilterDTO
     {
-        public int? MovieId { get; set; }
-        public int? HallId { get; set; }
+        public Guid? MovieId { get; set; }
+        public Guid? HallId { get; set; }
         public DateTime? StartTimeFrom { get; set; }
         public DateTime? StartTimeTo { get; set; }
         public int? MinPrice { get; set; }

@@ -30,7 +30,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<HallResponseDTO>>(orderedHalls);
         }
 
-        public async Task<HallResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<HallResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
 
@@ -58,7 +58,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<HallResponseDTO>(hall);
         }
 
-        public async Task<HallResponseDTO?> UpdateAsync(int id, HallUpdateDTO dto, CancellationToken cancellationToken = default)
+        public async Task<HallResponseDTO?> UpdateAsync(Guid id, HallUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
             if (hall == null) return null;
@@ -74,7 +74,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<HallResponseDTO>(hall);
         }
 
-        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
             if (hall == null) return false;

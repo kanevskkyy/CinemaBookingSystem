@@ -29,7 +29,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<MovieResponseDTO>>(orderedMovies);
         }
 
-        public async Task<MovieResponseDTO> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<MovieResponseDTO> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Movie movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
 
@@ -37,7 +37,7 @@ namespace CinemaBookingSystemBLL.Services
             else return mapper.Map<MovieResponseDTO>(movie);
         }
 
-        public async Task<List<MovieResponseDTO>> GetByGenreAsync(int genreId, CancellationToken cancellationToken = default)
+        public async Task<List<MovieResponseDTO>> GetByGenreAsync(Guid genreId, CancellationToken cancellationToken = default)
         {
             List<Movie> movies = await unitOfWork.Movies.GetByGenreAsync(genreId, cancellationToken);
 
@@ -63,7 +63,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<MovieResponseDTO>(movie);
         }
 
-        public async Task<MovieResponseDTO> UpdateAsync(int id, MovieUpdateDTO dto, CancellationToken cancellationToken = default)
+        public async Task<MovieResponseDTO> UpdateAsync(Guid id, MovieUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             Movie movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
             if (movie == null) return null;
@@ -79,7 +79,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<MovieResponseDTO>(movie);
         }
 
-        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Movie movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
             if (movie == null) return false;

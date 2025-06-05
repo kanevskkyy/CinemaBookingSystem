@@ -38,20 +38,20 @@ namespace CinemaBookingSystemBLL.Services
             return result;
         }
 
-        public async Task<SessionResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<SessionResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Session session = await unitOfWork.Sessions.GetByIdWithDetailsAsync(id, cancellationToken);
+            Session? session = await unitOfWork.Sessions.GetByIdWithDetailsAsync(id, cancellationToken);
             if (session == null) return null;
             return mapper.Map<SessionResponseDTO>(session);
         }
 
-        public async Task<List<SessionResponseDTO>> GetByMovieIdAsync(int movieId, CancellationToken cancellationToken = default)
+        public async Task<List<SessionResponseDTO>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default)
         {
             List<Session> sessions = await unitOfWork.Sessions.GetByMovieIdAsync(movieId, cancellationToken);
             return mapper.Map<List<SessionResponseDTO>>(sessions);
         }
 
-        public async Task<List<SessionResponseDTO>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default)
+        public async Task<List<SessionResponseDTO>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default)
         {
             var sessions = await unitOfWork.Sessions.GetByHallIdAsync(hallId, cancellationToken);
             return mapper.Map<List<SessionResponseDTO>>(sessions);
@@ -75,8 +75,10 @@ namespace CinemaBookingSystemBLL.Services
             foreach (var existingSession in sessionsInHall)
             {
                 Movie existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
+                
                 DateTime existingStart = existingSession.StartTime.ToUniversalTime();
                 DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration).ToUniversalTime();
+                
                 if (newStart < existingEnd && existingStart < newEnd) throw new InvalidOperationException("This hall already has a session during this time.");
             }
 
@@ -88,7 +90,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<SessionResponseDTO>(createdSession);
         }
 
-        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Session session = await unitOfWork.Sessions.GetByIdAsync(id, cancellationToken);
             if (session == null) return false;
@@ -98,7 +100,7 @@ namespace CinemaBookingSystemBLL.Services
             return true;
         }
 
-        public async Task<SessionResponseDTO?> UpdateAsync(int id, SessionUpdateDTO dto, CancellationToken cancellationToken = default)
+        public async Task<SessionResponseDTO?> UpdateAsync(Guid id, SessionUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             Session session = await unitOfWork.Sessions.GetByIdAsync(id, cancellationToken);
             if (session == null) return null;

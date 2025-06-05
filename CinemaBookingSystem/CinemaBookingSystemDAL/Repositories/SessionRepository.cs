@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class SessionRepository : GenericRepository<Session, int>, ISessionRepository
+    public class SessionRepository : GenericRepository<Session, Guid>, ISessionRepository
     {
         public SessionRepository(CinemaDbContext context) : base(context) { 
         
         }
 
-        public async Task<List<Session>> GetByMovieIdAsync(int movieId, CancellationToken cancellationToken = default)
+        public async Task<List<Session>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AsNoTracking()
@@ -27,7 +27,7 @@ namespace CinemaBookingSystemDAL.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Session?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<Session?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AsNoTracking()
@@ -37,7 +37,7 @@ namespace CinemaBookingSystemDAL.Repositories
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         }
 
-        public async Task<List<Session>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default)
+        public async Task<List<Session>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AsNoTracking()

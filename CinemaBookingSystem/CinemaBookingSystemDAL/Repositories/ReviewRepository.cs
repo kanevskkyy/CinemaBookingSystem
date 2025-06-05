@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class ReviewRepository : GenericRepository<Review, int>, IReviewRepository
+    public class ReviewRepository : GenericRepository<Review, Guid>, IReviewRepository
     {
         public ReviewRepository(CinemaDbContext context) : base(context)
         {
@@ -26,7 +26,7 @@ namespace CinemaBookingSystemDAL.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Review>> GetByMovieIdAsync(int movieId, CancellationToken cancellationToken = default)
+        public async Task<List<Review>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AsNoTracking()

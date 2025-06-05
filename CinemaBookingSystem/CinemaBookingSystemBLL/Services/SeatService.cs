@@ -40,7 +40,7 @@ namespace CinemaBookingSystemBLL.Services
             return new PagedList<SeatResponseDTO>(seatDtos, pagedSeats.TotalCount, pagedSeats.CurrentPage, pagedSeats.PageSize);
         }
 
-        public async Task<SeatResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<SeatResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Seat seat = await unitOfWork.Seats.GetByIdAsync(id, cancellationToken);
             if (seat == null) return null;
@@ -48,13 +48,13 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<SeatResponseDTO>(seat);
         }
 
-        public async Task<List<SeatResponseDTO>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default)
+        public async Task<List<SeatResponseDTO>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default)
         {
             var seats = await unitOfWork.Seats.GetByHallIdAsync(hallId, cancellationToken);
             return mapper.Map<List<SeatResponseDTO>>(seats);
         }
 
-        public async Task<SeatResponseDTO?> GetByRowAndNumberAsync(int hallId, int rowNumber, int seatNumber, CancellationToken cancellationToken = default)
+        public async Task<SeatResponseDTO?> GetByRowAndNumberAsync(Guid hallId, int rowNumber, int seatNumber, CancellationToken cancellationToken = default)
         {
             Seat? seat = await unitOfWork.Seats.GetByRowAndNumberAsync(hallId, rowNumber, seatNumber, cancellationToken);
             if (seat == null) return null;
@@ -72,7 +72,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<SeatResponseDTO>(seat);
         }
 
-        public async Task<SeatResponseDTO?> UpdateAsync(int id, SeatUpdateDTO dto, CancellationToken cancellationToken = default)
+        public async Task<SeatResponseDTO?> UpdateAsync(Guid id, SeatUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             Seat seat = await unitOfWork.Seats.GetByIdAsync(id, cancellationToken);
             if (seat == null) return null;
@@ -85,7 +85,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<SeatResponseDTO>(seat);
         }
 
-        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Seat seat = await unitOfWork.Seats.GetByIdAsync(id, cancellationToken);
             if (seat == null) return false;

@@ -10,12 +10,12 @@ namespace CinemaBookingSystemDAL.Interfaces
 
     namespace CinemaBookingSystemDAL.Interfaces
     {
-        public interface ISessionRepository : IGenericRepository<Session, int>
+        public interface ISessionRepository : IGenericRepository<Session, Guid>
         {
-            Task<Session?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default);
+            Task<Session?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
             IQueryable<Session> GetAllMoviesAsyncDetail(CancellationToken cancellationToken = default);
-            Task<List<Session>> GetByMovieIdAsync(int movieId, CancellationToken cancellationToken = default);
-            Task<List<Session>> GetByHallIdAsync(int hallId, CancellationToken cancellationToken = default);
+            Task<List<Session>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default);
+            Task<List<Session>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default);
             Task<List<Session>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
         }
     }

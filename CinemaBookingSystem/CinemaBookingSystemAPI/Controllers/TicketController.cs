@@ -44,12 +44,12 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(pagedSessions);
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(typeof(TicketResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
@@ -77,12 +77,12 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(tickets);
         }
 
-        [HttpGet("by-session/{sessionId:int}")]
+        [HttpGet("by-session/{sessionId:Guid}")]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetBySessionId(int sessionId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetBySessionId(Guid sessionId, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
@@ -92,12 +92,12 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(tickets);
         }
 
-        [HttpGet("by-seat/{seatId:int}")]
+        [HttpGet("by-seat/{seatId:Guid}")]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetBySeatId(int seatId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetBySeatId(Guid seatId, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
@@ -132,12 +132,12 @@ namespace CinemaBookingSystemAPI.Controllers
             }
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
@@ -159,11 +159,11 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPost("{id}/confirm-payment")]
+        [HttpPost("{id:Guid}/confirm-payment")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ConfirmPayment(int id)
+        public async Task<IActionResult> ConfirmPayment(Guid id)
         {
             var result = await ticketService.ConfirmPaymentAsync(id);
             if (!result) return NotFound();

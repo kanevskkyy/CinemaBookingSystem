@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CinemaBookingSystemDAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreatingDbWithGuid : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,8 +55,7 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "Genres",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
@@ -68,8 +67,7 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "Halls",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
                     RowsAmount = table.Column<int>(type: "integer", nullable: false),
                     SeatsPerRow = table.Column<int>(type: "integer", nullable: false)
@@ -210,13 +208,12 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "Movies",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "character varying(90)", maxLength: 90, nullable: false),
                     Description = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: false),
                     Duration = table.Column<int>(type: "integer", nullable: false),
                     PosterUrl = table.Column<string>(type: "text", nullable: false),
-                    GenreId = table.Column<int>(type: "integer", nullable: false),
+                    GenreId = table.Column<Guid>(type: "uuid", nullable: false),
                     Rating = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
@@ -234,9 +231,8 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "Seats",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    HallId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    HallId = table.Column<Guid>(type: "uuid", nullable: false),
                     RowNumber = table.Column<int>(type: "integer", nullable: false),
                     SeatNumber = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -255,13 +251,12 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "Reviews",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Text = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: false, defaultValue: 1),
                     UserId = table.Column<string>(type: "text", nullable: false),
-                    MovieId = table.Column<int>(type: "integer", nullable: false)
+                    MovieId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -285,10 +280,9 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "Sessions",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    MovieId = table.Column<int>(type: "integer", nullable: false),
-                    HallId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    MovieId = table.Column<Guid>(type: "uuid", nullable: false),
+                    HallId = table.Column<Guid>(type: "uuid", nullable: false),
                     StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Price = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -313,11 +307,10 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "Tickets",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: false),
-                    SessionId = table.Column<int>(type: "integer", nullable: false),
-                    SeatId = table.Column<int>(type: "integer", nullable: false),
+                    SessionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SeatId = table.Column<Guid>(type: "uuid", nullable: false),
                     PurchaseTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsPaid = table.Column<bool>(type: "boolean", nullable: false)
                 },

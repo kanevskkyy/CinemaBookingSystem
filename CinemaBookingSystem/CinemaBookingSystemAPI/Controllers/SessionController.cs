@@ -37,11 +37,11 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(pagedSessions);
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:Guid}")]
         [ProducesResponseType(typeof(SessionResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var session = await sessionService.GetByIdAsync(id, cancellationToken);
             if (session == null) return NotFound();
@@ -49,11 +49,11 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(session);
         }
 
-        [HttpGet("by-movie/{movieId:int}")]
+        [HttpGet("by-movie/{movieId:Guid}")]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByMovieId(int movieId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetByMovieId(Guid movieId, CancellationToken cancellationToken)
         {
             var sessions = await sessionService.GetByMovieIdAsync(movieId, cancellationToken);
             if (sessions == null || !sessions.Any()) return NotFound();
@@ -61,11 +61,11 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(sessions);
         }
 
-        [HttpGet("by-hall/{hallId:int}")]
+        [HttpGet("by-hall/{hallId:Guid}")]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByHallId(int hallId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetByHallId(Guid hallId, CancellationToken cancellationToken)
         {
             var sessions = await sessionService.GetByHallIdAsync(hallId, cancellationToken);
             if (sessions == null || !sessions.Any()) return NotFound();
@@ -95,13 +95,13 @@ namespace CinemaBookingSystemAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update(int id, [FromBody] SessionUpdateDTO dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update(Guid id, [FromBody] SessionUpdateDTO dto, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
@@ -111,12 +111,12 @@ namespace CinemaBookingSystemAPI.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 

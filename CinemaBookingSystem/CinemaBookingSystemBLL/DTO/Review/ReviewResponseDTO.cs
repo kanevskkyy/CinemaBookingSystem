@@ -8,10 +8,10 @@ namespace CinemaBookingSystemBLL.DTO.Review
 {
     public class ReviewResponseDTO
     {
-        public int Id { get; set; }
-        public string UserId { get; set; } = null!;
-        public int MovieId { get; set; }
-        public string Text { get; set; } = string.Empty;
+        public Guid Id { get; set; }
+        public string UserId { get; set; }
+        public Guid MovieId { get; set; }
+        public string Text { get; set; }
         public int Rating { get; set; }
         public DateTime CreatedAt { get; set; }
     }
