@@ -8,13 +8,13 @@ namespace CinemaBookingSystemDAL.Entities
 {
     public class Movie
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public String Title { get; set; }
         public String Description { get; set; }
         public int Duration { get; set; }
         public String PosterUrl { get; set; }
 
-        public int GenreId { get; set; }
+        public Guid GenreId { get; set; }
         public Genre Genre { get; set; }
 
         public double Rating { get; set; }

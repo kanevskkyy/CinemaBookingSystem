@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CinemaBookingSystemDAL.Migrations
 {
     [DbContext(typeof(CinemaDbContext))]
-    [Migration("20250604130037_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250605075223_InitialCreatingDbWithGuid")]
+    partial class InitialCreatingDbWithGuid
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,9 @@ namespace CinemaBookingSystemDAL.Migrations
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Genre", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -48,11 +46,9 @@ namespace CinemaBookingSystemDAL.Migrations
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Hall", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -75,11 +71,9 @@ namespace CinemaBookingSystemDAL.Migrations
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Movie", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -89,8 +83,8 @@ namespace CinemaBookingSystemDAL.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("integer");
 
-                    b.Property<int>("GenreId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("GenreId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("PosterUrl")
                         .IsRequired()
@@ -147,17 +141,15 @@ namespace CinemaBookingSystemDAL.Migrations
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Review", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Rating")
                         .ValueGeneratedOnAdd()
@@ -193,14 +185,12 @@ namespace CinemaBookingSystemDAL.Migrations
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Seat", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("HallId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("HallId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("RowNumber")
                         .HasColumnType("integer");
@@ -217,17 +207,15 @@ namespace CinemaBookingSystemDAL.Migrations
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Session", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("HallId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("HallId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Price")
                         .HasColumnType("integer");
@@ -250,11 +238,9 @@ namespace CinemaBookingSystemDAL.Migrations
 
             modelBuilder.Entity("CinemaBookingSystemDAL.Entities.Ticket", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("boolean");
@@ -262,11 +248,11 @@ namespace CinemaBookingSystemDAL.Migrations
                     b.Property<DateTime>("PurchaseTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("SeatId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("SeatId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("SessionId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("UserId")
                         .IsRequired()

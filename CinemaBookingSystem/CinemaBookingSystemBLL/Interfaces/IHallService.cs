@@ -10,10 +10,10 @@ namespace CinemaBookingSystemBLL.Interfaces
     public interface IHallService
     {
         Task<List<HallResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default);
-        Task<HallResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<HallResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<HallResponseDTO> CreateAsync(HallCreateDTO dto, CancellationToken cancellationToken = default);
-        Task<HallResponseDTO?> UpdateAsync(int id, HallUpdateDTO dto, CancellationToken cancellationToken = default);
-        Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+        Task<HallResponseDTO?> UpdateAsync(Guid id, HallUpdateDTO dto, CancellationToken cancellationToken = default);
+        Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
         Task<HallResponseDTO?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
     }
 }

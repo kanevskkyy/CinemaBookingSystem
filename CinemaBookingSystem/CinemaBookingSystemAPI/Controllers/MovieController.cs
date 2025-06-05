@@ -46,21 +46,21 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:Guid}")]
         [ProducesResponseType(typeof(MovieResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var movie = await movieService.GetByIdAsync(id, cancellationToken);
             if (movie == null) return NotFound();
             return Ok(movie);
         }
 
-        [HttpGet("by-genre/{genreId:int}")]
+        [HttpGet("by-genre/{genreId:Guid}")]
         [ProducesResponseType(typeof(List<MovieResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByGenre(int genreId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetByGenre(Guid genreId, CancellationToken cancellationToken)
         {
             var movies = await movieService.GetByGenreAsync(genreId, cancellationToken);
             return Ok(movies);
@@ -88,13 +88,13 @@ namespace CinemaBookingSystemAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update(int id, [FromBody] MovieUpdateDTO dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update(Guid id, [FromBody] MovieUpdateDTO dto, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
@@ -104,12 +104,12 @@ namespace CinemaBookingSystemAPI.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 

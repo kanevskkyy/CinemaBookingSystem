@@ -11,12 +11,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class MovieRepository : GenericRepository<Movie, int>, IMovieRepository
+    public class MovieRepository : GenericRepository<Movie, Guid>, IMovieRepository
     {
         public MovieRepository(CinemaDbContext context) : base(context) {
         
         }
-        public async Task<List<Movie>> GetByGenreAsync(int genreId, CancellationToken cancellationToken = default)
+        public async Task<List<Movie>> GetByGenreAsync(Guid genreId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AsNoTracking()

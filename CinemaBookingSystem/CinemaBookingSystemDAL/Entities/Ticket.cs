@@ -8,10 +8,10 @@ namespace CinemaBookingSystemDAL.Entities
 {
     public class Ticket
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string UserId { get; set; }
-        public int SessionId { get; set; }
-        public int SeatId { get; set; }
+        public Guid SessionId { get; set; }
+        public Guid SeatId { get; set; }
         public DateTime PurchaseTime { get; set; }
         public bool IsPaid { get; set; } = false;
         public Session Session { get; set; }

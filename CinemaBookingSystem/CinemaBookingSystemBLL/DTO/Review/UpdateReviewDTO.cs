@@ -8,7 +8,7 @@ namespace CinemaBookingSystemBLL.DTO.Review
 {
     public class UpdateReviewDTO
     {
-        public string? Text { get; set; } = null!;
+        public string? Text { get; set; }
         public int? Rating { get; set; }
     }
 }

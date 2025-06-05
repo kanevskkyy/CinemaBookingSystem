@@ -33,7 +33,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 
-        public async Task<ReviewResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<ReviewResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
             if (review == null) return null;
@@ -47,7 +47,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 
-        public async Task<List<ReviewResponseDTO>> GetByMovieIdAsync(int movieId, CancellationToken cancellationToken = default)
+        public async Task<List<ReviewResponseDTO>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default)
         {
             var reviews = await unitOfWork.Review.GetByMovieIdAsync(movieId, cancellationToken);
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
@@ -64,7 +64,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<ReviewResponseDTO>(review);
         }
 
-        public async Task<ReviewResponseDTO?> UpdateAsync(int id, UpdateReviewDTO dto, CancellationToken cancellationToken = default)
+        public async Task<ReviewResponseDTO?> UpdateAsync(Guid id, UpdateReviewDTO dto, CancellationToken cancellationToken = default)
         {
             Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
             if (review == null) return null;
@@ -78,7 +78,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<ReviewResponseDTO>(review);
         }
 
-        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
             if (review == null) return false;

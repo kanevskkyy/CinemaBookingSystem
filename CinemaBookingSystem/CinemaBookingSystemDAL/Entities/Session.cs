@@ -8,9 +8,9 @@ namespace CinemaBookingSystemDAL.Entities
 {
     public class Session
     {
-        public int Id { get; set; }
-        public int MovieId { get; set; }
-        public int HallId { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid MovieId { get; set; }
+        public Guid HallId { get; set; }
         public DateTime StartTime { get; set; }
         public int Price { get; set; }  
 

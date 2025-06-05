@@ -45,7 +45,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
 
-        public async Task<TicketResponseDTO?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<TicketResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Ticket ticket = await unitOfWork.Tickets.GetByIdWithDetailsAsync(id, cancellationToken);
             if (ticket == null) return null;
@@ -66,7 +66,7 @@ namespace CinemaBookingSystemBLL.Services
 
             return mapper.Map<TicketResponseDTO>(createdTicket);
         }
-        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(id, cancellationToken);
             if (ticket == null) return false;
@@ -84,14 +84,14 @@ namespace CinemaBookingSystemBLL.Services
         }
 
 
-        public async Task<List<TicketResponseDTO>> GetBySessionIdAsync(int sessionId, CancellationToken cancellationToken = default)
+        public async Task<List<TicketResponseDTO>> GetBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default)
         {
             List<Ticket> tickets = await unitOfWork.Tickets.GetBySessionIdAsync(sessionId, cancellationToken);
 
             return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
 
-        public async Task<List<TicketResponseDTO>> GetBySeatIdAsync(int seatId, CancellationToken cancellationToken = default)
+        public async Task<List<TicketResponseDTO>> GetBySeatIdAsync(Guid seatId, CancellationToken cancellationToken = default)
         {
             List<Ticket> tickets = await unitOfWork.Tickets.GetBySeatIdAsync(seatId, cancellationToken);
 
@@ -161,7 +161,7 @@ namespace CinemaBookingSystemBLL.Services
             PagedList<TicketResponseDTO> pagedList = await PagedList<TicketResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
             return pagedList;
         }
-        public async Task<bool> ConfirmPaymentAsync(int ticketId, CancellationToken cancellationToken = default)
+        public async Task<bool> ConfirmPaymentAsync(Guid ticketId, CancellationToken cancellationToken = default)
         {
             Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(ticketId, cancellationToken);
             if (ticket == null) return false;

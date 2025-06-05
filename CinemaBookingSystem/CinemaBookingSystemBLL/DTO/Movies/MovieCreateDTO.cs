@@ -8,11 +8,11 @@ namespace CinemaBookingSystemBLL.DTO.Movies
 {
     public class MovieCreateDTO
     {
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        public string Title { get; set; }
+        public string Description { get; set; }
         public int Duration { get; set; }
-        public string PosterUrl { get; set; } = string.Empty;
-        public int GenreId { get; set; }
+        public string PosterUrl { get; set; }
+        public Guid GenreId { get; set; }
         public double Rating { get; set; }
     }
 }

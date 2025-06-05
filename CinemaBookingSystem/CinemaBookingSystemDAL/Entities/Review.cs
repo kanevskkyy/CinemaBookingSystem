@@ -9,14 +9,14 @@ namespace CinemaBookingSystemDAL.Entities
 {
     public class Review
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Text { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow.ToUniversalTime();
         public int Rating { get; set; }
         public string UserId { get; set; }
         public User User { get; set; }
 
-        public int MovieId { get; set; }
+        public Guid MovieId { get; set; }
         public Movie Movie { get; set; }
     }
 }

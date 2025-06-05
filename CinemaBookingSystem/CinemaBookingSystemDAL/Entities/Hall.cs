@@ -8,7 +8,7 @@ namespace CinemaBookingSystemDAL.Entities
 {
     public class Hall
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; }
         public int RowsAmount { get; set; }
         public int SeatsPerRow { get; set; }

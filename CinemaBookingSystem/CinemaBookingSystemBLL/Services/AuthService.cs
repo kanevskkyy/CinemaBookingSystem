@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using AutoMapper;
 using CinemaBookingSystemBLL.DTO.Authorization;
 using CinemaBookingSystemBLL.DTO.Users;
 using CinemaBookingSystemBLL.Interfaces;
@@ -16,29 +17,43 @@ namespace CinemaBookingSystemBLL.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly IConfiguration _configuration;
-        private readonly CinemaDbContext _context;
+        private UserManager<User> userManager;
+        private SignInManager<User> signInManager;
+        private IConfiguration config;
+        private CinemaDbContext context;
+        private IMapper mapper;
 
-        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, CinemaDbContext context)
+        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, CinemaDbContext context, IMapper mapper)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _configuration = configuration;
-            _context = context;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
+            config = configuration;
+            this.context = context;
+            this.mapper = mapper;
         }
 
         public async Task<(string AccessToken, string RefreshToken)> LoginAsync(LoginDTO dto)
         {
-            var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null) throw new UnauthorizedAccessException("Invalid credentials");
+            User? user = await userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("Invalid credentials");
+            }
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-            if (!result.Succeeded) throw new UnauthorizedAccessException("Invalid credentials");
+            if (await userManager.IsLockedOutAsync(user))
+            {
+                throw new UnauthorizedAccessException("Your account is temporarily locked due to multiple failed login attempts. Please try again later.");
+            }
 
-            var accessToken = await GenerateJwtToken(user);
-            var refreshToken = GenerateRefreshToken();
+            var result = await signInManager.CheckPasswordSignInAsync(user, dto.Password, true);
+            if (!result.Succeeded)
+            {
+                throw new UnauthorizedAccessException("Invalid credentials");
+            }
+            await userManager.ResetAccessFailedCountAsync(user);
+
+            string accessToken = await GenerateJwtToken(user);
+            RefreshToken refreshToken = GenerateRefreshToken();
             await SaveRefreshToken(user.Id, refreshToken);
 
             return (accessToken, refreshToken.Token);
@@ -46,22 +61,18 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<(string AccessToken, string RefreshToken)> RegisterAsync(UserCreateDTO dto)
         {
-            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
+            User? existingUser = await userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null) throw new InvalidOperationException("A user with this email already exists.");
 
-            User user = new User
-            {
-                Email = dto.Email,
-                UserName = dto.Name
-            };
+            User user = mapper.Map<User>(dto);
 
-            var result = await _userManager.CreateAsync(user, dto.Password);
+            var result = await userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded) throw new Exception("Something went wrong...");
 
-            await _userManager.AddToRoleAsync(user, "Customer");
+            await userManager.AddToRoleAsync(user, "Customer");
 
-            var accessToken = await GenerateJwtToken(user);
-            var refreshToken = GenerateRefreshToken();
+            string accessToken = await GenerateJwtToken(user);
+            RefreshToken refreshToken = GenerateRefreshToken();
             await SaveRefreshToken(user.Id, refreshToken);
 
             return (accessToken, refreshToken.Token);
@@ -72,17 +83,13 @@ namespace CinemaBookingSystemBLL.Services
         {
             if (dto.Role != "Admin" && dto.Role != "Customer") throw new ArgumentException("Role must be either 'Admin' or 'Customer'.");
 
-            User user = new User
-            {
-                Email = dto.Email,
-                UserName = dto.Name
-            };
+            User user = mapper.Map<User>(dto);
 
-            User? existingUser = await _userManager.FindByEmailAsync(dto.Email);
+            User? existingUser = await userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null) throw new InvalidOperationException("A user with this email already exists.");
 
-            var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded) throw new Exception("Something went wrong..."); await _userManager.AddToRoleAsync(user, dto.Role);
+            var result = await userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded) throw new Exception("Something went wrong..."); await userManager.AddToRoleAsync(user, dto.Role);
 
             return "User created successfully";
         }
@@ -92,20 +99,18 @@ namespace CinemaBookingSystemBLL.Services
             var principal = GetPrincipalFromExpiredToken(request.AccessToken);
             if (principal == null) throw new SecurityTokenException("Invalid token");
 
-            string userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var savedToken = await _context.RefreshTokens
-                .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken && rt.UserId == userId);
-
+            var savedToken = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken && rt.UserId == userId);
             if (savedToken == null || savedToken.ExpiryDate <= DateTime.UtcNow) throw new SecurityTokenException("Invalid or expired refresh token");
 
-            User? user = await _userManager.FindByIdAsync(userId);
-            var newAccessToken = await GenerateJwtToken(user);
-            var newRefreshToken = GenerateRefreshToken();
+            User? user = await userManager.FindByIdAsync(userId);
+            string newAccessToken = await GenerateJwtToken(user);
+            RefreshToken newRefreshToken = GenerateRefreshToken();
 
             savedToken.Token = newRefreshToken.Token;
             savedToken.ExpiryDate = newRefreshToken.ExpiryDate;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return (newAccessToken, newRefreshToken.Token);
         }
@@ -119,17 +124,17 @@ namespace CinemaBookingSystemBLL.Services
                 new Claim(ClaimTypes.Email, user.Email)
             };
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var roles = await userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+            JwtSecurityToken token = new JwtSecurityToken(
+                issuer: config["Jwt:Issuer"],
+                audience: config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddMinutes(int.Parse(config["Jwt:AccessTokenExpiryMinutes"])),
                 signingCredentials: creds
             );
 
@@ -141,13 +146,13 @@ namespace CinemaBookingSystemBLL.Services
             return new RefreshToken
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                ExpiryDate = DateTime.UtcNow.AddDays(7)
+                ExpiryDate = DateTime.UtcNow.AddDays(int.Parse(config["Jwt:RefreshTokenExpiryDays"]))
             };
         }
 
         private async Task SaveRefreshToken(string userId, RefreshToken refreshToken)
         {
-            var existing = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
+            var existing = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
 
             if (existing != null)
             {
@@ -157,10 +162,10 @@ namespace CinemaBookingSystemBLL.Services
             else
             {
                 refreshToken.UserId = userId;
-                await _context.RefreshTokens.AddAsync(refreshToken);
+                await context.RefreshTokens.AddAsync(refreshToken);
             }
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
@@ -169,21 +174,18 @@ namespace CinemaBookingSystemBLL.Services
             {
                 ValidateAudience = true,
                 ValidateIssuer = true,
-                ValidIssuer = _configuration["Jwt:Issuer"],
-                ValidAudience = _configuration["Jwt:Audience"],
+                ValidIssuer = config["Jwt:Issuer"],
+                ValidAudience = config["Jwt:Audience"],
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
                 ValidateLifetime = false
             };
 
-            var handler = new JwtSecurityTokenHandler();
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             try
             {
                 var principal = handler.ValidateToken(token, validationParameters, out SecurityToken securityToken);
-                if (securityToken is not JwtSecurityToken jwtToken ||
-                    !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                    return null;
-
+                if (securityToken is not JwtSecurityToken jwtToken ||!jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase)) return null;
                 return principal;
             }
             catch

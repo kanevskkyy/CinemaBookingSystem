@@ -9,7 +9,7 @@ namespace CinemaBookingSystemBLL.Filters
     public class MovieFilterDTO
     {
         public string? Title { get; set; }
-        public int? GenreId { get; set; }
+        public Guid? GenreId { get; set; }
         public double? MinRating { get; set; }         
         public double? MaxRating { get; set; } 
         public int? MinDuration { get; set; }  
