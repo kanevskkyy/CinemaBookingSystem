@@ -33,6 +33,10 @@ namespace CinemaBookingSystemDAL.Configurations
                 .HasForeignKey(p => p.HallId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasCheckConstraint("CK_Hall_RowsAmount", "\"RowsAmount\" >= 1");
+
+            builder.HasCheckConstraint("CK_Hall_SeatsPerRow", "\"SeatsPerRow\" >= 1");
+
             builder.HasMany(p => p.Sessions)
                 .WithOne(p => p.Hall)
                 .HasForeignKey(p => p.HallId)

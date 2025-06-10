@@ -88,7 +88,7 @@ namespace CinemaBookingSystemBLL.Services
             return true;
         }
 
-        public async Task<PagedList<ReviewResponseDTO>> GetFilteredReviewsAsync(FilterReviewDto filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        public async Task<PagedList<ReviewResponseDTO>> GetFilteredReviewsAsync(ReviewFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             var query = unitOfWork.Review.GetAll();
 

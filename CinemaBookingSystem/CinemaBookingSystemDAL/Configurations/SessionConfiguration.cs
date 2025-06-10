@@ -29,6 +29,8 @@ namespace CinemaBookingSystemDAL.Configurations
             builder.Property(p => p.Price)
                    .IsRequired();
 
+            builder.HasCheckConstraint("CK_Session_Price", "\"Price\" >= 1");
+
             builder.HasOne(p => p.Movie)
                    .WithMany(p => p.Sessions)
                    .HasForeignKey(p => p.MovieId)

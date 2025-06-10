@@ -21,6 +21,10 @@ namespace CinemaBookingSystemDAL.Configurations
             builder.Property(p => p.SeatNumber)
                    .IsRequired();
 
+            builder.HasCheckConstraint("CK_Seat_RowNumber", "\"RowNumber\" >= 1");
+
+            builder.HasCheckConstraint("CK_Seat_SeatNumber", "\"SeatNumber\" >= 1");
+
             builder.HasOne(p => p.Hall)
                    .WithMany(p => p.Seats)
                    .HasForeignKey(p => p.HallId)

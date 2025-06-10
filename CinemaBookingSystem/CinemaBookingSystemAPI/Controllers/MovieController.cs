@@ -53,7 +53,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var movie = await movieService.GetByIdAsync(id, cancellationToken);
-            if (movie == null) return NotFound();
+            if (movie == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find movie with this id!" });
             return Ok(movie);
         }
 
@@ -99,7 +99,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var updated = await movieService.UpdateAsync(id, dto, cancellationToken);
-            if (updated == null) return NotFound();
+            if (updated == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update movie with this id!" }); ;
 
             return NoContent();
         }
@@ -114,7 +114,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var result = await movieService.DeleteAsync(id, cancellationToken);
-            if (!result) return NotFound();
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete movie with this id!" });
 
             return NoContent();
         }

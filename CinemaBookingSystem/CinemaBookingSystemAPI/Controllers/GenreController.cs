@@ -31,7 +31,8 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var genre = await genreService.GetByIdAsync(id, cancellationToken);
-            if (genre == null) return NotFound();
+            
+            if (genre == null) return StatusCode(StatusCodes.Status404NotFound, new {message = "Cannot find genre with this id!" });
             return Ok(genre);
         }
 
@@ -42,8 +43,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] GenreCreateDTO dto, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin"))
-                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var created = await genreService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);

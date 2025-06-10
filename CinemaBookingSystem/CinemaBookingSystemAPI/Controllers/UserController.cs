@@ -55,7 +55,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin") && userId != id) return Forbid();
 
             var user = await userService.GetByIdAsync(id, cancellationToken);
-            if (user == null) return NotFound();
+            if (user == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find user with this id!" });
 
             return Ok(user);
         }
@@ -70,7 +70,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var user = await userService.GetByEmailAsync(email, cancellationToken);
-            if (user == null) return NotFound();
+            if (user == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find user with this email!" });
 
             return Ok(user);
         }
@@ -87,7 +87,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin") && userId != id) return Forbid();
 
             var existingUser = await userService.GetByIdAsync(id, cancellationToken);
-            if (existingUser == null) return NotFound();
+            if (existingUser == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update user with this id!" });
 
             var updatedUser = await userService.UpdateAsync(id, dto, cancellationToken);
             return Ok(updatedUser);
@@ -120,7 +120,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin") && userId != id) return Forbid();
 
             var result = await userService.DeleteAsync(id, cancellationToken);
-            if (!result) return NotFound();
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete user with this id!" });
 
             return NoContent();
         }

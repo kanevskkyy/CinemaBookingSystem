@@ -44,7 +44,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var session = await sessionService.GetByIdAsync(id, cancellationToken);
-            if (session == null) return NotFound();
+            if (session == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session with this id!" });
 
             return Ok(session);
         }
@@ -56,7 +56,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetByMovieId(Guid movieId, CancellationToken cancellationToken)
         {
             var sessions = await sessionService.GetByMovieIdAsync(movieId, cancellationToken);
-            if (sessions == null || !sessions.Any()) return NotFound();
+            if (sessions == null || !sessions.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session movie with this id!" });
 
             return Ok(sessions);
         }
@@ -68,7 +68,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetByHallId(Guid hallId, CancellationToken cancellationToken)
         {
             var sessions = await sessionService.GetByHallIdAsync(hallId, cancellationToken);
-            if (sessions == null || !sessions.Any()) return NotFound();
+            if (sessions == null || !sessions.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session hall with this id!" });
 
             return Ok(sessions);
         }
@@ -106,7 +106,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var updated = await sessionService.UpdateAsync(id, dto, cancellationToken);
-            if (updated == null) return NotFound();
+            if (updated == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update session with this id!" });
 
             return NoContent();
         }
@@ -121,7 +121,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var result = await sessionService.DeleteAsync(id, cancellationToken);
-            if (!result) return NotFound();
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete session with this id!" });
 
             return NoContent();
         }
