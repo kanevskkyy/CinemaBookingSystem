@@ -28,6 +28,10 @@ namespace CinemaBookingSystemDAL.Configurations
             
             builder.HasIndex(p => p.Rating);
 
+            builder.HasCheckConstraint("CK_Movie_Duration", "\"Duration\" >= 1");
+
+            builder.HasCheckConstraint("CK_Movie_Rating", "\"Rating\" >= 2.0 AND \"Rating\" <= 10.0 ");
+
             builder.Property(p => p.Description)
                 .HasMaxLength(3000)
                 .IsRequired();
@@ -44,9 +48,9 @@ namespace CinemaBookingSystemDAL.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(p => p.Genre)
-            .WithMany(p => p.Movies)
-            .HasForeignKey(p => p.GenreId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(p => p.Movies)
+                .HasForeignKey(p => p.GenreId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(p => p.Rating)
                 .IsRequired();

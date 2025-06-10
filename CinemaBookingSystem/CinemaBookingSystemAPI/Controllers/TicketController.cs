@@ -54,7 +54,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var ticket = await ticketService.GetByIdAsync(id, cancellationToken);
-            if (ticket == null) return NotFound();
+            if (ticket == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket with this id!" });
 
             return Ok(ticket);
         }
@@ -72,7 +72,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (currentUserId == null || (!User.IsInRole("Admin") && currentUserId != userId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
 
             var tickets = await ticketService.GetByUserIdAsync(userId, cancellationToken);
-            if (tickets == null || !tickets.Any()) return NotFound();
+            if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket by user with this id!" });
 
             return Ok(tickets);
         }
@@ -87,7 +87,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var tickets = await ticketService.GetBySessionIdAsync(sessionId, cancellationToken);
-            if (tickets == null || !tickets.Any()) return NotFound();
+            if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket by session with this id!" });
 
             return Ok(tickets);
         }
@@ -102,7 +102,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var tickets = await ticketService.GetBySeatIdAsync(seatId, cancellationToken);
-            if (tickets == null || !tickets.Any()) return NotFound();
+            if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session by seat with this id!" });
 
             return Ok(tickets);
         }
@@ -142,7 +142,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var result = await ticketService.DeleteAsync(id, cancellationToken);
-            if (!result) return NotFound();
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete session with this id!" });
 
             return NoContent();
         }
@@ -166,7 +166,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> ConfirmPayment(Guid id)
         {
             var result = await ticketService.ConfirmPaymentAsync(id);
-            if (!result) return NotFound();
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot confirm payment ticket with this id!" });
 
             return Ok();
         }

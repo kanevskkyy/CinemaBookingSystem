@@ -19,7 +19,7 @@ namespace CinemaBookingSystemBLL.Interfaces
         Task<ReviewResponseDTO> UpdateAsync(Guid id, UpdateReviewDTO dto, CancellationToken cancellationToken = default);
         Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
         Task<PagedList<ReviewResponseDTO>> GetPagedReviewsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
-        Task<PagedList<ReviewResponseDTO>> GetFilteredReviewsAsync(FilterReviewDto filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+        Task<PagedList<ReviewResponseDTO>> GetFilteredReviewsAsync(ReviewFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         Task<List<ReviewResponseDTO>> GetTop10BestReviewsAsync(CancellationToken cancellationToken = default);
         Task<List<ReviewResponseDTO>> GetTop10WorstReviewsAsync(CancellationToken cancellationToken = default);
     }

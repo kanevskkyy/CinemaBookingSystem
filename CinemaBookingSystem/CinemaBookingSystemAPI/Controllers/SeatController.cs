@@ -40,7 +40,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var seat = await seatService.GetByIdAsync(id, cancellationToken);
-            if (seat == null) return NotFound();
+            if (seat == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find seat with this id!" });
             return Ok(seat);
         }
 
@@ -51,7 +51,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetByHallId(Guid hallId, CancellationToken cancellationToken)
         {
             var seats = await seatService.GetByHallIdAsync(hallId, cancellationToken);
-            if (seats == null) return NotFound();
+            if (seats == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find hall with this id!" });
             return Ok(seats);
         }
 
@@ -90,7 +90,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var updated = await seatService.UpdateAsync(id, dto, cancellationToken);
-            if (updated == null) return NotFound();
+            if (updated == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update seat with this id!" });
             return NoContent();
         }
 
@@ -104,7 +104,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var result = await seatService.DeleteAsync(id, cancellationToken);
-            if (!result) return NotFound();
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete seat with this id!" });
             return NoContent();
         }
     }

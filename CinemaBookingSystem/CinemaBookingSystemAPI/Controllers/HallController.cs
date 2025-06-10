@@ -32,7 +32,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var hall = await hallService.GetByIdAsync(id, cancellationToken);
-            if (hall == null) return NotFound();
+            if (hall == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find hall with this id!" });
             return Ok(hall);
         }
 
@@ -43,7 +43,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetByName(string name, CancellationToken cancellationToken)
         {
             var hall = await hallService.GetByNameAsync(name, cancellationToken);
-            if (hall == null) return NotFound();
+            if (hall == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find hall with this name!" });
             return Ok(hall);
         }
 
@@ -71,7 +71,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var updated = await hallService.UpdateAsync(id, dto, cancellationToken);
-            if (updated == null) return NotFound();
+            if (updated == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update hall!" }); ;
             return NoContent();
         }
 
@@ -85,7 +85,7 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             var result = await hallService.DeleteAsync(id, cancellationToken);
-            if (!result) return NotFound();
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete hall with this id!" }); ;
             return NoContent();
         }
     }
