@@ -14,7 +14,7 @@ namespace CinemaBookingSystemBLL.Validations.Users
         {
             RuleFor(p => p.Email).EmailAddress().WithMessage("Email must be a valid email address.");
 
-            RuleFor(p => p.Role).Must(role => new[] { "Customer", "Admin" }.Contains(role)).WithMessage("Role must be one of the following: Customer, Admin.");
+            RuleFor(p => p.Role).Must(role => new[] { "customer", "admin" }.Contains(role.ToLower())).WithMessage("Role must be one of the following: Customer, Admin.");
         }
     }
 }

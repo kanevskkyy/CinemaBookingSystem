@@ -93,21 +93,21 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(updatedUser);
         }
 
-        [HttpPost("{id}/change-password")]
+        [HttpPost("change-password")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> ChangePassword(string id, [FromBody] ChangePasswordDTO dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO dto, CancellationToken cancellationToken)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (currentUserId != id) return Forbid();
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(currentUserId)) return Forbid();
 
-            var result = await userService.ChangePasswordAsync(id, dto, cancellationToken);
+            var result = await userService.ChangePasswordAsync(currentUserId, dto, cancellationToken);
             if (!result) return BadRequest(new { message = "Incorrect current password or password requirements not met." });
 
             return NoContent();
         }
+
 
         [HttpDelete("{id}")]
         [Authorize]

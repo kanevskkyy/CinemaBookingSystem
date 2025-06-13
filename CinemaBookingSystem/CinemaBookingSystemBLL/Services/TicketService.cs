@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using CinemaBookingSystemBLL.DTO.Sessions;
 using CinemaBookingSystemBLL.DTO.Tickets;
 using CinemaBookingSystemBLL.Filters;
@@ -100,64 +101,52 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<TicketResponseDTO>> GetFilteredTicketsAsync(TicketFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Tickets.GetAll();
+            IQueryable<Ticket> queryable = unitOfWork.Tickets.GetAll();
 
-            if (filter.UserId.Trim().Length > 0) query = query.Where(t => t.UserId == filter.UserId);
-            if (filter.SessionId.HasValue) query = query.Where(t => t.SessionId == filter.SessionId.Value);
-            if (filter.SeatId.HasValue) query = query.Where(t => t.SeatId == filter.SeatId.Value);
-            if (filter.PurchaseTimeFrom.HasValue) query = query.Where(t => t.PurchaseTime >= filter.PurchaseTimeFrom.Value);
-            if (filter.PurchaseTimeTo.HasValue) query = query.Where(t => t.PurchaseTime <= filter.PurchaseTimeTo.Value);
+            if (filter.UserId.Trim().Length > 0) queryable = queryable.Where(t => t.UserId == filter.UserId);
+            if (filter.SessionId.HasValue) queryable = queryable.Where(t => t.SessionId == filter.SessionId.Value);
+            if (filter.SeatId.HasValue) queryable = queryable.Where(t => t.SeatId == filter.SeatId.Value);
+            if (filter.PurchaseTimeFrom.HasValue) queryable = queryable.Where(t => t.PurchaseTime >= filter.PurchaseTimeFrom.Value);
+            if (filter.PurchaseTimeTo.HasValue) queryable = queryable.Where(t => t.PurchaseTime <= filter.PurchaseTimeTo.Value);
 
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
                 switch (filter.SortBy.ToLower())
                 {
                     case "purchasetime":
-                        if (filter.SortDescending) query = query.OrderByDescending(t => t.PurchaseTime);
-                        else query = query.OrderBy(t => t.PurchaseTime);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.PurchaseTime);
+                        else queryable = queryable.OrderBy(t => t.PurchaseTime);
                         
                         break;
 
                     case "userid":
-                        if (filter.SortDescending) query = query.OrderByDescending(t => t.UserId);
-                        else query = query.OrderBy(t => t.UserId);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.UserId);
+                        else queryable = queryable.OrderBy(t => t.UserId);
                         
                         break;
 
                     case "sessionid":
-                        if (filter.SortDescending) query = query.OrderByDescending(t => t.SessionId);
-                        else query = query.OrderBy(t => t.SessionId);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.SessionId);
+                        else queryable = queryable.OrderBy(t => t.SessionId);
                         
                         break;
 
                     case "seatid":
-                        if (filter.SortDescending) query = query.OrderByDescending(t => t.SeatId);
-                        else query = query.OrderBy(t => t.SeatId);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.SeatId);
+                        else queryable = queryable.OrderBy(t => t.SeatId);
                         
                         break;
 
                     default:
-                        if (filter.SortDescending) query = query.OrderByDescending(t => t.Id);
-                        else query = query.OrderBy(t => t.Id);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.Id);
+                        else queryable = queryable.OrderBy(t => t.Id);
                         
                         break;
                 }
             }
-            else query = query.OrderBy(t => t.Id);
+            else queryable = queryable.OrderBy(t => t.Id);
 
-            var projectedQuery = query.Select(t => new TicketResponseDTO
-            {
-                Id = t.Id,
-                UserId = t.UserId,
-                UserName = t.User.UserName,
-                SessionId = t.SessionId,
-                SessionMovieTitle = t.Session.Movie.Title,
-                SeatId = t.SeatId,
-                SeatInfo = $"Row {t.Seat.RowNumber} Seat {t.Seat.SeatNumber}",
-                PurchaseTime = t.PurchaseTime,
-                IsPaid = t.IsPaid
-            });
-
+            var projectedQuery = queryable.ProjectTo<TicketResponseDTO>(mapper.ConfigurationProvider);
             PagedList<TicketResponseDTO> pagedList = await PagedList<TicketResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
             return pagedList;
         }

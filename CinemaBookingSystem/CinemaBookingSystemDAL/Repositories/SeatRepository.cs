@@ -24,17 +24,5 @@ namespace CinemaBookingSystemDAL.Repositories
                 .Where(p => p.HallId == hallId)
                 .ToListAsync(cancellationToken);
         }
-
-        public async Task<Seat?> GetByRowAndNumberAsync(Guid hallId, int rowNumber, int columnNumber, CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .AsNoTracking()
-                .OrderBy(p => p.Id)
-                .FirstOrDefaultAsync(p =>
-                    p.HallId == hallId &&
-                    p.RowNumber == rowNumber &&
-                    p.SeatNumber == columnNumber,
-                    cancellationToken);
-        }
     }
 }

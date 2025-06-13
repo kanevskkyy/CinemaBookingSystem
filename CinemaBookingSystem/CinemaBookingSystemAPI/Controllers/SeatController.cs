@@ -55,17 +55,6 @@ namespace CinemaBookingSystemAPI.Controllers
             return Ok(seats);
         }
 
-        [HttpGet("by-row-and-number/{hallId:Guid}/{rowNumber:int}/{seatNumber:int}")]
-        [ProducesResponseType(typeof(SeatResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByRowAndNumber(Guid hallId, int rowNumber, int seatNumber, CancellationToken cancellationToken)
-        {
-            var seat = await seatService.GetByRowAndNumberAsync(hallId, rowNumber, seatNumber, cancellationToken);
-            if (seat == null) return NotFound();
-            return Ok(seat);
-        }
-
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(SeatResponseDTO), StatusCodes.Status201Created)]

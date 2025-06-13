@@ -67,7 +67,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByUserId(string userId, CancellationToken cancellationToken)
         {
-            string currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string? currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (currentUserId == null || (!User.IsInRole("Admin") && currentUserId != userId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
 

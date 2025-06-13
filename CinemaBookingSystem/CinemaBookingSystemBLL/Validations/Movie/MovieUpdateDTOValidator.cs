@@ -8,14 +8,14 @@ using FluentValidation;
 
 namespace CinemaBookingSystemBLL.Validations.Movie
 {
-    public class MovieUpdateDTOValidator:AbstractValidator<MovieUpdateDTO>
+    public class MovieUpdateDTOValidator : AbstractValidator<MovieUpdateDTO>
     {
-        public MovieUpdateDTOValidator() 
+        public MovieUpdateDTOValidator()
         {
             RuleFor(p => p.Title).NotEmpty().WithMessage("Title is required and can not be empty")
                 .MaximumLength(90).WithMessage("Title length cannot be bigger than 90 symbols");
 
-            RuleFor(p => p.Description).NotEmpty().WithMessage("Desctiption is required and can not be empty")
+            RuleFor(p => p.Description).NotEmpty().WithMessage("Description is required and can not be empty")
                 .MaximumLength(3000).WithMessage("Description length should be less than 3000 symbols");
 
             RuleFor(p => p.Duration).GreaterThan(0).WithMessage("Duration must be greater than 0.");
@@ -23,9 +23,10 @@ namespace CinemaBookingSystemBLL.Validations.Movie
             RuleFor(p => p.PosterUrl).NotEmpty().WithMessage("Poster URL is required.")
                 .MaximumLength(300).WithMessage("Poster URL must not exceed 300 characters.");
 
-            RuleFor(p => p.GenreId).NotEmpty().WithMessage("GenreId is required.");
+            RuleFor(p => p.GenreIds).NotEmpty().WithMessage("At least one GenreId is required.")
+                .Must(list => list.All(id => id != Guid.Empty)).WithMessage("All GenreIds must be valid GUIDs.");
 
-            RuleFor(p => p.Rating).InclusiveBetween(0.0, 10.0).WithMessage("Rating musb be between 0.0 and 10.0");
+            RuleFor(p => p.Rating).InclusiveBetween(0.1, 10.0).WithMessage("Rating must be between 0.1 and 10.0");
         }
     }
 }

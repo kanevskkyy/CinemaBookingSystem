@@ -139,7 +139,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<UserResponseDTO>> GetFilteredUsersAsync(UserFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Users.GetAll();
+            IQueryable<User> query = unitOfWork.Users.GetAll();
 
             if (!string.IsNullOrWhiteSpace(filter.Name)) query = query.Where(u => u.UserName.ToLower().Contains(filter.Name.ToLower()));
             if (!string.IsNullOrWhiteSpace(filter.Email)) query = query.Where(u => u.Email.ToLower().Contains(filter.Email.ToLower()));
@@ -190,9 +190,7 @@ namespace CinemaBookingSystemBLL.Services
                 else filteredList.OrderBy(u => u.Role).ToList();
             }
 
-            var pagedItems = filteredList.Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            var pagedItems = filteredList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
             return new PagedList<UserResponseDTO>(pagedItems, filteredList.Count, pageNumber, pageSize);
         }
     }

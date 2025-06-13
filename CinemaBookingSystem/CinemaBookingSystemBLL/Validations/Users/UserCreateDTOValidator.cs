@@ -23,7 +23,7 @@ namespace CinemaBookingSystemBLL.Validations.Users
 
             RuleFor(p => p.Role)
                 .NotEmpty().WithMessage("Role is required.")
-                .Must(role => new[] {"Customer", "Admin"}.Contains(role))
+                .Must(role => new[] {"customer", "admin"}.Contains(role.ToLower()))
                 .WithMessage("Role must be one of the following: Customer, Admin.");
         }
     }

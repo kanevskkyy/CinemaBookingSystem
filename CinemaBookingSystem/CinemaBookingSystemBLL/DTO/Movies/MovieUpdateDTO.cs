@@ -12,7 +12,7 @@ namespace CinemaBookingSystemBLL.DTO.Movies
         public string Description { get; set; }
         public int Duration { get; set; }
         public string PosterUrl { get; set; }
-        public Guid GenreId { get; set; }
+        public List<Guid> GenreIds { get; set; }
         public double Rating { get; set; }
     }
 }
