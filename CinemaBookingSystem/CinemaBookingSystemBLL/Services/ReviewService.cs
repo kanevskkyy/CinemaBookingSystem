@@ -43,13 +43,13 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<ReviewResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
-            var reviews = await unitOfWork.Review.GetByUserIdAsync(userId, cancellationToken);
+            List<Review> reviews = await unitOfWork.Review.GetByUserIdAsync(userId, cancellationToken);
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 
         public async Task<List<ReviewResponseDTO>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default)
         {
-            var reviews = await unitOfWork.Review.GetByMovieIdAsync(movieId, cancellationToken);
+            List<Review> reviews = await unitOfWork.Review.GetByMovieIdAsync(movieId, cancellationToken);
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 
@@ -90,19 +90,19 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<ReviewResponseDTO>> GetFilteredReviewsAsync(ReviewFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Review.GetAll();
+            var queryable = unitOfWork.Review.GetAll();
 
-            if (!string.IsNullOrEmpty(filter.UserId)) query = query.Where(r => r.UserId == filter.UserId);
-            if (filter.MovieId.HasValue) query = query.Where(r => r.MovieId == filter.MovieId.Value);
-            if (filter.MinRating.HasValue) query = query.Where(r => r.Rating >= filter.MinRating.Value);
-            if (filter.MaxRating.HasValue) query = query.Where(r => r.Rating <= filter.MaxRating.Value);
-            if (!string.IsNullOrEmpty(filter.TextContains)) query = query.Where(r => r.Text.ToLower().Contains(filter.TextContains.ToLower()));
-            if (filter.CreatedAfter.HasValue) query = query.Where(r => r.CreatedAt >= filter.CreatedAfter.Value);
-            if (filter.CreatedBefore.HasValue) query = query.Where(r => r.CreatedAt <= filter.CreatedBefore.Value);
+            if (!string.IsNullOrEmpty(filter.UserId)) queryable = queryable.Where(r => r.UserId == filter.UserId);
+            if (filter.MovieId.HasValue) queryable = queryable.Where(r => r.MovieId == filter.MovieId.Value);
+            if (filter.MinRating.HasValue) queryable = queryable.Where(r => r.Rating >= filter.MinRating.Value);
+            if (filter.MaxRating.HasValue) queryable = queryable.Where(r => r.Rating <= filter.MaxRating.Value);
+            if (!string.IsNullOrEmpty(filter.TextContains)) queryable = queryable.Where(r => r.Text.ToLower().Contains(filter.TextContains.ToLower()));
+            if (filter.CreatedAfter.HasValue) queryable = queryable.Where(r => r.CreatedAt >= filter.CreatedAfter.Value);
+            if (filter.CreatedBefore.HasValue) queryable = queryable.Where(r => r.CreatedAt <= filter.CreatedBefore.Value);
 
-            query = query.OrderByDescending(r => r.CreatedAt.ToUniversalTime());
+            queryable = queryable.OrderByDescending(r => r.CreatedAt.ToUniversalTime());
 
-            PagedList<Review> items = await PagedList<Review>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
+            PagedList<Review> items = await PagedList<Review>.ToPagedListAsync(queryable, pageNumber, pageSize, cancellationToken);
             var result = mapper.Map<List<ReviewResponseDTO>>(items.Items);
 
             return new PagedList<ReviewResponseDTO>(result, items.TotalCount, items.CurrentPage, items.PageSize);

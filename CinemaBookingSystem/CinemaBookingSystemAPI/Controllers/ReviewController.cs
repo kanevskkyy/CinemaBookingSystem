@@ -34,6 +34,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             var review = await reviewService.GetByIdAsync(id, cancellationToken);
             if (review == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find review with this id!" });
+            
             return Ok(review);
         }
 
@@ -42,7 +43,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(typeof(List<ReviewResponseDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByUserId(string userId, CancellationToken cancellationToken)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!User.IsInRole("Admin") && currentUserId != userId) return Forbid();
 
             var result = await reviewService.GetByUserIdAsync(userId, cancellationToken);
@@ -63,7 +64,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateReviewDTO dto, CancellationToken cancellationToken)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (dto.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed or user who`s reviews is to perform this action." });
 
             var created = await reviewService.CreateAsync(dto, cancellationToken);
@@ -80,7 +81,7 @@ namespace CinemaBookingSystemAPI.Controllers
             var existing = await reviewService.GetByIdAsync(id, cancellationToken);
             if (existing == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find review with this id!" });
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed or user who`s reviews is to perform this action." });
 
             var updated = await reviewService.UpdateAsync(id, dto, cancellationToken);
@@ -97,7 +98,7 @@ namespace CinemaBookingSystemAPI.Controllers
             var existing = await reviewService.GetByIdAsync(id, cancellationToken);
             if (existing == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete review with this id!" });
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed or user who`s reviews is to perform this action." });
 
             await reviewService.DeleteAsync(id, cancellationToken);

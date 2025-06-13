@@ -29,9 +29,12 @@ namespace CinemaBookingSystemBLL.AutoMapper
             CreateMap<HallCreateDTO, Hall>();
             CreateMap<HallUpdateDTO, Hall>().ForMember(dest => dest.Id, opt => opt.Ignore());
 
-            CreateMap<Movie, MovieResponseDTO>();
-            CreateMap<MovieCreateDTO, Movie>();
-            CreateMap<MovieUpdateDTO, Movie>().ForMember(dest => dest.Id, opt => opt.Ignore());
+            CreateMap<Movie, MovieResponseDTO>().ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.MovieGenres.Select(mg => mg.Genre)));
+            CreateMap<MovieCreateDTO, Movie>().ForMember(dest => dest.MovieGenres, opt => opt.MapFrom(src => src.GenreIds.Select(id => new MovieGenre { GenreId = id })));
+            CreateMap<MovieUpdateDTO, Movie>()
+                .ForMember(dest => dest.MovieGenres, opt => opt.MapFrom(src => src.GenreIds.Select(id => new MovieGenre { GenreId = id })))
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
+
 
             CreateMap<Review, ReviewResponseDTO>().ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToUniversalTime()));
             CreateMap<CreateReviewDTO, Review>().ForMember(dest => dest.CreatedAt, opt => opt.Ignore());

@@ -53,7 +53,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<SessionResponseDTO>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default)
         {
-            var sessions = await unitOfWork.Sessions.GetByHallIdAsync(hallId, cancellationToken);
+            List<Session> sessions = await unitOfWork.Sessions.GetByHallIdAsync(hallId, cancellationToken);
             return mapper.Map<List<SessionResponseDTO>>(sessions);
         }
 
@@ -65,7 +65,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<SessionResponseDTO> CreateAsync(SessionCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            var movie = await unitOfWork.Movies.GetByIdAsync(dto.MovieId, cancellationToken);
+            Movie? movie = await unitOfWork.Movies.GetByIdAsync(dto.MovieId, cancellationToken);
             if (movie == null) throw new ArgumentException("Movie not found.");
 
             var sessionsInHall = await unitOfWork.Sessions.GetAllAsync();
@@ -110,8 +110,7 @@ namespace CinemaBookingSystemBLL.Services
 
             DateTime newStart = dto.StartTime.ToUniversalTime();
             DateTime newEnd = newStart.AddMinutes(movie.Duration).ToUniversalTime();
-            var sessionsInHall = await unitOfWork.Sessions
-                .FindAsync(s => s.HallId == session.HallId && s.Id != id, cancellationToken);
+            var sessionsInHall = await unitOfWork.Sessions.FindAsync(s => s.HallId == session.HallId && s.Id != id, cancellationToken);
 
             foreach (var existingSession in sessionsInHall)
             {
@@ -133,39 +132,39 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<SessionResponseDTO>> GetFilteredSessionsAsync(SessionFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Sessions.GetAll();
+            IQueryable<Session> queryable = unitOfWork.Sessions.GetAll();
 
-            if (filter.MovieId.HasValue) query = query.Where(s => s.MovieId == filter.MovieId.Value);
-            if (filter.HallId.HasValue) query = query.Where(s => s.HallId == filter.HallId.Value);
-            if (filter.StartTimeFrom.HasValue) query = query.Where(s => s.StartTime >= filter.StartTimeFrom.Value);
-            if (filter.StartTimeTo.HasValue) query = query.Where(s => s.StartTime <= filter.StartTimeTo.Value);
-            if (filter.MinPrice.HasValue) query = query.Where(s => s.Price >= filter.MinPrice.Value);
-            if (filter.MaxPrice.HasValue) query = query.Where(s => s.Price <= filter.MaxPrice.Value);
+            if (filter.MovieId.HasValue) queryable = queryable.Where(s => s.MovieId == filter.MovieId.Value);
+            if (filter.HallId.HasValue) queryable = queryable.Where(s => s.HallId == filter.HallId.Value);
+            if (filter.StartTimeFrom.HasValue) queryable = queryable.Where(s => s.StartTime >= filter.StartTimeFrom.Value);
+            if (filter.StartTimeTo.HasValue) queryable = queryable.Where(s => s.StartTime <= filter.StartTimeTo.Value);
+            if (filter.MinPrice.HasValue) queryable = queryable.Where(s => s.Price >= filter.MinPrice.Value);
+            if (filter.MaxPrice.HasValue) queryable = queryable.Where(s => s.Price <= filter.MaxPrice.Value);
 
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
                 switch (filter.SortBy.ToLower())
                 {
                     case "starttime":
-                        query = filter.SortDescending ? query.OrderByDescending(s => s.StartTime) : query.OrderBy(s => s.StartTime);
+                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.StartTime) : queryable.OrderBy(s => s.StartTime);
                         break;
                     case "movieid":
-                        query = filter.SortDescending ? query.OrderByDescending(s => s.MovieId) : query.OrderBy(s => s.MovieId);
+                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.MovieId) : queryable.OrderBy(s => s.MovieId);
                         break;
                     case "hallid":
-                        query = filter.SortDescending ? query.OrderByDescending(s => s.HallId) : query.OrderBy(s => s.HallId);
+                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.HallId) : queryable.OrderBy(s => s.HallId);
                         break;
                     case "price":
-                        query = filter.SortDescending ? query.OrderByDescending(s => s.Price) : query.OrderBy(s => s.Price);
+                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.Price) : queryable.OrderBy(s => s.Price);
                         break;
                     default:
-                        query = filter.SortDescending ? query.OrderByDescending(s => s.Id) : query.OrderBy(s => s.Id);
+                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.Id) : queryable.OrderBy(s => s.Id);
                         break;
                 }
             }
-            else query = query.OrderBy(s => s.Id);
+            else queryable = queryable.OrderBy(s => s.Id);
 
-            var projectedQuery = query.ProjectTo<SessionResponseDTO>(mapper.ConfigurationProvider);/**/
+            var projectedQuery = queryable.ProjectTo<SessionResponseDTO>(mapper.ConfigurationProvider);/**/
             var pagedList = await PagedList<SessionResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
             
             return pagedList;

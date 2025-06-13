@@ -16,12 +16,33 @@ namespace CinemaBookingSystemDAL.Repositories
         public MovieRepository(CinemaDbContext context) : base(context) {
         
         }
+
+        public async Task<Movie?> GetByIdWithGenresAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return await dbSet
+                .AsNoTracking()
+                .Include(m => m.MovieGenres)
+                .ThenInclude(mg => mg.Genre)
+                .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+        }
+
+        public async Task<List<Movie>> GetAllWithGenresAsync(CancellationToken cancellationToken = default)
+        {
+            return await dbSet
+                .AsNoTracking()
+                .Include(m => m.MovieGenres)
+                .ThenInclude(mg => mg.Genre)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<List<Movie>> GetByGenreAsync(Guid genreId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AsNoTracking()
-                .Where(p => p.GenreId == genreId)
-                .OrderBy(p => p.Id)
+                .Include(m => m.MovieGenres)
+                .ThenInclude(mg => mg.Genre)
+                .Where(m => m.MovieGenres.Any(mg => mg.GenreId == genreId))
+                .OrderBy(m => m.Id)
                 .ToListAsync(cancellationToken);
         }
 
@@ -29,6 +50,8 @@ namespace CinemaBookingSystemDAL.Repositories
         {
             return await dbSet
                 .AsNoTracking()
+                .Include(m => m.MovieGenres)
+                .ThenInclude(mg => mg.Genre)
                 .OrderByDescending(p => p.Rating) 
                 .Take(10)
                 .ToListAsync(cancellationToken);

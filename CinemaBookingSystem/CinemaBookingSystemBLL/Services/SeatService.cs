@@ -50,16 +50,8 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<SeatResponseDTO>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default)
         {
-            var seats = await unitOfWork.Seats.GetByHallIdAsync(hallId, cancellationToken);
+            List<Seat> seats = await unitOfWork.Seats.GetByHallIdAsync(hallId, cancellationToken);
             return mapper.Map<List<SeatResponseDTO>>(seats);
-        }
-
-        public async Task<SeatResponseDTO?> GetByRowAndNumberAsync(Guid hallId, int rowNumber, int seatNumber, CancellationToken cancellationToken = default)
-        {
-            Seat? seat = await unitOfWork.Seats.GetByRowAndNumberAsync(hallId, rowNumber, seatNumber, cancellationToken);
-            if (seat == null) return null;
-
-            return mapper.Map<SeatResponseDTO>(seat);
         }
 
         public async Task<SeatResponseDTO> CreateAsync(SeatCreateDTO dto, CancellationToken cancellationToken = default)

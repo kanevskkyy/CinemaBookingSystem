@@ -23,6 +23,7 @@ namespace CinemaBookingSystemDAL.DbCreating
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<MovieGenre> MovieGenres { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +35,7 @@ namespace CinemaBookingSystemDAL.DbCreating
             modelBuilder.ApplyConfiguration(new GenreConfiguration());
             modelBuilder.ApplyConfiguration(new ReviewConfiguration());
             modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+            modelBuilder.ApplyConfiguration(new MovieGenreConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
@@ -43,12 +45,13 @@ namespace CinemaBookingSystemDAL.DbCreating
             await UserGeneration.GenerateAsync(userManager, roleManager);
             List<Genre> genres = GenreGeneration.Generate(context);
             List<Hall> halls = HallGeneration.Generate(context);
-            List<Movie> movies = MovieGeneration.Generate(context, genres);
+            List<Movie> movies = MovieGeneration.Generate(context);
             List<Seat> seats = SeatGeneration.Generate(context, halls);
             List<Session> sessions = SessionGeneration.Generate(context, movies, halls);
             List<User> users = userManager.Users.ToList();
             List<Review> reviews = ReviewGeneration.Generate(context, users, movies);
             TicketGeneration.Generate(context, users, sessions, seats);
+            MovieGenreGeneration.Generate(context, movies, genres);
             await context.SaveChangesAsync();
         }
     }

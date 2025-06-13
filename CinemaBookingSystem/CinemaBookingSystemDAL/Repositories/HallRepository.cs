@@ -20,7 +20,7 @@ namespace CinemaBookingSystemDAL.Repositories
         {
             return await dbSet
                 .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Name == hallName, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Name.ToLower() == hallName.ToLower(), cancellationToken);
         }
     }
 }
