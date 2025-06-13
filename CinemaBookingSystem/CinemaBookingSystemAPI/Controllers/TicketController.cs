@@ -3,6 +3,7 @@ using CinemaBookingSystemBLL.DTO.Tickets;
 using CinemaBookingSystemBLL.DTO.Users;
 using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemBLL.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,45 +21,67 @@ namespace CinemaBookingSystemAPI.Controllers
             this.ticketService = ticketService;
         }
 
+        /// <summary>
+        /// Get all tickets (admin only).
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var pagedSessions = await ticketService.GetAllAsync(cancellationToken);
-            return Ok(pagedSessions);
+            List<TicketResponseDTO> tickets = await ticketService.GetAllAsync(cancellationToken);
+            return Ok(tickets);
         }
 
+        /// <summary>
+        /// Get paginated list of tickets (admin only).
+        /// </summary>
+        /// <param name="pageNumber">Page number.</param>
+        /// <param name="pageSize">Page size.</param>
         [HttpGet("paginated")]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPagedSessions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var pagedSessions = await ticketService.GetPagedTicketsAsync(pageNumber, pageSize);
-            return Ok(pagedSessions);
+            PagedList<TicketResponseDTO> paginatedTickets = await ticketService.GetPagedTicketsAsync(pageNumber, pageSize);
+            return Ok(paginatedTickets);
         }
 
+        /// <summary>
+        /// Get ticket by ID (admin only).
+        /// </summary>
+        /// <param name="id">Ticket ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(typeof(TicketResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var ticket = await ticketService.GetByIdAsync(id, cancellationToken);
+            TicketResponseDTO ticket = await ticketService.GetByIdAsync(id, cancellationToken);
             if (ticket == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket with this id!" });
 
             return Ok(ticket);
         }
 
+        /// <summary>
+        /// Get tickets by user ID (admin or own tickets).
+        /// </summary>
+        /// <param name="userId">User ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-user/{userId}")]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
@@ -71,46 +94,64 @@ namespace CinemaBookingSystemAPI.Controllers
 
             if (currentUserId == null || (!User.IsInRole("Admin") && currentUserId != userId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
 
-            var tickets = await ticketService.GetByUserIdAsync(userId, cancellationToken);
+            List<TicketResponseDTO> tickets = await ticketService.GetByUserIdAsync(userId, cancellationToken);
             if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket by user with this id!" });
 
             return Ok(tickets);
         }
 
+        /// <summary>
+        /// Get tickets by session ID (admin only).
+        /// </summary>
+        /// <param name="sessionId">Session ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-session/{sessionId:Guid}")]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetBySessionId(Guid sessionId, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var tickets = await ticketService.GetBySessionIdAsync(sessionId, cancellationToken);
+            List<TicketResponseDTO> tickets = await ticketService.GetBySessionIdAsync(sessionId, cancellationToken);
             if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket by session with this id!" });
 
             return Ok(tickets);
         }
 
+        /// <summary>
+        /// Get tickets by seat ID (admin only).
+        /// </summary>
+        /// <param name="seatId">Seat ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-seat/{seatId:Guid}")]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetBySeatId(Guid seatId, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var tickets = await ticketService.GetBySeatIdAsync(seatId, cancellationToken);
+            List<TicketResponseDTO> tickets = await ticketService.GetBySeatIdAsync(seatId, cancellationToken);
             if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session by seat with this id!" });
 
             return Ok(tickets);
         }
 
+        /// <summary>
+        /// Create new ticket.
+        /// </summary>
+        /// <param name="dto">TicketCreateDTO object.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(TicketResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] TicketCreateDTO dto, CancellationToken cancellationToken)
         {
@@ -119,7 +160,7 @@ namespace CinemaBookingSystemAPI.Controllers
                 string userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-                var created = await ticketService.CreateAsync(userId, dto, cancellationToken);
+                TicketResponseDTO created = await ticketService.CreateAsync(userId, dto, cancellationToken);
                 return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
             }
             catch (InvalidOperationException ex)
@@ -132,40 +173,59 @@ namespace CinemaBookingSystemAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Delete ticket by ID (admin only).
+        /// </summary>
+        /// <param name="id">Ticket ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpDelete("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var result = await ticketService.DeleteAsync(id, cancellationToken);
+            bool result = await ticketService.DeleteAsync(id, cancellationToken);
             if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete session with this id!" });
 
             return NoContent();
         }
 
+        /// <summary>
+        /// Get filtered tickets with pagination (admin only).
+        /// </summary>
+        /// <param name="filter">Filter parameters.</param>
+        /// <param name="pageNumber">Page number.</param>
+        /// <param name="pageSize">Page size.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("filtered")]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFilteredTickets([FromQuery] TicketFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var result = await ticketService.GetFilteredTicketsAsync(filter, pageNumber, pageSize, cancellationToken);
+            PagedList<TicketResponseDTO> result = await ticketService.GetFilteredTicketsAsync(filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);
         }
 
+        /// <summary>
+        /// Confirm payment for ticket (admin only).
+        /// </summary>
+        /// <param name="id">Ticket ID.</param>
         [HttpPost("{id:Guid}/confirm-payment")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> ConfirmPayment(Guid id)
         {
-            var result = await ticketService.ConfirmPaymentAsync(id);
+            bool result = await ticketService.ConfirmPaymentAsync(id);
             if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot confirm payment ticket with this id!" });
 
             return Ok();

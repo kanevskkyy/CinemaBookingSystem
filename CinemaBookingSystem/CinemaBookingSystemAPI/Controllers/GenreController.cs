@@ -14,28 +14,41 @@ namespace CinemaBookingSystemAPI.Controllers
             this.genreService = genreService;
         }
 
+        /// <summary>
+        /// Gets all genres.
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet]
         [ProducesResponseType(typeof(List<GenreResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            
-            var genres = await genreService.GetAllAsync(cancellationToken);
+            List<GenreResponseDTO> genres = await genreService.GetAllAsync(cancellationToken);
             return Ok(genres);
         }
 
+        /// <summary>
+        /// Gets genre by ID.
+        /// </summary>
+        /// <param name="id">Genre ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("{id:Guid}")]
         [ProducesResponseType(typeof(GenreResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
-            var genre = await genreService.GetByIdAsync(id, cancellationToken);
-            
-            if (genre == null) return StatusCode(StatusCodes.Status404NotFound, new {message = "Cannot find genre with this id!" });
+            GenreResponseDTO genre = await genreService.GetByIdAsync(id, cancellationToken);
+
+            if (genre == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find genre with this id!" });
             return Ok(genre);
         }
 
+        /// <summary>
+        /// Creates a new genre (Admin only).
+        /// </summary>
+        /// <param name="dto">Genre create DTO.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(GenreResponseDTO), StatusCodes.Status201Created)]
@@ -45,10 +58,16 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var created = await genreService.CreateAsync(dto, cancellationToken);
+            GenreResponseDTO created = await genreService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
+        /// <summary>
+        /// Updates existing genre (Admin only).
+        /// </summary>
+        /// <param name="id">Genre ID.</param>
+        /// <param name="dto">Genre update DTO.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPut("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -58,11 +77,17 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var updated = await genreService.UpdateAsync(id, dto, cancellationToken);
+            GenreResponseDTO updated = await genreService.UpdateAsync(id, dto, cancellationToken);
             if (updated == null) return NotFound();
+            
             return NoContent();
         }
 
+        /// <summary>
+        /// Deletes genre by ID (Admin only).
+        /// </summary>
+        /// <param name="id">Genre ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpDelete("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -72,25 +97,36 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var result = await genreService.DeleteAsync(id, cancellationToken);
+            bool result = await genreService.DeleteAsync(id, cancellationToken);
             if (!result) return NotFound();
+            
             return NoContent();
         }
+
+        /// <summary>
+        /// Gets movie counts per each genre.
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("movie-counts")]
         [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetMovieCounts(CancellationToken cancellationToken)
         {
-            var counts = await genreService.GetMovieCountsPerGenreAsync(cancellationToken);
+            Dictionary<string, int> counts = await genreService.GetMovieCountsPerGenreAsync(cancellationToken);
             return Ok(counts);
         }
 
+        /// <summary>
+        /// Checks if genre with given name exists.
+        /// </summary>
+        /// <param name="name">Genre name.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("exists/{name}")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ExistsByName(string name, CancellationToken cancellationToken)
         {
-            var exists = await genreService.ExistsByNameAsync(name, cancellationToken);
+            bool exists = await genreService.ExistsByNameAsync(name, cancellationToken);
             return Ok(exists);
         }
     }

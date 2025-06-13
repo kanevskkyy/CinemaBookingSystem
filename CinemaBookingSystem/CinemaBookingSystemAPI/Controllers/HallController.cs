@@ -16,37 +16,58 @@ namespace CinemaBookingSystemAPI.Controllers
             this.hallService = hallService;
         }
 
+        /// <summary>
+        /// Get all halls.
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet]
         [ProducesResponseType(typeof(List<HallResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            var halls = await hallService.GetAllAsync(cancellationToken);
+            List<HallResponseDTO> halls = await hallService.GetAllAsync(cancellationToken);
             return Ok(halls);
         }
 
+        /// <summary>
+        /// Get hall by ID.
+        /// </summary>
+        /// <param name="id">Hall ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("{id:Guid}")]
         [ProducesResponseType(typeof(HallResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
-            var hall = await hallService.GetByIdAsync(id, cancellationToken);
+            HallResponseDTO hall = await hallService.GetByIdAsync(id, cancellationToken);
             if (hall == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find hall with this id!" });
+            
             return Ok(hall);
         }
 
+        /// <summary>
+        /// Get hall by name.
+        /// </summary>
+        /// <param name="name">Hall name.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-name/{name}")]
         [ProducesResponseType(typeof(HallResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByName(string name, CancellationToken cancellationToken)
         {
-            var hall = await hallService.GetByNameAsync(name, cancellationToken);
+            HallResponseDTO hall = await hallService.GetByNameAsync(name, cancellationToken);
             if (hall == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find hall with this name!" });
+            
             return Ok(hall);
         }
 
+        /// <summary>
+        /// Create new hall (Admin only).
+        /// </summary>
+        /// <param name="dto">Hall create DTO.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(HallResponseDTO), StatusCodes.Status201Created)]
@@ -56,10 +77,16 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var created = await hallService.CreateAsync(dto, cancellationToken);
+            HallResponseDTO created = await hallService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
+        /// <summary>
+        /// Update hall (Admin only).
+        /// </summary>
+        /// <param name="id">Hall ID.</param>
+        /// <param name="dto">Hall update DTO.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPut("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -70,11 +97,16 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var updated = await hallService.UpdateAsync(id, dto, cancellationToken);
+            HallResponseDTO updated = await hallService.UpdateAsync(id, dto, cancellationToken);
             if (updated == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update hall!" }); ;
             return NoContent();
         }
 
+        /// <summary>
+        /// Delete hall by ID (Admin only).
+        /// </summary>
+        /// <param name="id">Hall ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpDelete("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -84,7 +116,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var result = await hallService.DeleteAsync(id, cancellationToken);
+            bool result = await hallService.DeleteAsync(id, cancellationToken);
             if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete hall with this id!" }); ;
             return NoContent();
         }

@@ -69,7 +69,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<MovieResponseDTO> UpdateAsync(Guid id, MovieUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            Movie movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
+            Movie movie = await unitOfWork.Movies.GetByIdWithGenresAsync(id, cancellationToken);
             if (movie == null) return null;
 
             var existByTitle = await unitOfWork.Movies.FindAsync(p => p.Id != id && p.Title.ToLower() == dto.Title.ToLower(), cancellationToken);
@@ -79,13 +79,23 @@ namespace CinemaBookingSystemBLL.Services
             if (existByPoster.Any()) throw new ArgumentException("Movie with this poster URL already exists");
 
             mapper.Map(dto, movie);
-            movie.MovieGenres = dto.GenreIds.Select(id => new MovieGenre { 
-                GenreId = id, 
-                MovieId = movie.Id 
-            }).ToList();
+            movie.MovieGenres.Clear();
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+
+            foreach (Guid genreId in dto.GenreIds)
+            {
+                MovieGenre movieGenre = new MovieGenre
+                {
+                    MovieId = movie.Id,
+                    GenreId = genreId
+                };
+
+                movie.MovieGenres.Add(movieGenre);
+            }
 
             unitOfWork.Movies.Update(movie);
             await unitOfWork.SaveChangesAsync(cancellationToken);
+
             return mapper.Map<MovieResponseDTO>(movie);
         }
 

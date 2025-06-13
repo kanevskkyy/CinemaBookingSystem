@@ -2,6 +2,7 @@
 using CinemaBookingSystemBLL.DTO.Sessions;
 using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
+using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemBLL.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,69 +20,104 @@ namespace CinemaBookingSystemAPI.Controllers
             this.sessionService = sessionService;
         }
 
+        /// <summary>
+        /// Get all sessions.
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
         {
-            var allSessions = await sessionService.GetAllAsync(cancellationToken);
+            List<SessionResponseDTO> allSessions = await sessionService.GetAllAsync(cancellationToken);
             return Ok(allSessions);
         }
 
+        /// <summary>
+        /// Get paginated list of sessions.
+        /// </summary>
+        /// <param name="pageNumber">Page number.</param>
+        /// <param name="pageSize">Page size.</param>
         [HttpGet("paginated")]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPagedSessions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var pagedSessions = await sessionService.GetPagedSessionsAsync(pageNumber, pageSize);
+            PagedList<SessionResponseDTO> pagedSessions = await sessionService.GetPagedSessionsAsync(pageNumber, pageSize);
             return Ok(pagedSessions);
         }
 
+        /// <summary>
+        /// Get session by ID.
+        /// </summary>
+        /// <param name="id">Session ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("{id:Guid}")]
         [ProducesResponseType(typeof(SessionResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
-            var session = await sessionService.GetByIdAsync(id, cancellationToken);
+            SessionResponseDTO session = await sessionService.GetByIdAsync(id, cancellationToken);
             if (session == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session with this id!" });
 
             return Ok(session);
         }
 
+        /// <summary>
+        /// Get sessions by movie ID.
+        /// </summary>
+        /// <param name="movieId">Movie ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-movie/{movieId:Guid}")]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByMovieId(Guid movieId, CancellationToken cancellationToken)
         {
-            var sessions = await sessionService.GetByMovieIdAsync(movieId, cancellationToken);
+            List<SessionResponseDTO> sessions = await sessionService.GetByMovieIdAsync(movieId, cancellationToken);
             if (sessions == null || !sessions.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session movie with this id!" });
 
             return Ok(sessions);
         }
 
+        /// <summary>
+        /// Get sessions by hall ID.
+        /// </summary>
+        /// <param name="hallId">Hall ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-hall/{hallId:Guid}")]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByHallId(Guid hallId, CancellationToken cancellationToken)
         {
-            var sessions = await sessionService.GetByHallIdAsync(hallId, cancellationToken);
+            List<SessionResponseDTO> sessions = await sessionService.GetByHallIdAsync(hallId, cancellationToken);
             if (sessions == null || !sessions.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session hall with this id!" });
 
             return Ok(sessions);
         }
 
+        /// <summary>
+        /// Get sessions by date range.
+        /// </summary>
+        /// <param name="startDate">Start date.</param>
+        /// <param name="endDate">End date.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-date-range")]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, CancellationToken cancellationToken)
         {
-            var sessions = await sessionService.GetByDateRangeAsync(startDate, endDate, cancellationToken);
+            List<SessionResponseDTO> sessions = await sessionService.GetByDateRangeAsync(startDate, endDate, cancellationToken);
             return Ok(sessions);
         }
 
+        /// <summary>
+        /// Create new session (admin only).
+        /// </summary>
+        /// <param name="dto">SessionCreateDTO object.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(SessionResponseDTO), StatusCodes.Status201Created)]
@@ -91,10 +127,16 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var created = await sessionService.CreateAsync(dto, cancellationToken);
+            SessionResponseDTO created = await sessionService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
+        /// <summary>
+        /// Update session by ID (admin only).
+        /// </summary>
+        /// <param name="id">Session ID.</param>
+        /// <param name="dto">SessionUpdateDTO object.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPut("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -105,12 +147,17 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var updated = await sessionService.UpdateAsync(id, dto, cancellationToken);
+            SessionResponseDTO updated = await sessionService.UpdateAsync(id, dto, cancellationToken);
             if (updated == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update session with this id!" });
 
             return NoContent();
         }
 
+        /// <summary>
+        /// Delete session by ID (admin only).
+        /// </summary>
+        /// <param name="id">Session ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpDelete("{id:Guid}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -120,20 +167,26 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            var result = await sessionService.DeleteAsync(id, cancellationToken);
+            bool result = await sessionService.DeleteAsync(id, cancellationToken);
             if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete session with this id!" });
 
             return NoContent();
         }
 
+        /// <summary>
+        /// Get filtered sessions with pagination.
+        /// </summary>
+        /// <param name="filter">Filter parameters.</param>
+        /// <param name="pageNumber">Page number.</param>
+        /// <param name="pageSize">Page size.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("filtered")]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFilteredSession([FromQuery] SessionFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            var result = await sessionService.GetFilteredSessionsAsync(filter, pageNumber, pageSize, cancellationToken);
+            PagedList<SessionResponseDTO> result = await sessionService.GetFilteredSessionsAsync(filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);
         }
-
     }
 }
