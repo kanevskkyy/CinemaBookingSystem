@@ -115,19 +115,5 @@ namespace CinemaBookingSystemAPI.Controllers
             Dictionary<string, int> counts = await genreService.GetMovieCountsPerGenreAsync(cancellationToken);
             return Ok(counts);
         }
-
-        /// <summary>
-        /// Checks if genre with given name exists.
-        /// </summary>
-        /// <param name="name">Genre name.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("exists/{name}")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ExistsByName(string name, CancellationToken cancellationToken)
-        {
-            bool exists = await genreService.ExistsByNameAsync(name, cancellationToken);
-            return Ok(exists);
-        }
     }
 }

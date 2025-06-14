@@ -119,7 +119,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="dto">SessionCreateDTO object.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(SessionResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -138,7 +138,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="dto">SessionUpdateDTO object.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPut("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -159,7 +159,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="id">Session ID.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpDelete("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

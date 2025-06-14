@@ -20,7 +20,8 @@ namespace CinemaBookingSystemDAL.Repositories
         {
             return await dbSet
                 .AsNoTracking()
-                .OrderBy(p => p.Id)
+                .OrderBy(s => s.RowNumber)
+                .ThenBy(s => s.SeatNumber)
                 .Where(p => p.HallId == hallId)
                 .ToListAsync(cancellationToken);
         }

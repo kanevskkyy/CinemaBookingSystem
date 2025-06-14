@@ -23,10 +23,9 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<MovieResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var movies = await unitOfWork.Movies.GetAllWithGenresAsync(cancellationToken);
-            var orderedMovies = movies.OrderBy(m => m.Id);
+            List<Movie> movies = await unitOfWork.Movies.GetAllWithGenresAsync(cancellationToken);
 
-            return mapper.Map<List<MovieResponseDTO>>(orderedMovies);
+            return mapper.Map<List<MovieResponseDTO>>(movies);
         }
 
         public async Task<MovieResponseDTO> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -47,16 +46,17 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<MovieResponseDTO>> GetTopRatedAsync(CancellationToken cancellationToken = default)
         {
             List<Movie> movies = await unitOfWork.Movies.GetTopRatedAsync(cancellationToken);
+
             return mapper.Map<List<MovieResponseDTO>>(movies);
         }
 
         public async Task<MovieResponseDTO> CreateAsync(MovieCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            var existByTitle = await unitOfWork.Movies.FindAsync(p => p.Title.ToLower() == dto.Title.ToLower(), cancellationToken);
-            if (existByTitle.Any()) throw new ArgumentException("Movie with this title already exists");
+            bool exist = await unitOfWork.Movies.ExistsByTitleAsync(dto.Title, null, cancellationToken);
+            if (exist) throw new ArgumentException("Movie with this title already exists");
 
-            var existByPoster = await unitOfWork.Movies.FindAsync(p => p.PosterUrl.ToLower() == dto.PosterUrl.ToLower(), cancellationToken);
-            if (existByPoster.Any()) throw new ArgumentException("Movie with this poster URL already exists");
+            exist = await unitOfWork.Movies.ExistsByPosterUrlAsync(dto.PosterUrl, null, cancellationToken);
+            if (exist) throw new ArgumentException("Movie with this poster URL already exists");
 
             Movie movie = mapper.Map<Movie>(dto);
 
@@ -72,11 +72,11 @@ namespace CinemaBookingSystemBLL.Services
             Movie movie = await unitOfWork.Movies.GetByIdWithGenresAsync(id, cancellationToken);
             if (movie == null) return null;
 
-            var existByTitle = await unitOfWork.Movies.FindAsync(p => p.Id != id && p.Title.ToLower() == dto.Title.ToLower(), cancellationToken);
-            if (existByTitle.Any()) throw new ArgumentException("Movie with this title already exists");
+            bool exist = await unitOfWork.Movies.ExistsByTitleAsync(dto.Title, null, cancellationToken);
+            if (exist) throw new ArgumentException("Movie with this title already exists");
 
-            var existByPoster = await unitOfWork.Movies.FindAsync(p => p.Id != id && p.PosterUrl.ToLower() == dto.PosterUrl.ToLower(), cancellationToken);
-            if (existByPoster.Any()) throw new ArgumentException("Movie with this poster URL already exists");
+            exist = await unitOfWork.Movies.ExistsByPosterUrlAsync(dto.PosterUrl, null, cancellationToken);
+            if (exist) throw new ArgumentException("Movie with this poster URL already exists");
 
             mapper.Map(dto, movie);
             movie.MovieGenres.Clear();
@@ -112,11 +112,12 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<MovieResponseDTO>> GetPagedMoviesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var queryable = unitOfWork.Movies.GetAll();
-            
-            PagedList<Movie> pagedMovies = await PagedList<Movie>.ToPagedListAsync(queryable, pageNumber, pageSize, cancellationToken);
-            List<MovieResponseDTO> movieDtos = mapper.Map<List<MovieResponseDTO>>(pagedMovies.Items);
-            
+            IQueryable<Movie> queryable = unitOfWork.Movies.GetAll().Include(m => m.MovieGenres).ThenInclude(mg => mg.Genre); 
+            queryable = queryable.OrderBy(p => p.Title); 
+
+            var pagedMovies = await PagedList<Movie>.ToPagedListAsync(queryable, pageNumber, pageSize, cancellationToken);
+            var movieDtos = mapper.Map<List<MovieResponseDTO>>(pagedMovies.Items);
+
             return new PagedList<MovieResponseDTO>(movieDtos, pagedMovies.TotalCount, pagedMovies.CurrentPage, pagedMovies.PageSize);
         }
 
@@ -124,12 +125,12 @@ namespace CinemaBookingSystemBLL.Services
         {
             IQueryable<Movie> queryable = unitOfWork.Movies.GetAll().AsQueryable();
 
-            if (!string.IsNullOrEmpty(filter.Title)) queryable = queryable.Where(m => m.Title.ToLower().Contains(filter.Title.ToLower()));
+            if (!string.IsNullOrEmpty(filter.Title)) queryable = queryable.Where(m => m.Title.ToLower().Contains(filter.Title.ToLower())).OrderBy(p => p.Title);
             if (filter.GenreId.HasValue) queryable = queryable.Where(m => m.MovieGenres.Any(mg => mg.GenreId == filter.GenreId.Value));
-            if (filter.MinRating.HasValue) queryable = queryable.Where(m => m.Rating >= filter.MinRating.Value);
-            if (filter.MaxRating.HasValue) queryable = queryable.Where(m => m.Rating <= filter.MaxRating.Value);
-            if (filter.MinDuration.HasValue) queryable = queryable.Where(m => m.Duration >= filter.MinDuration.Value);
-            if (filter.MaxDuration.HasValue) queryable = queryable.Where(m => m.Duration <= filter.MaxDuration.Value);
+            if (filter.MinRating.HasValue) queryable = queryable.Where(m => m.Rating >= filter.MinRating.Value).OrderBy(p => p.Rating);
+            if (filter.MaxRating.HasValue) queryable = queryable.Where(m => m.Rating <= filter.MaxRating.Value).OrderBy(p => p.Rating);
+            if (filter.MinDuration.HasValue) queryable = queryable.Where(m => m.Duration >= filter.MinDuration.Value).OrderBy(p => p.Duration);
+            if (filter.MaxDuration.HasValue) queryable = queryable.Where(m => m.Duration <= filter.MaxDuration.Value).OrderBy(p => p.Duration);
 
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
@@ -167,22 +168,9 @@ namespace CinemaBookingSystemBLL.Services
                             queryable = queryable.OrderBy(m => m.Duration);
                         }
                         break;
-
                     default:
-                        if (filter.SortDescending)
-                        {
-                            queryable = queryable.OrderByDescending(m => m.Id);
-                        }
-                        else
-                        {
-                            queryable = queryable.OrderBy(m => m.Id);
-                        }
                         break;
                 }
-            }
-            else
-            {
-                queryable = queryable.OrderBy(m => m.Id);
             }
 
             queryable = queryable.Include(m => m.MovieGenres);

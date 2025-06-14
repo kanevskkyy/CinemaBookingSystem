@@ -9,6 +9,6 @@ namespace CinemaBookingSystemDAL.Interfaces
 {
     public interface IHallRepository : IGenericRepository<Hall, Guid>
     {
-        Task<Hall?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
+        Task<bool> ExistsByNameAsync(string name, Guid? id = null, CancellationToken cancellationToken = default);
     }
 }

@@ -17,19 +17,6 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         /// <summary>
-        /// Get all seats.
-        /// </summary>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet]
-        [ProducesResponseType(typeof(List<SeatResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GettAllAsync(CancellationToken cancellationToken)
-        {
-            List<SeatResponseDTO> allSeats = await seatService.GetAllAsync(cancellationToken);
-            return Ok(allSeats);
-        }
-
-        /// <summary>
         /// Get paginated list of seats.
         /// </summary>
         /// <param name="pageNumber">Page number.</param>

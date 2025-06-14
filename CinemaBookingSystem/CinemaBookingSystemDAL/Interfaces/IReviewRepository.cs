@@ -9,9 +9,8 @@ namespace CinemaBookingSystemDAL.Interfaces
 {
     public interface IReviewRepository : IGenericRepository<Review, Guid>
     {
+        IQueryable<Review> GetReviewsByMovieId(Guid movieId);
+        Task<bool> ExistsByUserAndMovieAsync(string userId, Guid movieId, CancellationToken cancellationToken = default);
         Task<List<Review>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default);
-        Task<List<Review>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default);
-        Task<List<Review>> GetTop10BestReviewsAsync(CancellationToken cancellationToken = default);
-        Task<List<Review>> GetTop10WorstReviewsAsync(CancellationToken cancellationToken = default);
     }
 }

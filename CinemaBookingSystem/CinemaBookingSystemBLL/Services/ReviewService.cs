@@ -47,16 +47,14 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 
-        public async Task<List<ReviewResponseDTO>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default)
+        public async Task<ReviewResponseDTO> CreateAsync(CreateReviewDTO dto, string userId, CancellationToken cancellationToken = default)
         {
-            List<Review> reviews = await unitOfWork.Review.GetByMovieIdAsync(movieId, cancellationToken);
-            return mapper.Map<List<ReviewResponseDTO>>(reviews);
-        }
+            bool exists = await unitOfWork.Review.ExistsByUserAndMovieAsync(userId, dto.MovieId, cancellationToken);
+            if (exists) throw new ArgumentException("You have already left a review for this movie.");
 
-        public async Task<ReviewResponseDTO> CreateAsync(CreateReviewDTO dto, CancellationToken cancellationToken = default)
-        {
             Review review = mapper.Map<Review>(dto);
             review.CreatedAt = DateTime.UtcNow.ToUniversalTime();
+            review.UserId = userId;
 
             await unitOfWork.Review.CreateAsync(review, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -88,12 +86,11 @@ namespace CinemaBookingSystemBLL.Services
             return true;
         }
 
-        public async Task<PagedList<ReviewResponseDTO>> GetFilteredReviewsAsync(ReviewFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        public async Task<PagedList<ReviewResponseDTO>> GetFilteredReviewsAsync(Guid movieId, ReviewFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var queryable = unitOfWork.Review.GetAll();
+            IQueryable<Review> queryable = unitOfWork.Review.GetReviewsByMovieId(movieId);
 
             if (!string.IsNullOrEmpty(filter.UserId)) queryable = queryable.Where(r => r.UserId == filter.UserId);
-            if (filter.MovieId.HasValue) queryable = queryable.Where(r => r.MovieId == filter.MovieId.Value);
             if (filter.MinRating.HasValue) queryable = queryable.Where(r => r.Rating >= filter.MinRating.Value);
             if (filter.MaxRating.HasValue) queryable = queryable.Where(r => r.Rating <= filter.MaxRating.Value);
             if (!string.IsNullOrEmpty(filter.TextContains)) queryable = queryable.Where(r => r.Text.ToLower().Contains(filter.TextContains.ToLower()));
@@ -101,30 +98,15 @@ namespace CinemaBookingSystemBLL.Services
             if (filter.CreatedBefore.HasValue) queryable = queryable.Where(r => r.CreatedAt <= filter.CreatedBefore.Value);
 
             queryable = queryable.OrderByDescending(r => r.CreatedAt.ToUniversalTime());
-
             PagedList<Review> items = await PagedList<Review>.ToPagedListAsync(queryable, pageNumber, pageSize, cancellationToken);
-            var result = mapper.Map<List<ReviewResponseDTO>>(items.Items);
-
+            List<ReviewResponseDTO> result = mapper.Map<List<ReviewResponseDTO>>(items.Items);
+            
             return new PagedList<ReviewResponseDTO>(result, items.TotalCount, items.CurrentPage, items.PageSize);
-        }
-
-        public async Task<List<ReviewResponseDTO>> GetTop10BestReviewsAsync(CancellationToken cancellationToken = default)
-        {
-            List<Review> reviews = await unitOfWork.Review.GetTop10BestReviewsAsync(cancellationToken);
-
-            return mapper.Map<List<ReviewResponseDTO>>(reviews);
-        }
-
-        public async Task<List<ReviewResponseDTO>> GetTop10WorstReviewsAsync(CancellationToken cancellationToken = default)
-        {
-            List<Review> reviews = await unitOfWork.Review.GetTop10WorstReviewsAsync(cancellationToken);
-
-            return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 
         public async Task<PagedList<ReviewResponseDTO>> GetPagedReviewsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Review.GetAll().OrderByDescending(r => r.CreatedAt);
+            IQueryable<Review> query = unitOfWork.Review.GetAll().OrderByDescending(r => r.CreatedAt);
             PagedList<Review> pagedReviews = await PagedList<Review>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
             List<ReviewResponseDTO> reviewDtos = mapper.Map<List<ReviewResponseDTO>>(pagedReviews.Items);
 

@@ -31,7 +31,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<TicketResponseDTO>> GetPagedTicketsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Tickets.GetAllWithDetails();
+            IQueryable<Ticket> query = unitOfWork.Tickets.GetAllWithDetails();
             PagedList<Ticket> pagedTickets = await PagedList<Ticket>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
 
             List<TicketResponseDTO> result = mapper.Map<List<TicketResponseDTO>>(pagedTickets.Items);
@@ -56,7 +56,26 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<TicketResponseDTO> CreateAsync(string userId, TicketCreateDTO dto, CancellationToken cancellationToken = default)
         {
+            Seat seat = await unitOfWork.Seats.GetByIdAsync(dto.SeatId, cancellationToken);
+            if (seat == null)
+            {
+                throw new ArgumentException($"Seat with ID {dto.SeatId} does not exist.");
+            }
+            
+            Session session = await unitOfWork.Sessions.GetByIdAsync(dto.SessionId, cancellationToken);
+            if (session == null)
+            {
+                throw new ArgumentException($"Session with ID {dto.SessionId} does not exist.");
+            }
+
+            Ticket existingTicket = await unitOfWork.Tickets.GetBySeatAndSessionAsync(dto.SeatId, dto.SessionId, cancellationToken);
+            if (existingTicket != null)
+            {
+                throw new InvalidOperationException("This seat is already booked for the selected session.");
+            }
+
             Ticket ticket = mapper.Map<Ticket>(dto);
+            ticket.UserId = userId;
 
             await unitOfWork.Tickets.CreateAsync(ticket, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -67,6 +86,7 @@ namespace CinemaBookingSystemBLL.Services
 
             return mapper.Map<TicketResponseDTO>(createdTicket);
         }
+
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(id, cancellationToken);

@@ -25,7 +25,27 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<HallResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var halls = await unitOfWork.Halls.GetAllAsync(cancellationToken);
-            var orderedHalls = halls.OrderBy(h => h.Id);
+            var orderedHalls = halls.OrderBy(h =>
+            {
+                string name = h.Name;
+                int index = -1;
+                
+                for (int i = 0; i < name.Length; i++)
+                {
+                    if (char.IsDigit(name[i]))
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+                
+                if (index == -1) return int.MaxValue;
+                string number = name.Substring(index);
+                
+                if (int.TryParse(number, out int result)) return result;
+                else return int.MaxValue;
+            })
+            .ThenBy(h => h.Name);   
 
             return mapper.Map<List<HallResponseDTO>>(orderedHalls);
         }
@@ -38,18 +58,10 @@ namespace CinemaBookingSystemBLL.Services
             else return mapper.Map<HallResponseDTO>(hall);
         }
 
-        public async Task<HallResponseDTO?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
-        {
-            Hall? hall = await unitOfWork.Halls.GetByNameAsync(name, cancellationToken);
-
-            if (hall == null) return null;
-            else return mapper.Map<HallResponseDTO>(hall);
-        }
-
         public async Task<HallResponseDTO> CreateAsync(HallCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            var existsByHallName = await unitOfWork.Halls.FindAsync(p => p.Name.ToLower() == dto.Name.ToLower(), cancellationToken);
-            if (existsByHallName.Any()) throw new ArgumentException("Hall with this name already exists");
+            bool exists = await unitOfWork.Halls.ExistsByNameAsync(dto.Name, cancellationToken: cancellationToken);
+            if (exists) throw new ArgumentException("Hall with this name already exists");
 
             Hall hall = mapper.Map<Hall>(dto);
             await unitOfWork.Halls.CreateAsync(hall, cancellationToken);
@@ -63,8 +75,8 @@ namespace CinemaBookingSystemBLL.Services
             Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
             if (hall == null) return null;
 
-            var existsByHallName = await unitOfWork.Halls.FindAsync(h => h.Name.ToLower() == dto.Name.ToLower() && h.Id != id, cancellationToken);
-            if (existsByHallName.Any()) throw new ArgumentException("Hall with this name already exists");
+            bool exist = await unitOfWork.Halls.ExistsByNameAsync(dto.Name, id, cancellationToken);
+            if (exist) throw new ArgumentException("Hall with this name already exists");
 
             mapper.Map(dto, hall);
 
@@ -73,6 +85,7 @@ namespace CinemaBookingSystemBLL.Services
 
             return mapper.Map<HallResponseDTO>(hall);
         }
+
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {

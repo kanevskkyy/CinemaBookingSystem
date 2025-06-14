@@ -47,23 +47,6 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         /// <summary>
-        /// Get hall by name.
-        /// </summary>
-        /// <param name="name">Hall name.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("by-name/{name}")]
-        [ProducesResponseType(typeof(HallResponseDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByName(string name, CancellationToken cancellationToken)
-        {
-            HallResponseDTO hall = await hallService.GetByNameAsync(name, cancellationToken);
-            if (hall == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find hall with this name!" });
-            
-            return Ok(hall);
-        }
-
-        /// <summary>
         /// Create new hall (Admin only).
         /// </summary>
         /// <param name="dto">Hall create DTO.</param>

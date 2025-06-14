@@ -24,7 +24,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<SessionResponseDTO>> GetPagedSessionsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Sessions.GetAllMoviesAsyncDetail();
+            IQueryable<Session> query = unitOfWork.Sessions.GetAllMoviesAsyncDetail();
             PagedList<Session> pagedSessions = await PagedList<Session>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
 
             List<SessionResponseDTO> sessionDtos = mapper.Map<List<SessionResponseDTO>>(pagedSessions.Items);
@@ -164,8 +164,8 @@ namespace CinemaBookingSystemBLL.Services
             }
             else queryable = queryable.OrderBy(s => s.Id);
 
-            var projectedQuery = queryable.ProjectTo<SessionResponseDTO>(mapper.ConfigurationProvider);/**/
-            var pagedList = await PagedList<SessionResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
+            var projectedQuery = queryable.ProjectTo<SessionResponseDTO>(mapper.ConfigurationProvider);
+            PagedList<SessionResponseDTO> pagedList = await PagedList<SessionResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
             
             return pagedList;
         }

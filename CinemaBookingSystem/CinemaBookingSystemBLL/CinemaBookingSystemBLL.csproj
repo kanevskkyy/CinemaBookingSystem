@@ -22,8 +22,4 @@
     <ProjectReference Include="..\CinemaBookingSystemDAL\CinemaBookingSystemDAL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\NewFolder\" />
-  </ItemGroup>
-
 </Project>

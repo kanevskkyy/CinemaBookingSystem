@@ -17,41 +17,23 @@ namespace CinemaBookingSystemDAL.Repositories
 
         }
 
+        public IQueryable<Review> GetReviewsByMovieId(Guid movieId)
+        {
+            return dbSet.Where(r => r.MovieId == movieId);
+        }
+
+        public async Task<bool> ExistsByUserAndMovieAsync(string userId, Guid movieId, CancellationToken cancellationToken = default)
+        {
+            return await dbSet
+                .AnyAsync(r => r.UserId == userId && r.MovieId == movieId, cancellationToken);
+        }
+
         public async Task<List<Review>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AsNoTracking()
                 .OrderBy(p => p.CreatedAt)
                 .Where(r => r.UserId == userId)
-                .ToListAsync(cancellationToken);
-        }
-
-        public async Task<List<Review>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .AsNoTracking()
-                .OrderBy(p => p.CreatedAt)
-                .Where(r => r.MovieId == movieId)
-                .ToListAsync(cancellationToken);
-        }
-
-        public async Task<List<Review>> GetTop10BestReviewsAsync(CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .AsNoTracking()
-                .OrderByDescending(r => r.Rating)
-                .ThenByDescending(r => r.Id)
-                .Take(10)
-                .ToListAsync(cancellationToken);
-        }
-
-        public async Task<List<Review>> GetTop10WorstReviewsAsync(CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .AsNoTracking()
-                .OrderBy(r => r.Rating)
-                .ThenBy(r => r.Id)
-                .Take(10)
                 .ToListAsync(cancellationToken);
         }
     }

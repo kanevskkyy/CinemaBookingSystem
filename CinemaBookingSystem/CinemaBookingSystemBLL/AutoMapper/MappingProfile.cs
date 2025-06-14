@@ -44,22 +44,29 @@ namespace CinemaBookingSystemBLL.AutoMapper
             CreateMap<SeatCreateDTO, Seat>();
             CreateMap<SeatUpdateDTO, Seat>().ForMember(dest => dest.Id, opt => opt.Ignore());
 
-            CreateMap<Session, SessionResponseDTO>();
             CreateMap<Session, SessionResponseDTO>()
                 .ForMember(dest => dest.MovieTitle, opt => opt.MapFrom(src => src.Movie.Title))
                 .ForMember(dest => dest.HallName, opt => opt.MapFrom(src => src.Hall.Name));
+
+            CreateMap<SessionCreateDTO, Session>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())  
+                .ForMember(dest => dest.Hall, opt => opt.Ignore())
+                .ForMember(dest => dest.Movie, opt => opt.Ignore());
+
             CreateMap<SessionUpdateDTO, Session>().ForMember(dest => dest.Id, opt => opt.Ignore());
 
             CreateMap<Ticket, TicketResponseDTO>()
                 .ForMember(dest => dest.SeatInfo, opt => opt.MapFrom(src => $"Row: {src.Seat.RowNumber}, Seat: {src.Seat.SeatNumber}"))
                 .ForMember(dest => dest.SessionMovieTitle, opt => opt.MapFrom(src => src.Session.Movie.Title))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName));
-            CreateMap<TicketCreateDTO, Ticket>();
-
-
+            CreateMap<TicketCreateDTO, Ticket>()
+                .ForMember(dest => dest.SeatId, opt => opt.MapFrom(src => src.SeatId))
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.PurchaseTime, opt => opt.MapFrom(src => DateTime.UtcNow.ToUniversalTime())); 
             CreateMap<User, UserResponseDTO>()
-            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UserName))
-            .ForMember(dest => dest.Role, opt => opt.Ignore()); 
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.Role, opt => opt.Ignore()); 
+            
             CreateMap<UserUpdateDTO, User>().ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name));
             CreateMap<UserCreateDTO, User>().ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name));
         }

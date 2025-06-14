@@ -48,34 +48,51 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         /// <summary>
-        /// Get reviews by user ID (only for admins or the user himself).
+        /// Get reviews by user ID (only for admins).
         /// </summary>
         /// <param name="userId">User ID.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-user/{userId}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(List<ReviewResponseDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByUserId(string userId, CancellationToken cancellationToken)
         {
-            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!User.IsInRole("Admin") && currentUserId != userId) return Forbid();
-
             List<ReviewResponseDTO> result = await reviewService.GetByUserIdAsync(userId, cancellationToken);
             return Ok(result);
         }
 
         /// <summary>
-        /// Get reviews by movie ID.
+        /// Get reviews of the current user.
         /// </summary>
-        /// <param name="movieId">Movie ID.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("by-movie/{movieId:Guid}")]
+        [HttpGet("my-reviews")]
+        [Authorize]
         [ProducesResponseType(typeof(List<ReviewResponseDTO>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetByMovieId(Guid movieId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetMyReviews(CancellationToken cancellationToken)
         {
-            List<ReviewResponseDTO> result = await reviewService.GetByMovieIdAsync(movieId, cancellationToken);
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(currentUserId)) return Unauthorized();
+
+            List<ReviewResponseDTO> result = await reviewService.GetByUserIdAsync(currentUserId, cancellationToken);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Get filtered reviews for a specific movie with pagination.
+        /// </summary>
+        /// <param name="movieId">Movie ID.</param>
+        /// <param name="filter">Filter parameters from query string.</param>
+        /// <param name="pageNumber">Page number.</param>
+        /// <param name="pageSize">Page size.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        [HttpGet("by-movie/{movieId:Guid}")]
+        [ProducesResponseType(typeof(PagedList<ReviewResponseDTO>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetByMovieId(Guid movieId, [FromQuery] ReviewFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+        {
+            var result = await reviewService.GetFilteredReviewsAsync(movieId, filter, pageNumber, pageSize, cancellationToken);
+            return Ok(result);
+        }
+
 
         /// <summary>
         /// Create new review (only for admins or the user himself).
@@ -89,9 +106,8 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> Create([FromBody] CreateReviewDTO dto, CancellationToken cancellationToken)
         {
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (dto.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed or user who`s reviews is to perform this action." });
 
-            ReviewResponseDTO created = await reviewService.CreateAsync(dto, cancellationToken);
+            ReviewResponseDTO created = await reviewService.CreateAsync(dto, currentUserId, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
@@ -138,45 +154,6 @@ namespace CinemaBookingSystemAPI.Controllers
 
             await reviewService.DeleteAsync(id, cancellationToken);
             return NoContent();
-        }
-
-        /// <summary>
-        /// Get filtered reviews with pagination.
-        /// </summary>
-        /// <param name="filter">Filter object.</param>
-        /// <param name="pageNumber">Page number.</param>
-        /// <param name="pageSize">Page size.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("filtered")]
-        [ProducesResponseType(typeof(PagedList<ReviewResponseDTO>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetFiltered([FromQuery] ReviewFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
-        {
-            PagedList<ReviewResponseDTO> result = await reviewService.GetFilteredReviewsAsync(filter, pageNumber, pageSize, cancellationToken);
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Get top 10 best reviews.
-        /// </summary>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("the-best/top-10")]
-        [ProducesResponseType(typeof(List<ReviewResponseDTO>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetTop10(CancellationToken cancellationToken = default)
-        {
-            List<ReviewResponseDTO> result = await reviewService.GetTop10BestReviewsAsync(cancellationToken);
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Get top 10 worst reviews.
-        /// </summary>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("the-worst/top-10")]
-        [ProducesResponseType(typeof(List<ReviewResponseDTO>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetWorst10(CancellationToken cancellationToken = default)
-        {
-            List<ReviewResponseDTO> result = await reviewService.GetTop10WorstReviewsAsync(cancellationToken);
-            return Ok(result);
         }
     }
 }

@@ -77,6 +77,26 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         /// <summary>
+        /// Get user by ID
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        [HttpGet("my")]
+        [Authorize]
+        [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetMyProfile(CancellationToken cancellationToken)
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Forbid();
+
+            UserResponseDTO user = await userService.GetByIdAsync(userId, cancellationToken);
+            if (user == null) return NotFound(new { message = "Cannot find user profile!" });
+            return Ok(user);
+        }
+
+
+        /// <summary>
         /// Get user by email (admin only).
         /// </summary>
         /// <param name="email">User email.</param>
@@ -163,26 +183,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete user with this id!" });
 
             return NoContent();
-        }
-
-        /// <summary>
-        /// Get filtered users with pagination (admin only).
-        /// </summary>
-        /// <param name="filter">Filter parameters.</param>
-        /// <param name="pageNumber">Page number.</param>
-        /// <param name="pageSize">Page size.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("filtered")]
-        [Authorize]
-        [ProducesResponseType(typeof(List<UserResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetFilteredUsers([FromQuery] UserFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
-        {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
-
-            PagedList<UserResponseDTO> result = await userService.GetFilteredUsersAsync(filter, pageNumber, pageSize, cancellationToken);
-            return Ok(result);
         }
     }
 }

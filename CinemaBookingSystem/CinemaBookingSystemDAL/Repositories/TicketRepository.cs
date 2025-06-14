@@ -16,6 +16,11 @@ namespace CinemaBookingSystemDAL.Repositories
         
         }
 
+        public async Task<Ticket> GetBySeatAndSessionAsync(Guid seatId, Guid sessionId, CancellationToken cancellationToken = default)
+        {
+            return await context.Tickets.FirstOrDefaultAsync(t => t.SeatId == seatId && t.SessionId == sessionId, cancellationToken);
+        }
+
         public async Task<Ticket?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await context.Tickets

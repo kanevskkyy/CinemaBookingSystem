@@ -7,6 +7,8 @@ using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemBLL.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace CinemaBookingSystemAPI.Controllers
 {
@@ -90,12 +92,31 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByUserId(string userId, CancellationToken cancellationToken)
         {
-            string? currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (currentUserId == null || (!User.IsInRole("Admin") && currentUserId != userId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
+            string? current = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (current == null || (!User.IsInRole("Admin") && current != userId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
 
             List<TicketResponseDTO> tickets = await ticketService.GetByUserIdAsync(userId, cancellationToken);
             if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket by user with this id!" });
+
+            return Ok(tickets);
+        }
+
+        /// <summary>
+        /// Get tickets by user
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        [HttpGet("my")]
+        [Authorize]
+        [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetMyTickets(CancellationToken cancellationToken)
+        {
+            string? userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userID == null) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
+
+            List<TicketResponseDTO> tickets = await ticketService.GetByUserIdAsync(userID, cancellationToken);
+            if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "No tickets found for the current user." });
 
             return Ok(tickets);
         }
@@ -106,7 +127,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="sessionId">Session ID.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-session/{sessionId:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -127,7 +148,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="seatId">Seat ID.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("by-seat/{seatId:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -152,6 +173,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(typeof(TicketResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] TicketCreateDTO dto, CancellationToken cancellationToken)
         {
@@ -163,9 +185,17 @@ namespace CinemaBookingSystemAPI.Controllers
                 TicketResponseDTO created = await ticketService.CreateAsync(userId, dto, cancellationToken);
                 return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
             }
-            catch (InvalidOperationException ex)
+            catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23503")
+            {
+                return BadRequest(new { message = "Invalid seat or session reference." });
             }
             catch (Exception ex)
             {
@@ -179,7 +209,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="id">Ticket ID.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpDelete("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -202,7 +232,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="pageSize">Page size.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("filtered")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

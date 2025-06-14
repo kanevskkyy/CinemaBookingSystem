@@ -23,17 +23,9 @@ namespace CinemaBookingSystemBLL.Services
             this.mapper = mapper;
         }
 
-        public async Task<List<SeatResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-            var seats = await unitOfWork.Seats.GetAllAsync(cancellationToken);
-            var orderedSeats = seats.OrderBy(m => m.Id);
-
-            return mapper.Map<List<SeatResponseDTO>>(orderedSeats);
-        }
-
         public async Task<PagedList<SeatResponseDTO>> GetPagedSeatsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var query = unitOfWork.Seats.GetAll();
+            IQueryable<Seat> query = unitOfWork.Seats.GetAll();
             PagedList<Seat> pagedSeats = await PagedList<Seat>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
             List<SeatResponseDTO> seatDtos = mapper.Map<List<SeatResponseDTO>>(pagedSeats.Items);
 
@@ -56,6 +48,12 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<SeatResponseDTO> CreateAsync(SeatCreateDTO dto, CancellationToken cancellationToken = default)
         {
+            Hall? hall = await unitOfWork.Halls.GetByIdAsync(dto.HallId, cancellationToken);
+
+            if (hall == null) throw new ArgumentException("Hall with the specified ID does not exist");
+            if (dto.SeatNumber < 1 || dto.SeatNumber > hall.SeatsPerRow) throw new ArgumentException($"Seat number must be between 1 and {hall.SeatsPerRow}");
+            if (dto.RowNumber < 1 || dto.RowNumber > hall.RowsAmount) throw new ArgumentException($"Row number must be between 1 and {hall.RowsAmount}");
+
             Seat seat = mapper.Map<Seat>(dto);
 
             await unitOfWork.Seats.CreateAsync(seat, cancellationToken);

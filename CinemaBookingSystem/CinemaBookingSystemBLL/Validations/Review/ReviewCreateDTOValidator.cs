@@ -12,8 +12,6 @@ namespace CinemaBookingSystemBLL.Validations.Review
     {
         public ReviewCreateDTOValidator() 
         {
-            RuleFor(p => p.UserId).NotEmpty().WithMessage("UserId is required");
-
             RuleFor(p => p.MovieId).NotEmpty().WithMessage("MovieId is required");
 
             RuleFor(p => p.Text).NotEmpty().WithMessage("The text in the review cannot be empty!")

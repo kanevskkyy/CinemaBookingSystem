@@ -25,7 +25,9 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<GenreResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var genres = await unitOfWork.Genres.GetAllAsync(cancellationToken);
-            return mapper.Map<List<GenreResponseDTO>>(genres);
+            var ordereGenres = genres.OrderBy(p => p.Name);
+
+            return mapper.Map<List<GenreResponseDTO>>(ordereGenres);
         }
 
         public async Task<GenreResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -38,8 +40,8 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<GenreResponseDTO> CreateAsync(GenreCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            var existByGenre = await unitOfWork.Genres.FindAsync(g => g.Name.ToLower() == dto.Name.ToLower(), cancellationToken);
-            if (existByGenre.Any()) throw new ArgumentException("Genre with this name already exists!");
+            bool existByGenre = await ExistsByNameAsync(dto.Name, cancellationToken);
+            if (existByGenre) throw new ArgumentException("Genre with this name already exists!");
 
             Genre genre = mapper.Map<Genre>(dto);
 
@@ -54,8 +56,8 @@ namespace CinemaBookingSystemBLL.Services
             Genre genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
             if (genre == null) return null;
 
-            var existByGenre = await unitOfWork.Genres.FindAsync(g => g.Name.ToLower() == dto.Name.ToLower() && g.Id != id, cancellationToken);
-            if (existByGenre.Any()) throw new ArgumentException("Genre with this name already exists!");
+            bool existByGenre = await ExistsByNameAsync(dto.Name, cancellationToken);
+            if (existByGenre) throw new ArgumentException("Genre with this name already exists!");
 
             mapper.Map(dto, genre);
 
