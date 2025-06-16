@@ -99,21 +99,6 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         /// <summary>
-        /// Get sessions by date range.
-        /// </summary>
-        /// <param name="startDate">Start date.</param>
-        /// <param name="endDate">End date.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("by-date-range")]
-        [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, CancellationToken cancellationToken)
-        {
-            List<SessionResponseDTO> sessions = await sessionService.GetByDateRangeAsync(startDate, endDate, cancellationToken);
-            return Ok(sessions);
-        }
-
-        /// <summary>
         /// Create new session (admin only).
         /// </summary>
         /// <param name="dto">SessionCreateDTO object.</param>

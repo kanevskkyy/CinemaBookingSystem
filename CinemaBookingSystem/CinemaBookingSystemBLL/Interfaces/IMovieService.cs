@@ -13,7 +13,6 @@ namespace CinemaBookingSystemBLL.Interfaces
     {
         Task<List<MovieResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<MovieResponseDTO> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<List<MovieResponseDTO>> GetByGenreAsync(Guid genreId, CancellationToken cancellationToken = default);
         Task<List<MovieResponseDTO>> GetTopRatedAsync(CancellationToken cancellationToken = default);
         Task<MovieResponseDTO> CreateAsync(MovieCreateDTO dto, CancellationToken cancellationToken = default);
         Task<MovieResponseDTO> UpdateAsync(Guid id, MovieUpdateDTO dto, CancellationToken cancellationToken = default);

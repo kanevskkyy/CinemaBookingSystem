@@ -103,7 +103,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [Authorize]
         [ProducesResponseType(typeof(ReviewResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] CreateReviewDTO dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> Create([FromBody] ReviewCreateDTO dto, CancellationToken cancellationToken)
         {
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -122,7 +122,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(typeof(ReviewResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateReviewDTO dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update(Guid id, [FromBody] ReviewUpdateDTO dto, CancellationToken cancellationToken)
         {
             ReviewResponseDTO existing = await reviewService.GetByIdAsync(id, cancellationToken);
             if (existing == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find review with this id!" });

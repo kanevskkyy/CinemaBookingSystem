@@ -92,7 +92,7 @@ namespace CinemaBookingSystemBLL.Services
             return "User created successfully";
         }
 
-        public async Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(TokenRefreshRequest request)
+        public async Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(TokenRefreshDTO request)
         {
             var principal = GetPrincipalFromExpiredToken(request.AccessToken);
             if (principal == null) throw new SecurityTokenException("Invalid token");

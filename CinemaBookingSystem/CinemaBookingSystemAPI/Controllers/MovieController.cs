@@ -79,20 +79,6 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         /// <summary>
-        /// Get movies by genre ID.
-        /// </summary>
-        /// <param name="genreId">Genre ID.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("by-genre/{genreId:Guid}")]
-        [ProducesResponseType(typeof(List<MovieResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByGenre(Guid genreId, CancellationToken cancellationToken)
-        {
-            List<MovieResponseDTO> movies = await movieService.GetByGenreAsync(genreId, cancellationToken);
-            return Ok(movies);
-        }
-
-        /// <summary>
         /// Get top 10 rated movies.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>

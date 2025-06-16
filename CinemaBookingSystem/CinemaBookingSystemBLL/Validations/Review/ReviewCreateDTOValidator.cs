@@ -8,7 +8,7 @@ using FluentValidation;
 
 namespace CinemaBookingSystemBLL.Validations.Review
 {
-    public class ReviewCreateDTOValidator : AbstractValidator<CreateReviewDTO>
+    public class ReviewCreateDTOValidator : AbstractValidator<ReviewCreateDTO>
     {
         public ReviewCreateDTOValidator() 
         {

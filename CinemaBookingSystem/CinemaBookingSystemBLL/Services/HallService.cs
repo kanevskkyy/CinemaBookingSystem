@@ -65,6 +65,22 @@ namespace CinemaBookingSystemBLL.Services
 
             Hall hall = mapper.Map<Hall>(dto);
             await unitOfWork.Halls.CreateAsync(hall, cancellationToken);
+
+            for (int i = 1; i <= dto.RowsAmount; i++)
+            {
+                for (int seatNumber = 1; seatNumber <= dto.SeatsPerRow; seatNumber++)
+                {
+                    Seat seat = new Seat
+                    {
+                        Id = Guid.NewGuid(),
+                        HallId = hall.Id,
+                        RowNumber = i,
+                        SeatNumber = seatNumber
+                    };
+                    await unitOfWork.Seats.CreateAsync(seat, cancellationToken);
+                }
+            }
+
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return mapper.Map<HallResponseDTO>(hall);
@@ -85,7 +101,6 @@ namespace CinemaBookingSystemBLL.Services
 
             return mapper.Map<HallResponseDTO>(hall);
         }
-
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {

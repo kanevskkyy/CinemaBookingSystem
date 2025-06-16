@@ -48,19 +48,6 @@ namespace CinemaBookingSystemDAL.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Session>> GetByDateRangeAsync(DateTime start, DateTime end, CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .AsNoTracking()
-                .Where(p => p.StartTime >= start.ToUniversalTime() && p.StartTime <= end.ToUniversalTime())
-                .OrderBy(p => p.Id)
-                .Include(p => p.Hall)
-                .Include(p => p.Movie)
-                .ToListAsync(cancellationToken);
-        }
-
-
-
         public IQueryable<Session> GetAllMoviesAsyncDetail(CancellationToken cancellationToken = default)
         {
             return dbSet

@@ -107,7 +107,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// Gets movie counts per each genre.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("movie-counts")]
+        [HttpGet("with-movie-counts")]
         [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetMovieCounts(CancellationToken cancellationToken)

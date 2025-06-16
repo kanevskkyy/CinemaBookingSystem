@@ -57,12 +57,6 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<SessionResponseDTO>>(sessions);
         }
 
-        public async Task<List<SessionResponseDTO>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
-        {
-            List<Session> sessions = await unitOfWork.Sessions.GetByDateRangeAsync(startDate, endDate, cancellationToken);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
-        }
-
         public async Task<SessionResponseDTO> CreateAsync(SessionCreateDTO dto, CancellationToken cancellationToken = default)
         {
             Movie? movie = await unitOfWork.Movies.GetByIdAsync(dto.MovieId, cancellationToken);

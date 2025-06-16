@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace CinemaBookingSystemBLL.DTO.Review
 {
-    public class UpdateReviewDTO
+    public class ReviewCreateDTO
     {
-        public string? Text { get; set; }
-        public int? Rating { get; set; }
+        public Guid MovieId { get; set; }
+        public string Text { get; set; }
+        public int Rating { get; set; }
     }
 }

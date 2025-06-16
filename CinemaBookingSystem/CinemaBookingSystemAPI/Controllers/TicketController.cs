@@ -143,27 +143,6 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         /// <summary>
-        /// Get tickets by seat ID (admin only).
-        /// </summary>
-        /// <param name="seatId">Seat ID.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("by-seat/{seatId:Guid}")]
-        [Authorize(Roles = "Admin")]
-        [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetBySeatId(Guid seatId, CancellationToken cancellationToken)
-        {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
-
-            List<TicketResponseDTO> tickets = await ticketService.GetBySeatIdAsync(seatId, cancellationToken);
-            if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session by seat with this id!" });
-
-            return Ok(tickets);
-        }
-
-        /// <summary>
         /// Create new ticket.
         /// </summary>
         /// <param name="dto">TicketCreateDTO object.</param>

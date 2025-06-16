@@ -2,8 +2,8 @@
 {
     public class ErrorHandlingMiddleware
     {
-        private readonly RequestDelegate requestDelegate; 
-        private readonly ILogger<ErrorHandlingMiddleware> logger;
+        private RequestDelegate requestDelegate; 
+        private ILogger<ErrorHandlingMiddleware> logger;
 
         public ErrorHandlingMiddleware(RequestDelegate request, ILogger<ErrorHandlingMiddleware> logger)
         {

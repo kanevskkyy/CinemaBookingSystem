@@ -112,13 +112,6 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
 
-        public async Task<List<TicketResponseDTO>> GetBySeatIdAsync(Guid seatId, CancellationToken cancellationToken = default)
-        {
-            List<Ticket> tickets = await unitOfWork.Tickets.GetBySeatIdAsync(seatId, cancellationToken);
-
-            return mapper.Map<List<TicketResponseDTO>>(tickets);
-        }
-
         public async Task<PagedList<TicketResponseDTO>> GetFilteredTicketsAsync(TicketFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             IQueryable<Ticket> queryable = unitOfWork.Tickets.GetAll();

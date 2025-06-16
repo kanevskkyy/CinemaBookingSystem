@@ -55,7 +55,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <summary>
         /// Register new user with any role (Customer or Admin). Need Admin authorization
         /// </summary>
-        [HttpPost("create")]
+        [HttpPost("admin-create")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateUserByAdmin([FromBody] UserCreateDTO dto)
         {
@@ -71,7 +71,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// </summary>
         [HttpPost("refresh")]
         [ProducesResponseType(typeof(TokenResponseDTO), StatusCodes.Status200OK)]
-        public async Task<IActionResult> RefreshToken([FromBody] TokenRefreshRequest dto)
+        public async Task<IActionResult> RefreshToken([FromBody] TokenRefreshDTO dto)
         {
             var (accessToken, refreshToken) = await service.RefreshTokenAsync(dto);
             TokenResponseDTO result = new TokenResponseDTO

@@ -48,17 +48,6 @@ namespace CinemaBookingSystemDAL.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Movie>> GetByGenreAsync(Guid genreId, CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .OrderBy(p => p.Title)
-                .Include(m => m.MovieGenres)
-                .ThenInclude(mg => mg.Genre)
-                .Where(m => m.MovieGenres.Any(mg => mg.GenreId == genreId))
-                .OrderBy(m => m.Id)
-                .ToListAsync(cancellationToken);
-        }
-
         public async Task<List<Movie>> GetTopRatedAsync(CancellationToken cancellationToken = default)
         {
             return await dbSet

@@ -8,6 +8,6 @@ namespace CinemaBookingSystemBLL.Interfaces
         Task<(string AccessToken, string RefreshToken)> LoginAsync(LoginDTO dto);
         Task<(string AccessToken, string RefreshToken)> RegisterAsync(UserCreateCustomerDTO dto);
         Task<string> CreateUserByAdminAsync(UserCreateDTO dto);
-        Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(TokenRefreshRequest request);
+        Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(TokenRefreshDTO request);
     }
 }

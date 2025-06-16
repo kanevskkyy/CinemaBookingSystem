@@ -36,13 +36,6 @@ namespace CinemaBookingSystemBLL.Services
             else return mapper.Map<MovieResponseDTO>(movie);
         }
 
-        public async Task<List<MovieResponseDTO>> GetByGenreAsync(Guid genreId, CancellationToken cancellationToken = default)
-        {
-            List<Movie> movies = await unitOfWork.Movies.GetByGenreAsync(genreId, cancellationToken);
-
-            return mapper.Map<List<MovieResponseDTO>>(movies);
-        }
-
         public async Task<List<MovieResponseDTO>> GetTopRatedAsync(CancellationToken cancellationToken = default)
         {
             List<Movie> movies = await unitOfWork.Movies.GetTopRatedAsync(cancellationToken);

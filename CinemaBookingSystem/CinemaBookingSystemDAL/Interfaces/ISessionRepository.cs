@@ -16,7 +16,6 @@ namespace CinemaBookingSystemDAL.Interfaces
             IQueryable<Session> GetAllMoviesAsyncDetail(CancellationToken cancellationToken = default);
             Task<List<Session>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default);
             Task<List<Session>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default);
-            Task<List<Session>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
         }
     }
 }

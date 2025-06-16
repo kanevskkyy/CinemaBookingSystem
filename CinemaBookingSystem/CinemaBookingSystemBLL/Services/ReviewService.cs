@@ -47,7 +47,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 
-        public async Task<ReviewResponseDTO> CreateAsync(CreateReviewDTO dto, string userId, CancellationToken cancellationToken = default)
+        public async Task<ReviewResponseDTO> CreateAsync(ReviewCreateDTO dto, string userId, CancellationToken cancellationToken = default)
         {
             bool exists = await unitOfWork.Review.ExistsByUserAndMovieAsync(userId, dto.MovieId, cancellationToken);
             if (exists) throw new ArgumentException("You have already left a review for this movie.");
@@ -62,7 +62,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<ReviewResponseDTO>(review);
         }
 
-        public async Task<ReviewResponseDTO?> UpdateAsync(Guid id, UpdateReviewDTO dto, CancellationToken cancellationToken = default)
+        public async Task<ReviewResponseDTO?> UpdateAsync(Guid id, ReviewUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
             if (review == null) return null;
