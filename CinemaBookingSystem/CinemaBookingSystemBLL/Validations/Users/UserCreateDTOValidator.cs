@@ -8,10 +8,11 @@ namespace CinemaBookingSystemBLL.Validations.Users
         public UserCreateDTOValidator() 
         {
             RuleFor(p => p.Name).NotEmpty().WithMessage("Name is required.")
-                .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
+                .MaximumLength(256).WithMessage("Name must not exceed 256 characters.");
 
             RuleFor(p => p.Email).NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Email must be a valid email address.");
+                .EmailAddress().WithMessage("Email must be a valid email address.")
+                .MaximumLength(256).WithMessage("Email must not exceed 256 characters.");
 
             RuleFor(p => p.Password)
                 .NotEmpty().WithMessage("Password is required.")
