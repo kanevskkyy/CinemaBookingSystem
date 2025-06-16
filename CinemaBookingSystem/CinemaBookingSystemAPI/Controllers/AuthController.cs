@@ -41,7 +41,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="dto">User registration data.</param>
         [HttpPost("register")]
         [ProducesResponseType(typeof(TokenResponseDTO), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Register([FromBody] UserCreateDTO dto)
+        public async Task<IActionResult> Register([FromBody] UserCreateCustomerDTO dto)
         {
             var (accessToken, refreshToken) = await service.RegisterAsync(dto);
             TokenResponseDTO result = new TokenResponseDTO

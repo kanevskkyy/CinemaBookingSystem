@@ -69,6 +69,7 @@ namespace CinemaBookingSystemBLL.AutoMapper
             
             CreateMap<UserUpdateDTO, User>().ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name));
             CreateMap<UserCreateDTO, User>().ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name));
+            CreateMap<UserCreateCustomerDTO, User>().ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name));
         }
     }
 }

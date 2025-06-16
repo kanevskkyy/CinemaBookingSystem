@@ -59,7 +59,7 @@ namespace CinemaBookingSystemBLL.Services
             return (accessToken, refreshToken.Token);
         }
 
-        public async Task<(string AccessToken, string RefreshToken)> RegisterAsync(UserCreateDTO dto)
+        public async Task<(string AccessToken, string RefreshToken)> RegisterAsync(UserCreateCustomerDTO dto)
         {
             User? existingUser = await userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null) throw new InvalidOperationException("A user with this email already exists.");
@@ -81,8 +81,6 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<string> CreateUserByAdminAsync(UserCreateDTO dto)
         {
-            if (dto.Role != "Admin" && dto.Role != "Customer") throw new ArgumentException("Role must be either 'Admin' or 'Customer'.");
-
             User user = mapper.Map<User>(dto);
 
             User? existingUser = await userManager.FindByEmailAsync(dto.Email);
@@ -143,16 +141,17 @@ namespace CinemaBookingSystemBLL.Services
 
         private RefreshToken GenerateRefreshToken()
         {
-            return new RefreshToken
+            RefreshToken refreshToken = new RefreshToken
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
                 ExpiryDate = DateTime.UtcNow.AddDays(int.Parse(config["Jwt:RefreshTokenExpiryDays"]))
             };
+            return refreshToken;
         }
 
         private async Task SaveRefreshToken(string userId, RefreshToken refreshToken)
         {
-            var existing = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
+            RefreshToken? existing = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
 
             if (existing != null)
             {
