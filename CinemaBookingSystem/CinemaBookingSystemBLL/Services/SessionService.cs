@@ -15,6 +15,7 @@ namespace CinemaBookingSystemBLL.Services
     {
         private IUnitOfWork unitOfWork;
         private IMapper mapper;
+        private const int cleaningTime = 15;
 
         public SessionService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -63,16 +64,17 @@ namespace CinemaBookingSystemBLL.Services
             if (movie == null) throw new ArgumentException("Movie not found.");
 
             var sessionsInHall = await unitOfWork.Sessions.GetAllAsync();
-            
+
             DateTime newStart = dto.StartTime.ToUniversalTime();
-            DateTime newEnd = newStart.AddMinutes(movie.Duration).ToUniversalTime();
+            DateTime newEnd = newStart.AddMinutes(movie.Duration + cleaningTime).ToUniversalTime();
+
             foreach (var existingSession in sessionsInHall)
             {
                 Movie existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
-                
+
                 DateTime existingStart = existingSession.StartTime.ToUniversalTime();
-                DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration).ToUniversalTime();
-                
+                DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration + cleaningTime).ToUniversalTime();
+
                 if (newStart < existingEnd && existingStart < newEnd) throw new InvalidOperationException("This hall already has a session during this time.");
             }
 
@@ -110,7 +112,7 @@ namespace CinemaBookingSystemBLL.Services
             {
                 Movie existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
                 DateTime existingStart = existingSession.StartTime.ToUniversalTime();
-                DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration).ToUniversalTime();
+                DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration + cleaningTime).ToUniversalTime();
 
                 if (newStart < existingEnd && existingStart < newEnd) throw new InvalidOperationException("This hall already has a session during this time.");
             }
@@ -140,21 +142,36 @@ namespace CinemaBookingSystemBLL.Services
                 switch (filter.SortBy.ToLower())
                 {
                     case "starttime":
-                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.StartTime) : queryable.OrderBy(s => s.StartTime);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(s => s.StartTime);
+                        else queryable = queryable.OrderBy(s => s.StartTime);
+
                         break;
+
                     case "movieid":
-                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.MovieId) : queryable.OrderBy(s => s.MovieId);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(s => s.MovieId);
+                        else queryable = queryable.OrderBy(s => s.MovieId);
+
                         break;
+
                     case "hallid":
-                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.HallId) : queryable.OrderBy(s => s.HallId);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(s => s.HallId);
+                        else queryable = queryable.OrderBy(s => s.HallId);
+
                         break;
+
                     case "price":
-                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.Price) : queryable.OrderBy(s => s.Price);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(s => s.Price);
+                        else queryable = queryable.OrderBy(s => s.Price);
+
                         break;
+
                     default:
-                        queryable = filter.SortDescending ? queryable.OrderByDescending(s => s.Id) : queryable.OrderBy(s => s.Id);
+                        if (filter.SortDescending) queryable = queryable.OrderByDescending(s => s.Id);
+                        else queryable = queryable.OrderBy(s => s.Id);
+                        
                         break;
                 }
+
             }
             else queryable = queryable.OrderBy(s => s.Id);
 
