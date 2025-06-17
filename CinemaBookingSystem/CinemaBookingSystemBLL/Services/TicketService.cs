@@ -8,6 +8,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using CinemaBookingSystemBLL.DTO.Sessions;
 using CinemaBookingSystemBLL.DTO.Tickets;
+using CinemaBookingSystemBLL.Exceptions;
 using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemBLL.Pagination;
@@ -15,6 +16,7 @@ using CinemaBookingSystemDAL.Entities;
 using CinemaBookingSystemDAL.Unit_of_Work;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CinemaBookingSystemBLL.Services
 {
@@ -49,7 +51,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<TicketResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Ticket ticket = await unitOfWork.Tickets.GetByIdWithDetailsAsync(id, cancellationToken);
-            if (ticket == null) return null;
+            if (ticket == null) throw new NotFoundException("Ticket", id);
 
             return mapper.Map<TicketResponseDTO>(ticket);
         }
@@ -57,22 +59,14 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<TicketResponseDTO> CreateAsync(string userId, TicketCreateDTO dto, CancellationToken cancellationToken = default)
         {
             Seat seat = await unitOfWork.Seats.GetByIdAsync(dto.SeatId, cancellationToken);
-            if (seat == null)
-            {
-                throw new ArgumentException($"Seat with ID {dto.SeatId} does not exist.");
-            }
-            
+            if (seat == null) throw new NotFoundException("Seat", dto.SeatId);
+                        
             Session session = await unitOfWork.Sessions.GetByIdAsync(dto.SessionId, cancellationToken);
-            if (session == null)
-            {
-                throw new ArgumentException($"Session with ID {dto.SessionId} does not exist.");
-            }
+            if (session == null) throw new NotFoundException("Session", dto.SessionId);
 
             Ticket existingTicket = await unitOfWork.Tickets.GetBySeatAndSessionAsync(dto.SeatId, dto.SessionId, cancellationToken);
-            if (existingTicket != null)
-            {
-                throw new InvalidOperationException("This seat is already booked for the selected session.");
-            }
+            if (existingTicket != null) throw new SeatAlreadyBookedException();
+            
 
             Ticket ticket = mapper.Map<Ticket>(dto);
             ticket.UserId = userId;
@@ -90,7 +84,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(id, cancellationToken);
-            if (ticket == null) return false;
+            if (ticket == null) throw new NotFoundException("Ticket", id);
 
             unitOfWork.Tickets.Delete(ticket);
             await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -100,6 +94,8 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<TicketResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             List<Ticket> tickets = await unitOfWork.Tickets.GetByUserIdAsync(userId, cancellationToken);
+            if (!Guid.TryParse(userId, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
+            if (tickets.IsNullOrEmpty()) throw new NotFoundException("Ticket", guidId);
 
             return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
@@ -108,6 +104,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<TicketResponseDTO>> GetBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default)
         {
             List<Ticket> tickets = await unitOfWork.Tickets.GetBySessionIdAsync(sessionId, cancellationToken);
+            if (tickets.IsNullOrEmpty()) throw new NotFoundException("Ticket", sessionId);
 
             return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
@@ -166,7 +163,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<bool> ConfirmPaymentAsync(Guid ticketId, CancellationToken cancellationToken = default)
         {
             Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(ticketId, cancellationToken);
-            if (ticket == null) return false;
+            if (ticket == null) throw new NotFoundException("Ticket", ticketId);
 
             ticket.IsPaid = true;
             await unitOfWork.SaveChangesAsync(cancellationToken);

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using CinemaBookingSystemBLL.DTO.Review;
+using CinemaBookingSystemBLL.Exceptions;
 using CinemaBookingSystemBLL.Filters;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemBLL.Pagination;
@@ -36,7 +37,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<ReviewResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
-            if (review == null) return null;
+            if (review == null) throw new NotFoundException("Review", id);
 
             return mapper.Map<ReviewResponseDTO>(review);
         }
@@ -44,13 +45,16 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<List<ReviewResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             List<Review> reviews = await unitOfWork.Review.GetByUserIdAsync(userId, cancellationToken);
+            if (!Guid.TryParse(userId, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
+            if (reviews.IsNullOrEmpty()) throw new NotFoundException("Review", guidId); 
+            
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 
         public async Task<ReviewResponseDTO> CreateAsync(ReviewCreateDTO dto, string userId, CancellationToken cancellationToken = default)
         {
             bool exists = await unitOfWork.Review.ExistsByUserAndMovieAsync(userId, dto.MovieId, cancellationToken);
-            if (exists) throw new ArgumentException("You have already left a review for this movie.");
+            if (exists) throw new ReviewAlreadyExistsException(userId, dto.MovieId);
 
             Review review = mapper.Map<Review>(dto);
             review.CreatedAt = DateTime.UtcNow.ToUniversalTime();
@@ -65,7 +69,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<ReviewResponseDTO?> UpdateAsync(Guid id, ReviewUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
-            if (review == null) return null;
+            if (review == null) throw new NotFoundException("Review", id);
 
             if (!string.IsNullOrEmpty(dto.Text)) review.Text = dto.Text;
             if (dto.Rating.HasValue) review.Rating = dto.Rating.Value;

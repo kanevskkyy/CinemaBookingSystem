@@ -39,8 +39,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             GenreResponseDTO genre = await genreService.GetByIdAsync(id, cancellationToken);
-
-            if (genre == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find genre with this id!" });
             return Ok(genre);
         }
 

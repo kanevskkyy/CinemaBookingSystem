@@ -28,7 +28,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetByHallId(Guid hallId, CancellationToken cancellationToken)
         {
             List<SeatResponseDTO> seats = await seatService.GetByHallIdAsync(hallId, cancellationToken);
-            if (seats == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find hall with this id!" });
             return Ok(seats);
         }
     }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using CinemaBookingSystemBLL.DTO.Halls;
+using CinemaBookingSystemBLL.Exceptions;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.Entities;
 using CinemaBookingSystemDAL.Unit_of_Work;
@@ -53,15 +54,14 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<HallResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
-
-            if (hall == null) return null;
+            if (hall == null) throw new NotFoundException("Hall", id);
             else return mapper.Map<HallResponseDTO>(hall);
         }
 
         public async Task<HallResponseDTO> CreateAsync(HallCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            bool exists = await unitOfWork.Halls.ExistsByNameAsync(dto.Name, cancellationToken: cancellationToken);
-            if (exists) throw new ArgumentException("Hall with this name already exists");
+            bool existsByName = await unitOfWork.Halls.ExistsByNameAsync(dto.Name, cancellationToken: cancellationToken);
+            if (existsByName) throw new EntityAlreadyExistsException("Hall", "Name", dto.Name);
 
             Hall hall = mapper.Map<Hall>(dto);
             await unitOfWork.Halls.CreateAsync(hall, cancellationToken);
@@ -89,10 +89,10 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<HallResponseDTO?> UpdateAsync(Guid id, HallUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
-            if (hall == null) return null;
+            if (hall == null) throw new NotFoundException("Hall", id);
 
             bool exist = await unitOfWork.Halls.ExistsByNameAsync(dto.Name, id, cancellationToken);
-            if (exist) throw new ArgumentException("Hall with this name already exists");
+            if (exist) throw new EntityAlreadyExistsException("Hall", "Name", dto.Name);
 
             mapper.Map(dto, hall);
 
@@ -105,7 +105,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
-            if (hall == null) return false;
+            if (hall == null) throw new NotFoundException("Hall", id);
 
             unitOfWork.Halls.Delete(hall);
             await unitOfWork.SaveChangesAsync(cancellationToken);

@@ -5,6 +5,7 @@ using System.Text;
 using AutoMapper;
 using CinemaBookingSystemBLL.DTO.Authorization;
 using CinemaBookingSystemBLL.DTO.Users;
+using CinemaBookingSystemBLL.Exceptions;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.DbCreating;
 using CinemaBookingSystemDAL.Entities;
@@ -62,12 +63,12 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<(string AccessToken, string RefreshToken)> RegisterAsync(UserCreateCustomerDTO dto)
         {
             User? existingUser = await userManager.FindByEmailAsync(dto.Email);
-            if (existingUser != null) throw new InvalidOperationException("A user with this email already exists.");
+            if (existingUser != null) throw new EmailAlreadyExistsException(dto.Email);
 
             User user = mapper.Map<User>(dto);
 
             var result = await userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded) throw new Exception("Something went wrong...");
+            if (!result.Succeeded) throw new UserCreationFailedException();
 
             await userManager.AddToRoleAsync(user, "Customer");
 
@@ -84,11 +85,12 @@ namespace CinemaBookingSystemBLL.Services
             User user = mapper.Map<User>(dto);
 
             User? existingUser = await userManager.FindByEmailAsync(dto.Email);
-            if (existingUser != null) throw new InvalidOperationException("A user with this email already exists.");
+            if (existingUser != null) throw new EmailAlreadyExistsException(dto.Email);
 
             var result = await userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded) throw new Exception("Something went wrong..."); await userManager.AddToRoleAsync(user, dto.Role);
-
+            if (!result.Succeeded) throw new UserCreationFailedException(); 
+            
+            await userManager.AddToRoleAsync(user, dto.Role);
             return "User created successfully";
         }
 

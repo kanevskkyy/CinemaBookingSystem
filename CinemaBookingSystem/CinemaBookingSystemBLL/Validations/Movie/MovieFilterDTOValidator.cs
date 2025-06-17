@@ -13,6 +13,10 @@ namespace CinemaBookingSystemBLL.Validations.Movie
     {
         public MovieFilterDTOValidator()
         {
+            RuleFor(p => p.GenreId)
+                .NotEmpty().WithMessage("GenreId is required.")
+                .Must(id => id != Guid.Empty).WithMessage("GenreId must be a valid GUID.");
+
             RuleFor(p => p.MinRating).GreaterThanOrEqualTo(2).WithMessage("The minimum movie rating for filtering must be greater than or equal to 0");
 
             RuleFor(p => p.MaxRating).GreaterThanOrEqualTo(2).WithMessage("The maximum movie rating for filtering must be greater than or equal to 1");

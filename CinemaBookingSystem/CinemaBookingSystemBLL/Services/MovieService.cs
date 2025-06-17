@@ -8,6 +8,7 @@ using CinemaBookingSystemBLL.Filters;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using System.Runtime.CompilerServices;
+using CinemaBookingSystemBLL.Exceptions;
 
 namespace CinemaBookingSystemBLL.Services
 {
@@ -32,7 +33,7 @@ namespace CinemaBookingSystemBLL.Services
         {
             Movie? movie = await unitOfWork.Movies.GetByIdWithGenresAsync(id, cancellationToken);
 
-            if (movie == null) return null;
+            if (movie == null) throw new NotFoundException("Movie", id);
             else return mapper.Map<MovieResponseDTO>(movie);
         }
 
@@ -46,10 +47,10 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<MovieResponseDTO> CreateAsync(MovieCreateDTO dto, CancellationToken cancellationToken = default)
         {
             bool exist = await unitOfWork.Movies.ExistsByTitleAsync(dto.Title, null, cancellationToken);
-            if (exist) throw new ArgumentException("Movie with this title already exists");
+            if (exist) throw new EntityAlreadyExistsException("Movie", "Title", dto.Title);
 
             exist = await unitOfWork.Movies.ExistsByPosterUrlAsync(dto.PosterUrl, null, cancellationToken);
-            if (exist) throw new ArgumentException("Movie with this poster URL already exists");
+            if (exist) throw new EntityAlreadyExistsException("Movie", "Poster URL", dto.PosterUrl);
 
             Movie movie = mapper.Map<Movie>(dto);
 
@@ -63,13 +64,13 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<MovieResponseDTO> UpdateAsync(Guid id, MovieUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             Movie movie = await unitOfWork.Movies.GetByIdWithGenresAsync(id, cancellationToken);
-            if (movie == null) return null;
+            if (movie == null) throw new NotFoundException("Movie", id);
 
             bool exist = await unitOfWork.Movies.ExistsByTitleAsync(dto.Title, null, cancellationToken);
-            if (exist) throw new ArgumentException("Movie with this title already exists");
+            if (exist) throw new EntityAlreadyExistsException("Movie", "Title", dto.Title);
 
             exist = await unitOfWork.Movies.ExistsByPosterUrlAsync(dto.PosterUrl, null, cancellationToken);
-            if (exist) throw new ArgumentException("Movie with this poster URL already exists");
+            if (exist) throw new EntityAlreadyExistsException("Movie", "Poster URL", dto.PosterUrl);
 
             mapper.Map(dto, movie);
             movie.MovieGenres.Clear();
@@ -96,7 +97,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Movie movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
-            if (movie == null) return false;
+            if (movie == null) throw new NotFoundException("Movie", id);
 
             unitOfWork.Movies.Delete(movie);
             await unitOfWork.SaveChangesAsync(cancellationToken);

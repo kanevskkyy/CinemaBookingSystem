@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using CinemaBookingSystemBLL.Pagination;
 using CinemaBookingSystemBLL.Filters;
 using AutoMapper;
+using CinemaBookingSystemBLL.Exceptions;
 
 namespace CinemaBookingSystemBLL.Services
 {
@@ -31,7 +32,9 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<bool> ChangePasswordAsync(string userId, ChangePasswordDTO dto, CancellationToken cancellationToken)
         {
             User user = await userManager.FindByIdAsync(userId);
-            if (user == null) return false;
+            if (!Guid.TryParse(userId, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
+
+            if (user == null) throw new NotFoundException("User", guidId);
 
             var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
             return result.Succeeded;
@@ -77,7 +80,8 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<UserResponseDTO?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
             User user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
-            if (user == null) return null;
+            if (!Guid.TryParse(id, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
+            if (user == null) throw new NotFoundException("User", guidId);
 
             var roles = await userManager.GetRolesAsync(user);
             string role = roles.FirstOrDefault();
@@ -92,7 +96,9 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
         {
             User user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
-            if (user == null) return false;
+            if (!Guid.TryParse(id, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
+
+            if (user == null) throw new NotFoundException("User", guidId);
 
             unitOfWork.Users.Delete(user);
             await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -120,7 +126,8 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<UserResponseDTO> UpdateAsync(string id, UserUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             User user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
-            if (user == null) throw new KeyNotFoundException("User not found");
+            if (!Guid.TryParse(id, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
+            if (user == null) throw new NotFoundException("User", guidId);
 
             user.UserName = dto.Name;
 

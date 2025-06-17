@@ -59,8 +59,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             SessionResponseDTO session = await sessionService.GetByIdAsync(id, cancellationToken);
-            if (session == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session with this id!" });
-
             return Ok(session);
         }
 
@@ -76,8 +74,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetByMovieId(Guid movieId, CancellationToken cancellationToken)
         {
             List<SessionResponseDTO> sessions = await sessionService.GetByMovieIdAsync(movieId, cancellationToken);
-            if (sessions == null || !sessions.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session movie with this id!" });
-
             return Ok(sessions);
         }
 
@@ -93,8 +89,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetByHallId(Guid hallId, CancellationToken cancellationToken)
         {
             List<SessionResponseDTO> sessions = await sessionService.GetByHallIdAsync(hallId, cancellationToken);
-            if (sessions == null || !sessions.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find session hall with this id!" });
-
             return Ok(sessions);
         }
 
@@ -133,8 +127,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             SessionResponseDTO updated = await sessionService.UpdateAsync(id, dto, cancellationToken);
-            if (updated == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update session with this id!" });
-
             return NoContent();
         }
 

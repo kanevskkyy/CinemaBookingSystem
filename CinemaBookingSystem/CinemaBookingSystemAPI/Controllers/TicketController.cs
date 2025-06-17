@@ -74,8 +74,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             TicketResponseDTO ticket = await ticketService.GetByIdAsync(id, cancellationToken);
-            if (ticket == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket with this id!" });
-
             return Ok(ticket);
         }
 
@@ -96,8 +94,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (current == null || (!User.IsInRole("Admin") && current != userId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
 
             List<TicketResponseDTO> tickets = await ticketService.GetByUserIdAsync(userId, cancellationToken);
-            if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket by user with this id!" });
-
             return Ok(tickets);
         }
 
@@ -116,8 +112,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (userID == null) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
 
             List<TicketResponseDTO> tickets = await ticketService.GetByUserIdAsync(userID, cancellationToken);
-            if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "No tickets found for the current user." });
-
             return Ok(tickets);
         }
 
@@ -137,8 +131,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             List<TicketResponseDTO> tickets = await ticketService.GetBySessionIdAsync(sessionId, cancellationToken);
-            if (tickets == null || !tickets.Any()) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find ticket by session with this id!" });
-
             return Ok(tickets);
         }
 

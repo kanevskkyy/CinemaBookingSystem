@@ -41,8 +41,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             HallResponseDTO hall = await hallService.GetByIdAsync(id, cancellationToken);
-            if (hall == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find hall with this id!" });
-            
             return Ok(hall);
         }
 
@@ -79,9 +77,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> Update(Guid id, [FromBody] HallUpdateDTO dto, CancellationToken cancellationToken)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
-
-            HallResponseDTO updated = await hallService.UpdateAsync(id, dto, cancellationToken);
-            if (updated == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update hall!" }); ;
             return NoContent();
         }
 

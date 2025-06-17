@@ -42,8 +42,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             ReviewResponseDTO review = await reviewService.GetByIdAsync(id, cancellationToken);
-            if (review == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find review with this id!" });
-            
             return Ok(review);
         }
 
@@ -125,8 +123,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> Update(Guid id, [FromBody] ReviewUpdateDTO dto, CancellationToken cancellationToken)
         {
             ReviewResponseDTO existing = await reviewService.GetByIdAsync(id, cancellationToken);
-            if (existing == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find review with this id!" });
-
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed or user who`s reviews is to perform this action." });
 
@@ -147,7 +143,6 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
             ReviewResponseDTO existing = await reviewService.GetByIdAsync(id, cancellationToken);
-            if (existing == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete review with this id!" });
 
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed or user who`s reviews is to perform this action." });

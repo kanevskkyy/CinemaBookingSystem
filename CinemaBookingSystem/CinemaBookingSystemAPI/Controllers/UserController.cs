@@ -71,8 +71,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin") && userId != id) return Forbid();
 
             UserResponseDTO user = await userService.GetByIdAsync(id, cancellationToken);
-            if (user == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find user with this id!" });
-
             return Ok(user);
         }
 
@@ -91,7 +89,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (userId == null) return Forbid();
 
             UserResponseDTO user = await userService.GetByIdAsync(userId, cancellationToken);
-            if (user == null) return NotFound(new { message = "Cannot find user profile!" });
             return Ok(user);
         }
 
@@ -112,8 +109,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             UserResponseDTO user = await userService.GetByEmailAsync(email, cancellationToken);
-            if (user == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot find user with this email!" });
-
             return Ok(user);
         }
 
@@ -134,9 +129,6 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!User.IsInRole("Admin") && userId != id) return Forbid();
-
-            UserResponseDTO existingUser = await userService.GetByIdAsync(id, cancellationToken);
-            if (existingUser == null) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot update user with this id!" });
 
             UserResponseDTO updatedUser = await userService.UpdateAsync(id, dto, cancellationToken);
             return Ok(updatedUser);
