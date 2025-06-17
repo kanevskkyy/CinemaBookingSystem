@@ -107,7 +107,7 @@ namespace CinemaBookingSystemBLL.Services
 
             DateTime newStart = dto.StartTime.ToUniversalTime();
             DateTime newEnd = newStart.AddMinutes(movie.Duration).ToUniversalTime();
-            var sessionsInHall = await unitOfWork.Sessions.FindAsync(s => s.HallId == session.HallId && s.Id != id, cancellationToken);
+            var sessionsInHall = await unitOfWork.Sessions.GetSessionsInHallExceptAsync(session.HallId, id, cancellationToken);
 
             foreach (var existingSession in sessionsInHall)
             {

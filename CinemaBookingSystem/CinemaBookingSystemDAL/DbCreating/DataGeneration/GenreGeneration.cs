@@ -10,7 +10,7 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 
             List<Genre> genreList = new List<Genre>();
             List<string> genreTypes = new List<string> { "Action", "Comedy", "Drama", "Horror", "Science Fiction", "Romance", "Thriller", "Fantasy", "Adventure", "Documentary" };
-            foreach (var genreName in genreTypes)
+            foreach (string genreName in genreTypes)
             {
                 Genre tempGenre = new Genre
                 {

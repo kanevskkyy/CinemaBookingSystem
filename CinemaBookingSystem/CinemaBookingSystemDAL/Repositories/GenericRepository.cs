@@ -31,11 +31,6 @@ namespace CinemaBookingSystemDAL.Repositories
             return await dbSet.AsNoTracking().ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
-        {
-            return await dbSet.Where(predicate).ToListAsync(cancellationToken);
-        }
-
         public async Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default)
         {
             await dbSet.AddAsync(entity, cancellationToken);

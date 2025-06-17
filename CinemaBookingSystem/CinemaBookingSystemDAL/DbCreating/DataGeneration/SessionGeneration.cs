@@ -11,7 +11,7 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 
             DateTime timeNow = DateTime.Now;
             DateTime localTime = timeNow.ToUniversalTime();
-            var sessionFaker = new Faker<Session>("en")
+            Faker<Session> sessionFaker = new Faker<Session>("en")
                 .RuleFor(p => p.MovieId, k => k.PickRandom(movieList).Id)
                 .RuleFor(p => p.HallId, k => k.PickRandom(hallList).Id)
                 .RuleFor(p => p.StartTime, k => k.Date.Between(localTime, localTime.AddMonths(1)).ToUniversalTime())

@@ -18,11 +18,11 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 
             if (userManager.Users.Any()) return;
 
-            var userFaker = new Faker<User>("en")
+            Faker<User> userFaker = new Faker<User>("en")
                 .RuleFor(u => u.UserName, f => f.Internet.UserName())
                 .RuleFor(u => u.Email, f => f.Internet.Email());
 
-            var fakeUsers = userFaker.Generate(60);
+            List<User> fakeUsers = userFaker.Generate(60);
 
             foreach (var user in fakeUsers)
             {

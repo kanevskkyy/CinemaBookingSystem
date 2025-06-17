@@ -10,7 +10,7 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 
             List<Seat> seatList = new List<Seat>();
 
-            foreach (var hall in hallList)
+            foreach (Hall hall in hallList)
             {
                 for (int row = 1; row <= hall.RowsAmount; row++)
                 {
