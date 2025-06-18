@@ -106,18 +106,16 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<PagedList<MovieResponseDTO>> GetPagedMoviesAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            IQueryable<Movie> queryable = unitOfWork.Movies.GetAll().Include(m => m.MovieGenres).ThenInclude(mg => mg.Genre); 
-            queryable = queryable.OrderBy(p => p.Title); 
-
-            var pagedMovies = await PagedList<Movie>.ToPagedListAsync(queryable, pageNumber, pageSize, cancellationToken);
-            var movieDtos = mapper.Map<List<MovieResponseDTO>>(pagedMovies.Items);
+            IQueryable<Movie> queryable = unitOfWork.Movies.GetAllWithGenres();
+            PagedList<Movie> pagedMovies = await PagedList<Movie>.ToPagedListAsync(queryable, pageNumber, pageSize, cancellationToken);
+            List<MovieResponseDTO> movieDtos = mapper.Map<List<MovieResponseDTO>>(pagedMovies.Items);
 
             return new PagedList<MovieResponseDTO>(movieDtos, pagedMovies.TotalCount, pagedMovies.CurrentPage, pagedMovies.PageSize);
         }
 
         public async Task<PagedList<MovieResponseDTO>> GetFilteredMoviesAsync(MovieFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            IQueryable<Movie> queryable = unitOfWork.Movies.GetAll().AsQueryable();
+            IQueryable<Movie> queryable = unitOfWork.Movies.GetAll();
 
             if (!string.IsNullOrEmpty(filter.Title)) queryable = queryable.Where(m => m.Title.ToLower().Contains(filter.Title.ToLower())).OrderBy(p => p.Title);
             if (filter.GenreId.HasValue) queryable = queryable.Where(m => m.MovieGenres.Any(mg => mg.GenreId == filter.GenreId.Value));

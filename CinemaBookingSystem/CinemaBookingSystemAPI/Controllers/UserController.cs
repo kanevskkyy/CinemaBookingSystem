@@ -128,7 +128,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UserUpdateDTO dto, CancellationToken cancellationToken)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!User.IsInRole("Admin") && userId != id) return Forbid();
+            if (!User.IsInRole("Admin") && userId != id) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admin or user who`s account is can update this account!" });
 
             UserResponseDTO updatedUser = await userService.UpdateAsync(id, dto, cancellationToken);
             return Ok(updatedUser);
@@ -147,7 +147,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO dto, CancellationToken cancellationToken)
         {
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserId)) return Forbid();
+            if (string.IsNullOrEmpty(currentUserId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Cannot find your id in JWT token" });
 
             bool result = await userService.ChangePasswordAsync(currentUserId, dto, cancellationToken);
             if (!result) return BadRequest(new { message = "Incorrect current password or password requirements not met." });
@@ -169,7 +169,7 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!User.IsInRole("Admin") && userId != id) return Forbid();
+            if (!User.IsInRole("Admin") && userId != id) return StatusCode(StatusCodes.Status403Forbidden, new {message = "Only admin or user who`s account is can delete this account!"});
 
             bool result = await userService.DeleteAsync(id, cancellationToken);
             if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete user with this id!" });

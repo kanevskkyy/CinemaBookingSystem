@@ -17,6 +17,15 @@ namespace CinemaBookingSystemDAL.Repositories
         
         }
 
+        public IQueryable<Movie> GetAllWithGenres()
+        {
+            return dbSet
+                .Include(p => p.MovieGenres)
+                .ThenInclude(p => p.Genre)
+                .OrderBy(p => p.Title);
+        }
+
+
         public async Task<bool> ExistsByTitleAsync(string title, Guid? id = null, CancellationToken cancellationToken = default)
         {
             return await dbSet

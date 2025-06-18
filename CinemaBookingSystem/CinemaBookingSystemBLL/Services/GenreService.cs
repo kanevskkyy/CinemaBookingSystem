@@ -78,6 +78,7 @@ namespace CinemaBookingSystemBLL.Services
             await unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
         }
+
         public async Task<Dictionary<string, int>> GetMovieCountsPerGenreAsync(CancellationToken cancellationToken = default)
         {
             return await unitOfWork.Genres.GetMovieCountsPerGenreAsync(cancellationToken);
