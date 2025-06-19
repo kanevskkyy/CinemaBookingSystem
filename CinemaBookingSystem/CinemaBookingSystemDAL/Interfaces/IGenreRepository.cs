@@ -10,6 +10,6 @@ namespace CinemaBookingSystemDAL.Interfaces
     public interface IGenreRepository : IGenericRepository<Genre, Guid>
     {
         Task<Dictionary<string, int>> GetMovieCountsPerGenreAsync(CancellationToken cancellationToken = default);
-        Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default);
+        Task<bool> ExistsByNameAsync(string name, Guid? id = null, CancellationToken cancellationToken = default);
     }
 }

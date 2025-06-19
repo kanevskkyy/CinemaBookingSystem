@@ -29,9 +29,13 @@ namespace CinemaBookingSystemDAL.Repositories
                 .ToDictionaryAsync(g => g.Name, g => g.MovieCount, cancellationToken);
         }
 
-        public async Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default)
+        public async Task<bool> ExistsByNameAsync(string name, Guid? idToExclude = null, CancellationToken cancellationToken = default)
         {
-            return await dbSet.AnyAsync(p => p.Name.ToLower() == name.ToLower(), cancellationToken);
+            bool result = await dbSet
+                .Where(g => g.Name.ToLower() == name.ToLower() && (!idToExclude.HasValue || g.Id != idToExclude.Value))
+                .AnyAsync(cancellationToken);
+            return result;
+
         }
     }
 }

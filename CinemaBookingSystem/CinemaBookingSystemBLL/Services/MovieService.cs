@@ -66,10 +66,10 @@ namespace CinemaBookingSystemBLL.Services
             Movie movie = await unitOfWork.Movies.GetByIdWithGenresAsync(id, cancellationToken);
             if (movie == null) throw new NotFoundException("Movie", id);
 
-            bool exist = await unitOfWork.Movies.ExistsByTitleAsync(dto.Title, null, cancellationToken);
+            bool exist = await unitOfWork.Movies.ExistsByTitleAsync(dto.Title, id, cancellationToken);
             if (exist) throw new EntityAlreadyExistsException("Movie", "Title", dto.Title);
 
-            exist = await unitOfWork.Movies.ExistsByPosterUrlAsync(dto.PosterUrl, null, cancellationToken);
+            exist = await unitOfWork.Movies.ExistsByPosterUrlAsync(dto.PosterUrl, id, cancellationToken);
             if (exist) throw new EntityAlreadyExistsException("Movie", "Poster URL", dto.PosterUrl);
 
             mapper.Map(dto, movie);

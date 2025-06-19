@@ -83,7 +83,7 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
-            if (review == null) return false;
+            if (review == null) throw new NotFoundException("Review", id);
 
             unitOfWork.Review.Delete(review);
             await unitOfWork.SaveChangesAsync(cancellationToken);

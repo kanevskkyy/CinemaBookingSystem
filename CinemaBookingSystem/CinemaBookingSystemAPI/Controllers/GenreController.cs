@@ -76,8 +76,6 @@ namespace CinemaBookingSystemAPI.Controllers
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
             GenreResponseDTO updated = await genreService.UpdateAsync(id, dto, cancellationToken);
-            if (updated == null) return NotFound();
-            
             return NoContent();
         }
 
@@ -95,9 +93,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
 
-            bool result = await genreService.DeleteAsync(id, cancellationToken);
-            if (!result) return NotFound();
-            
+            bool result = await genreService.DeleteAsync(id, cancellationToken);            
             return NoContent();
         }
 

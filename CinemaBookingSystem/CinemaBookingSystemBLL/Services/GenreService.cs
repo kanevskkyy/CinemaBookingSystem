@@ -41,7 +41,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<GenreResponseDTO> CreateAsync(GenreCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            bool existByGenre = await ExistsByNameAsync(dto.Name, cancellationToken);
+            bool existByGenre = await unitOfWork.Genres.ExistsByNameAsync(dto.Name, null, cancellationToken);
             if (existByGenre) throw new EntityAlreadyExistsException("Genre", "Name", dto.Name);
 
             Genre genre = mapper.Map<Genre>(dto);
@@ -57,7 +57,7 @@ namespace CinemaBookingSystemBLL.Services
             Genre genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
             if (genre == null) throw new NotFoundException("Genre", id);
 
-            bool existByGenre = await ExistsByNameAsync(dto.Name, cancellationToken);
+            bool existByGenre = await unitOfWork.Genres.ExistsByNameAsync(dto.Name, id, cancellationToken);
             if (existByGenre) throw new EntityAlreadyExistsException("Genre", "Name", dto.Name);
 
             mapper.Map(dto, genre);
@@ -82,11 +82,6 @@ namespace CinemaBookingSystemBLL.Services
         public async Task<Dictionary<string, int>> GetMovieCountsPerGenreAsync(CancellationToken cancellationToken = default)
         {
             return await unitOfWork.Genres.GetMovieCountsPerGenreAsync(cancellationToken);
-        }
-
-        public async Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default)
-        {
-            return await unitOfWork.Genres.ExistsByNameAsync(name, cancellationToken);
         }
     }
 }

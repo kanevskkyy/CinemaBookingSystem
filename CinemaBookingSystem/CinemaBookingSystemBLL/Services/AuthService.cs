@@ -96,12 +96,12 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(TokenRefreshDTO request)
         {
-            var principal = GetPrincipalFromExpiredToken(request.AccessToken);
+            ClaimsPrincipal? principal = GetPrincipalFromExpiredToken(request.AccessToken);
             if (principal == null) throw new SecurityTokenException("Invalid token");
 
             string? userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var savedToken = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken && rt.UserId == userId);
+            RefreshToken? savedToken = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken && rt.UserId == userId);
             if (savedToken == null || savedToken.ExpiryDate <= DateTime.UtcNow) throw new SecurityTokenException("Invalid or expired refresh token");
 
             User? user = await userManager.FindByIdAsync(userId);
@@ -127,8 +127,8 @@ namespace CinemaBookingSystemBLL.Services
             var roles = await userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            SymmetricSecurityKey? key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
+            SigningCredentials? creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             JwtSecurityToken token = new JwtSecurityToken(
                 issuer: config["Jwt:Issuer"],
@@ -185,7 +185,7 @@ namespace CinemaBookingSystemBLL.Services
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             try
             {
-                var principal = handler.ValidateToken(token, validationParameters, out SecurityToken securityToken);
+                ClaimsPrincipal? principal = handler.ValidateToken(token, validationParameters, out SecurityToken securityToken);
                 if (securityToken is not JwtSecurityToken jwtToken ||!jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase)) return null;
                 return principal;
             }

@@ -87,7 +87,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(typeof(PagedList<ReviewResponseDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByMovieId(Guid movieId, [FromQuery] ReviewFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            var result = await reviewService.GetFilteredReviewsAsync(movieId, filter, pageNumber, pageSize, cancellationToken);
+            PagedList<ReviewResponseDTO> result = await reviewService.GetFilteredReviewsAsync(movieId, filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);
         }
 

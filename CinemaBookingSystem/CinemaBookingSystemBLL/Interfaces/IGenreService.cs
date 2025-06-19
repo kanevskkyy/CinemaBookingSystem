@@ -15,6 +15,5 @@ namespace CinemaBookingSystemBLL.Interfaces
         Task<GenreResponseDTO?> UpdateAsync(Guid id, GenreUpdateDTO dto, CancellationToken cancellationToken = default);
         Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
         Task<Dictionary<string, int>> GetMovieCountsPerGenreAsync(CancellationToken cancellationToken = default);
-        Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default);
     }
 }

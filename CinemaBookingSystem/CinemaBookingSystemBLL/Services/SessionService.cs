@@ -69,7 +69,7 @@ namespace CinemaBookingSystemBLL.Services
             DateTime newStart = dto.StartTime.ToUniversalTime();
             DateTime newEnd = newStart.AddMinutes(movie.Duration + cleaningTime).ToUniversalTime();
 
-            foreach (var existingSession in sessionsInHall)
+            foreach (Session existingSession in sessionsInHall)
             {
                 Movie existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
 
@@ -107,9 +107,9 @@ namespace CinemaBookingSystemBLL.Services
 
             DateTime newStart = dto.StartTime.ToUniversalTime();
             DateTime newEnd = newStart.AddMinutes(movie.Duration).ToUniversalTime();
-            var sessionsInHall = await unitOfWork.Sessions.GetSessionsInHallExceptAsync(session.HallId, id, cancellationToken);
+            List<Session> sessionsInHall = await unitOfWork.Sessions.GetSessionsInHallExceptAsync(session.HallId, id, cancellationToken);
 
-            foreach (var existingSession in sessionsInHall)
+            foreach (Session existingSession in sessionsInHall)
             {
                 Movie existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
                 DateTime existingStart = existingSession.StartTime.ToUniversalTime();
