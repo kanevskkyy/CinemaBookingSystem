@@ -66,7 +66,8 @@ namespace CinemaBookingSystemBLL.Services
 
             Ticket existingTicket = await unitOfWork.Tickets.GetBySeatAndSessionAsync(dto.SeatId, dto.SessionId, cancellationToken);
             if (existingTicket != null) throw new SeatAlreadyBookedException();
-            
+
+            if (seat.HallId != session.HallId) throw new InvalidSeatInHall();
 
             Ticket ticket = mapper.Map<Ticket>(dto);
             ticket.UserId = userId;
