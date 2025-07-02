@@ -1,13 +1,14 @@
 ﻿using Bogus;
 using CinemaBookingSystemDAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
     public class MovieGeneration
     {
-        public static List<Movie> Generate(CinemaDbContext context)
+        public static async Task<List<Movie>> Generate(CinemaDbContext context)
         {
-            if (context.Movies.Any()) return context.Movies.ToList();
+            if (await context.Movies.AnyAsync()) return await context.Movies.ToListAsync();
 
             Faker<Movie> movieFaker = new Faker<Movie>("en")
                 .RuleFor(p => p.Title, k => k.Lorem.Sentence(3))
@@ -17,8 +18,9 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
                 .RuleFor(p => p.Rating, f => Math.Round(f.Random.Double(2.0, 10.0), 1));
 
             List<Movie> movies = movieFaker.Generate(60);
-            context.Movies.AddRange(movies);
-            context.SaveChanges();
+            await context.Movies.AddRangeAsync(movies);
+            await context.SaveChangesAsync();
+            
             return movies;
         }
     }

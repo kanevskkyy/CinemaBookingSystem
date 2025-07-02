@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Bogus;
 using CinemaBookingSystemDAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
     public static class ReviewGeneration
     {
-        public static List<Review> Generate(CinemaDbContext context, List<User> users, List<Movie> movies)
+        public static async Task<List<Review>> Generate(CinemaDbContext context, List<User> users, List<Movie> movies)
         {
-            if (context.Reviews.Any()) return context.Reviews.ToList();
+            if (context.Reviews.Any()) return await context.Reviews.ToListAsync();
 
             Faker faker = new Faker("en");
             Faker<Review> reviewFaker = new Faker<Review>("en")
@@ -23,8 +24,8 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
                 .RuleFor(r => r.MovieId, f => f.PickRandom(movies).Id);
 
             List<Review> reviews = reviewFaker.Generate(200);
-            context.Reviews.AddRange(reviews);
-            context.SaveChanges();
+            await context.Reviews.AddRangeAsync(reviews);
+            await context.SaveChangesAsync();
 
             return reviews;
         }

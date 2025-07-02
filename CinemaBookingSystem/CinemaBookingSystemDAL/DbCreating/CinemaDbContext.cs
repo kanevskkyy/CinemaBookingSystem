@@ -24,6 +24,7 @@ namespace CinemaBookingSystemDAL.DbCreating
         public DbSet<Review> Reviews { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<MovieGenre> MovieGenres { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +38,7 @@ namespace CinemaBookingSystemDAL.DbCreating
             modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
             modelBuilder.ApplyConfiguration(new MovieGenreConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
@@ -44,15 +46,16 @@ namespace CinemaBookingSystemDAL.DbCreating
         public static async Task SeedAsync(CinemaDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             await UserGeneration.GenerateAsync(userManager, roleManager);
-            List<Genre> genres = GenreGeneration.Generate(context);
-            List<Hall> halls = HallGeneration.Generate(context);
-            List<Movie> movies = MovieGeneration.Generate(context);
-            List<Seat> seats = SeatGeneration.Generate(context, halls);
-            List<Session> sessions = SessionGeneration.Generate(context, movies, halls);
+            List<Genre> genres = await GenreGeneration.Generate(context);
+            List<Hall> halls = await HallGeneration.Generate(context);
+            List<Movie> movies = await MovieGeneration.Generate(context);
+            List<Seat> seats = await SeatGeneration.Generate(context, halls);
+            List<Session> sessions = await SessionGeneration.Generate(context, movies, halls);
             List<User> users = userManager.Users.ToList();
-            List<Review> reviews = ReviewGeneration.Generate(context, users, movies);
-            TicketGeneration.Generate(context, users, sessions, seats);
-            MovieGenreGeneration.Generate(context, movies, genres);
+            List<Review> reviews = await ReviewGeneration.Generate(context, users, movies);
+            List<Ticket> tickets = await TicketGeneration.Generate(context, users, sessions, seats);
+            await MovieGenreGeneration.Generate(context, movies, genres);
+            await PaymentGeneration.Generate(context, tickets);
             await context.SaveChangesAsync();
         }
     }

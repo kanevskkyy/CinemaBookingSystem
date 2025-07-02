@@ -1,12 +1,13 @@
 ﻿using CinemaBookingSystemDAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
     public class SeatGeneration
     {
-        public static List<Seat> Generate(CinemaDbContext context, List<Hall> hallList)
+        public static async Task<List<Seat>> Generate(CinemaDbContext context, List<Hall> hallList)
         {
-            if (context.Seats.Any()) return context.Seats.ToList();
+            if (await context.Seats.AnyAsync()) return await context.Seats.ToListAsync();
 
             List<Seat> seatList = new List<Seat>();
 
@@ -26,8 +27,8 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
                     }
                 }
             }
-            context.Seats.AddRange(seatList);
-            context.SaveChanges();
+            await context.Seats.AddRangeAsync(seatList);
+            await context.SaveChangesAsync();
             return seatList;
         }
     }

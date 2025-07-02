@@ -1,13 +1,14 @@
 ﻿using Bogus;
 using CinemaBookingSystemDAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
     public class HallGeneration
     {
-        public static List<Hall> Generate(CinemaDbContext context)
+        public static async Task<List<Hall>> Generate(CinemaDbContext context)
         {
-            if (context.Halls.Any()) return context.Halls.ToList();
+            if (await context.Halls.AnyAsync()) return await context.Halls.ToListAsync();
 
             Faker<Hall> hallFaker = new Faker<Hall>("en")
                 .RuleFor(p => p.RowsAmount, k => k.Random.Number(10, 30))
@@ -27,8 +28,8 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
                 hallsList.Add(tempHall);
             }
 
-            context.Halls.AddRange(hallsList);
-            context.SaveChanges();
+            await context.Halls.AddRangeAsync(hallsList);
+            await context.SaveChangesAsync();
             return hallsList;
         }
     }

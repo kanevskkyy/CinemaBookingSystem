@@ -17,5 +17,7 @@ namespace CinemaBookingSystemDAL.Entities
         public Session Session { get; set; }
         public User User { get; set; }
         public Seat Seat { get; set; }
+
+        public Payment Payment { get; set; }
     }
 }

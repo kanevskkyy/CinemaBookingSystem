@@ -1,12 +1,13 @@
 ﻿using CinemaBookingSystemDAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
     public class GenreGeneration
     {
-        public static List<Genre> Generate(CinemaDbContext context)
+        public static async Task<List<Genre>> Generate(CinemaDbContext context)
         {
-            if (context.Genres.Any()) return context.Genres.ToList();
+            if (await context.Genres.AnyAsync()) return await context.Genres.ToListAsync();
 
             List<Genre> genreList = new List<Genre>();
             List<string> genreTypes = new List<string> { "Action", "Comedy", "Drama", "Horror", "Science Fiction", "Romance", "Thriller", "Fantasy", "Adventure", "Documentary" };
@@ -18,8 +19,9 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
                 };
                 genreList.Add(tempGenre);
             }
-            context.Genres.AddRange(genreList);
-            context.SaveChanges();
+
+            await context.Genres.AddRangeAsync(genreList);
+            await context.SaveChangesAsync();
             return genreList;
         }
     }

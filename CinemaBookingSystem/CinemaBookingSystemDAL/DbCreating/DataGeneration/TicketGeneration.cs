@@ -1,13 +1,15 @@
-﻿using Bogus;
+﻿using System.Threading.Tasks;
+using Bogus;
 using CinemaBookingSystemDAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
     public class TicketGeneration
     {
-        public static void Generate(CinemaDbContext context, List<User> userList, List<Session> sessionList, List<Seat> seatList)
+        public static async Task<List<Ticket>> Generate(CinemaDbContext context, List<User> userList, List<Session> sessionList, List<Seat> seatList)
         {
-            if (context.Tickets.Any()) return;
+            if (await context.Tickets.AnyAsync()) return await context.Tickets.ToListAsync();
 
             Random random = new Random();
             List<Ticket> ticketList = new List<Ticket>();
@@ -32,8 +34,9 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
                 ticketList.Add(tempTicket);
             }
 
-            context.Tickets.AddRange(ticketList);
-            context.SaveChanges();
+            await context.Tickets.AddRangeAsync(ticketList);
+            await context.SaveChangesAsync();
+            return ticketList;
         }
     }
 
