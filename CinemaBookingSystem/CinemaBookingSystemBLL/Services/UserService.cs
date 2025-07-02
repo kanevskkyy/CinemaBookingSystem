@@ -31,7 +31,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> ChangePasswordAsync(string userId, ChangePasswordDTO dto, CancellationToken cancellationToken)
         {
-            User user = await userManager.FindByIdAsync(userId);
+            User? user = await userManager.FindByIdAsync(userId);
             if (!Guid.TryParse(userId, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
 
             if (user == null) throw new NotFoundException("User", guidId);
@@ -62,7 +62,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<UserResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var users = await unitOfWork.Users.GetAllAsync(cancellationToken);
+            List<User> users = await unitOfWork.Users.GetAllAsync(cancellationToken);
 
             List<UserResponseDTO> result = new List<UserResponseDTO>();
             foreach (var user in users)
@@ -107,7 +107,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<UserResponseDTO?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            User user = await unitOfWork.Users.GetByEmailAsync(email, cancellationToken);
+            User? user = await unitOfWork.Users.GetByEmailAsync(email, cancellationToken);
             if (user == null) return null;
 
             var roles = await userManager.GetRolesAsync(user);

@@ -14,8 +14,8 @@ namespace CinemaBookingSystemDAL.DbCreating
         {
             DbContextOptionsBuilder<CinemaDbContext> optionsBuilder = new DbContextOptionsBuilder<CinemaDbContext>();
 
-            var connectionString = "Host=localhost;Port=5432;Database=CinemaDb;Username=postgres;Password=postgres";
-            optionsBuilder.UseNpgsql(connectionString);
+            string connection = "Host=localhost;Port=5432;Database=CinemaDb;Username=postgres;Password=postgres";
+            optionsBuilder.UseNpgsql(connection);
 
             return new CinemaDbContext(optionsBuilder.Options);
         }

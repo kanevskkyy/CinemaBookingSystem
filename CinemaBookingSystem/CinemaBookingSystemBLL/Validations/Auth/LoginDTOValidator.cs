@@ -13,12 +13,17 @@ namespace CinemaBookingSystemBLL.Validations.Auth
     {
         public LoginDTOValidator() 
         {
-            RuleFor(p => p.Email).NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Email must be a valid email address.");
+            RuleFor(p => p.Email)
+                .NotEmpty()
+                .WithMessage("Email is required.")
+                .EmailAddress()
+                .WithMessage("Email must be a valid email address.");
 
             RuleFor(p => p.Password)
-                .NotEmpty().WithMessage("Password is required.")
-                .MinimumLength(6).WithMessage("Password must be at least 6 characters long.");
+                .NotEmpty()
+                .WithMessage("Password is required.")
+                .MinimumLength(6)
+                .WithMessage("Password must be at least 6 characters long.");
         }
     }
 }

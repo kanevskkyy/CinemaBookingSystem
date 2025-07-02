@@ -13,10 +13,16 @@ namespace CinemaBookingSystemBLL.Validations.Tickets
         public TicketFilterDTOValidator() 
         {
             RuleFor(p => p.SessionId)
-                .Must(id => id != Guid.Empty).WithMessage("SessionId must be a valid GUID.");
+                .Must(id => id != Guid.Empty)
+                .WithMessage("SessionId must be a valid GUID.");
 
             RuleFor(p => p.SeatId)
-                .Must(id => id != Guid.Empty).WithMessage("SeatId must be a valid GUID.");
+                .Must(id => id != Guid.Empty)
+                .WithMessage("SeatId must be a valid GUID.");
+
+            RuleFor(p => p.SortBy)
+                .Must(sortBy => new[] { "purchasetime", "userid", "sessionid", "seatid" }.Contains(sortBy?.ToLower()))
+                .WithMessage("Sorting can only be by PurchaseTime, UserID, SessionID or SeatID!");
         }
     }
 }

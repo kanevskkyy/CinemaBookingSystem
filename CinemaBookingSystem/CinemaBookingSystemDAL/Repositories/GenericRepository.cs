@@ -26,7 +26,7 @@ namespace CinemaBookingSystemDAL.Repositories
             return await dbSet.FindAsync(new object[] { id }, cancellationToken);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await dbSet.AsNoTracking().ToListAsync(cancellationToken);
         }
@@ -34,20 +34,17 @@ namespace CinemaBookingSystemDAL.Repositories
         public async Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default)
         {
             await dbSet.AddAsync(entity, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
             return entity;
         }
 
         public void Update(T entity)
         {
             dbSet.Update(entity);
-            context.SaveChanges();
         }
 
         public void Delete(T entity)
         {
             dbSet.Remove(entity);
-            context.SaveChanges();
         }
 
         public IQueryable<T> GetAll()

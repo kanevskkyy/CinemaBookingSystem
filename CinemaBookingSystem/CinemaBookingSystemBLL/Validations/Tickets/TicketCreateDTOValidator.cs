@@ -12,9 +12,13 @@ namespace CinemaBookingSystemBLL.Validations.Tickets
     {
         public TicketCreateDTOValidator() 
         {
-            RuleFor(p => p.SessionId).NotEmpty().WithMessage("SessionId is required");
+            RuleFor(p => p.SessionId)
+                .NotEmpty()
+                .WithMessage("SessionId is required");
 
-            RuleFor(p => p.SeatId).NotEmpty().WithMessage("SeatId is required");
+            RuleFor(p => p.SeatId)
+                .NotEmpty()
+                .WithMessage("SeatId is required");
         }
     }
 }

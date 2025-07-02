@@ -12,8 +12,11 @@ namespace CinemaBookingSystemBLL.Validations.Users
     {
         public UserUpdateDTOValidator() 
         {
-            RuleFor(p => p.Name).NotEmpty().WithMessage("Name is required.")
-               .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
+            RuleFor(p => p.Name)
+                .NotEmpty()
+                .WithMessage("Name is required.")
+                .MaximumLength(100)
+                .WithMessage("Name must not exceed 100 characters.");
         }
     }
 }

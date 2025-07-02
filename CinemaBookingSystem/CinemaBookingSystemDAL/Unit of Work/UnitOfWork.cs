@@ -12,7 +12,7 @@ namespace CinemaBookingSystemDAL.Unit_of_Work
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly CinemaDbContext context;
+        private CinemaDbContext context;
 
         public UnitOfWork(CinemaDbContext context)
         {

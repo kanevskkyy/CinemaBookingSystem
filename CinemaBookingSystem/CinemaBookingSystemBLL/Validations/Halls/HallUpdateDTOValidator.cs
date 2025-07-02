@@ -12,8 +12,11 @@ namespace CinemaBookingSystemBLL.Validations.Halls
     {
         public HallUpdateDTOValidator()
         {
-            RuleFor(p => p.Name).NotEmpty().WithMessage("Name cannot be empty!")
-                .MaximumLength(60).WithMessage("Hall name length must not exceed 60 characters.");
+            RuleFor(p => p.Name)
+                .NotEmpty()
+                .WithMessage("Name cannot be empty!")
+                .MaximumLength(60)
+                .WithMessage("Hall name length must not exceed 60 characters.");
         }
     }
 }

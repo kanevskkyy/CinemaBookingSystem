@@ -25,10 +25,10 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<GenreResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var genres = await unitOfWork.Genres.GetAllAsync(cancellationToken);
-            var ordereGenres = genres.OrderBy(p => p.Name);
+            List<Genre> genres = await unitOfWork.Genres.GetAllAsync(cancellationToken);
+            List<Genre> orderedGenres = genres.OrderBy(p => p.Name).ToList();
 
-            return mapper.Map<List<GenreResponseDTO>>(ordereGenres);
+            return mapper.Map<List<GenreResponseDTO>>(orderedGenres);
         }
 
         public async Task<GenreResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -64,7 +64,6 @@ namespace CinemaBookingSystemBLL.Services
 
             unitOfWork.Genres.Update(genre);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-
             return mapper.Map<GenreResponseDTO>(genre);
         }
 

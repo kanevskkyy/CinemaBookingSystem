@@ -30,7 +30,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<ReviewResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var reviews = await unitOfWork.Review.GetAllAsync(cancellationToken);
+            List<Review> reviews = await unitOfWork.Review.GetAllAsync(cancellationToken);
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 

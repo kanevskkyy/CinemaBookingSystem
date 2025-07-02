@@ -50,7 +50,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<TicketResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Ticket ticket = await unitOfWork.Tickets.GetByIdWithDetailsAsync(id, cancellationToken);
+            Ticket? ticket = await unitOfWork.Tickets.GetByIdWithDetailsAsync(id, cancellationToken);
             if (ticket == null) throw new NotFoundException("Ticket", id);
 
             return mapper.Map<TicketResponseDTO>(ticket);
@@ -75,8 +75,7 @@ namespace CinemaBookingSystemBLL.Services
             await unitOfWork.Tickets.CreateAsync(ticket, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            Ticket createdTicket = await unitOfWork.Tickets.GetByIdWithDetailsAsync(ticket.Id, cancellationToken);
-
+            Ticket? createdTicket = await unitOfWork.Tickets.GetByIdWithDetailsAsync(ticket.Id, cancellationToken);
             if (createdTicket == null) throw new InvalidOperationException("Failed to retrieve the created ticket.");
 
             return mapper.Map<TicketResponseDTO>(createdTicket);
@@ -114,7 +113,7 @@ namespace CinemaBookingSystemBLL.Services
         {
             IQueryable<Ticket> queryable = unitOfWork.Tickets.GetAll();
 
-            if (filter.UserId.Trim().Length > 0) queryable = queryable.Where(t => t.UserId == filter.UserId);
+            if (filter.UserId?.Trim().Length > 0) queryable = queryable.Where(t => t.UserId == filter.UserId);
             if (filter.SessionId.HasValue) queryable = queryable.Where(t => t.SessionId == filter.SessionId.Value);
             if (filter.SeatId.HasValue) queryable = queryable.Where(t => t.SeatId == filter.SeatId.Value);
             if (filter.PurchaseTimeFrom.HasValue) queryable = queryable.Where(t => t.PurchaseTime >= filter.PurchaseTimeFrom.Value);
@@ -149,26 +148,21 @@ namespace CinemaBookingSystemBLL.Services
                         break;
 
                     default:
-                        if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.Id);
-                        else queryable = queryable.OrderBy(t => t.Id);
-                        
                         break;
                 }
             }
-            else queryable = queryable.OrderBy(t => t.Id);
-
             var projectedQuery = queryable.ProjectTo<TicketResponseDTO>(mapper.ConfigurationProvider);
             PagedList<TicketResponseDTO> pagedList = await PagedList<TicketResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
             return pagedList;
         }
+
         public async Task<bool> ConfirmPaymentAsync(Guid ticketId, CancellationToken cancellationToken = default)
         {
-            Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(ticketId, cancellationToken);
+            Ticket? ticket = await unitOfWork.Tickets.GetByIdAsync(ticketId, cancellationToken);
             if (ticket == null) throw new NotFoundException("Ticket", ticketId);
 
             ticket.IsPaid = true;
             await unitOfWork.SaveChangesAsync(cancellationToken);
-
             return true;
         }
     }

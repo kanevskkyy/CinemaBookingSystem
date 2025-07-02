@@ -12,10 +12,15 @@ namespace CinemaBookingSystemBLL.Validations.Review
     {
         public ReviewUpdateDTOValidator() 
         {
-            RuleFor(p => p.Text).NotEmpty().WithMessage("The text in the review cannot be empty!")
-                .MaximumLength(1000).WithMessage("The maximum length of a review should be less than 1000 characters!");
+            RuleFor(p => p.Text)
+                .NotEmpty()
+                .WithMessage("The text in the review cannot be empty!")
+                .MaximumLength(1000)
+                .WithMessage("The maximum length of a review should be less than 1000 characters!");
 
-            RuleFor(p => p.Rating).InclusiveBetween(1, 5).WithMessage("You can give 1 to 5 stars to one review!");
+            RuleFor(p => p.Rating)
+                .InclusiveBetween(1, 5)
+                .WithMessage("You can give 1 to 5 stars to one review!");
         }
     }
 }

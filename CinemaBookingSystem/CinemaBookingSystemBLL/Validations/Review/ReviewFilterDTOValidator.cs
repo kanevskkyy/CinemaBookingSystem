@@ -12,11 +12,17 @@ namespace CinemaBookingSystemBLL.Validations.Review
     {
         public ReviewFilterDTOValidator()
         {
-            RuleFor(p => p.MinRating).GreaterThanOrEqualTo(1).WithMessage("The minimum rating for filtering must be equal to or greater than 1 star")
-                .LessThanOrEqualTo(5).WithMessage("The maximum rating for filtering must be less than or equal to 5 stars");
+            RuleFor(p => p.MinRating)
+                .GreaterThanOrEqualTo(1)
+                .WithMessage("The minimum rating for filtering must be equal to or greater than 1 star")
+                .LessThanOrEqualTo(5)
+                .WithMessage("The maximum rating for filtering must be less than or equal to 5 stars");
 
-            RuleFor(p => p.MaxRating).LessThanOrEqualTo(5).WithMessage("The maximum rating for filtering must be less than or equal to 5 stars")
-                .GreaterThanOrEqualTo(1).WithMessage("The maximum rating for filtering must be equal or bigger than 1 star");
+            RuleFor(p => p.MaxRating)
+                .LessThanOrEqualTo(5)
+                .WithMessage("The maximum rating for filtering must be less than or equal to 5 stars")
+                .GreaterThanOrEqualTo(1)
+                .WithMessage("The maximum rating for filtering must be equal or bigger than 1 star");
         }
     }
 }

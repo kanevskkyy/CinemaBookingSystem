@@ -83,7 +83,7 @@ namespace CinemaBookingSystemBLL.Services
             await unitOfWork.Sessions.CreateAsync(session, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            Session createdSession = await unitOfWork.Sessions.GetByIdWithDetailsAsync(session.Id, cancellationToken);
+            Session? createdSession = await unitOfWork.Sessions.GetByIdWithDetailsAsync(session.Id, cancellationToken);
             return mapper.Map<SessionResponseDTO>(createdSession);
         }
 
@@ -99,10 +99,10 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<SessionResponseDTO?> UpdateAsync(Guid id, SessionUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            Session session = await unitOfWork.Sessions.GetByIdAsync(id, cancellationToken);
+            Session? session = await unitOfWork.Sessions.GetByIdAsync(id, cancellationToken);
             if (session == null) throw new NotFoundException("Session", id);
 
-            Movie movie = await unitOfWork.Movies.GetByIdAsync(session.MovieId, cancellationToken);
+            Movie? movie = await unitOfWork.Movies.GetByIdAsync(session.MovieId, cancellationToken);
             if (movie == null) throw new NotFoundException("Movie", session.MovieId);
 
             DateTime newStart = dto.StartTime.ToUniversalTime();
@@ -123,7 +123,7 @@ namespace CinemaBookingSystemBLL.Services
             unitOfWork.Sessions.Update(session);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            Session updatedSession = await unitOfWork.Sessions.GetByIdWithDetailsAsync(id, cancellationToken);
+            Session? updatedSession = await unitOfWork.Sessions.GetByIdWithDetailsAsync(id, cancellationToken);
             return mapper.Map<SessionResponseDTO>(updatedSession);
         }
 
@@ -167,15 +167,10 @@ namespace CinemaBookingSystemBLL.Services
                         break;
 
                     default:
-                        if (filter.SortDescending) queryable = queryable.OrderByDescending(s => s.Id);
-                        else queryable = queryable.OrderBy(s => s.Id);
-                        
                         break;
                 }
 
             }
-            else queryable = queryable.OrderBy(s => s.Id);
-
             var projectedQuery = queryable.ProjectTo<SessionResponseDTO>(mapper.ConfigurationProvider);
             PagedList<SessionResponseDTO> pagedList = await PagedList<SessionResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
             

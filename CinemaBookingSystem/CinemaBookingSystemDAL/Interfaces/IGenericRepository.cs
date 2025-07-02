@@ -11,8 +11,8 @@ namespace CinemaBookingSystemDAL.Interfaces
     public interface IGenericRepository<T, Key>
     {
         IQueryable<T> GetAll();
-        Task<T> GetByIdAsync(Key id, CancellationToken cancellationToken = default);
-        Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<T?> GetByIdAsync(Key id, CancellationToken cancellationToken = default);
+        Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default);
         void Update(T entity);
         void Delete(T entity);

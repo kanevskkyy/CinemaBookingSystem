@@ -25,8 +25,8 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<List<HallResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var halls = await unitOfWork.Halls.GetAllAsync(cancellationToken);
-            var orderedHalls = halls.OrderBy(h =>
+            List<Hall> halls = await unitOfWork.Halls.GetAllAsync(cancellationToken);
+            List<Hall> orderedHalls = halls.OrderBy(h =>
             {
                 string name = h.Name;
                 int index = -1;
@@ -42,11 +42,12 @@ namespace CinemaBookingSystemBLL.Services
                 
                 if (index == -1) return int.MaxValue;
                 string number = name.Substring(index);
-                
+              
                 if (int.TryParse(number, out int result)) return result;
                 else return int.MaxValue;
             })
-            .ThenBy(h => h.Name);   
+            .ThenBy(h => h.Name)
+            .ToList();   
 
             return mapper.Map<List<HallResponseDTO>>(orderedHalls);
         }
@@ -82,7 +83,6 @@ namespace CinemaBookingSystemBLL.Services
             }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
-
             return mapper.Map<HallResponseDTO>(hall);
         }
 
@@ -98,7 +98,6 @@ namespace CinemaBookingSystemBLL.Services
 
             unitOfWork.Halls.Update(hall);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-
             return mapper.Map<HallResponseDTO>(hall);
         }
 
