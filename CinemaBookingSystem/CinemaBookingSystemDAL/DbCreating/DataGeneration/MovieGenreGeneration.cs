@@ -7,32 +7,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
-    public class MovieGenreGeneration
+    public class MovieGenreGeneration : IGenerateData
     {
-        public static async Task Generate(CinemaDbContext context, List<Movie> movies, List<Genre> genres)
+        public async Task Generate(CinemaDbContext context)
         {
-            if (await context.MovieGenres.AnyAsync()) return;
-
-            List<MovieGenre> movieGenres = new List<MovieGenre>();
-            Faker faker = new Faker();
-
-            foreach (Movie movie in movies)
+            if(!await context.MovieGenres.AnyAsync())
             {
-                int genresNumber = faker.Random.Int(1, genres.Count);
-                List<Genre> randomGenres = faker.Random.Shuffle(genres).Take(genresNumber).ToList();
+                List<Movie> movies = await context.Movies.ToListAsync();
+                List<Genre> genres = await context.Genres.ToListAsync();
 
-                foreach (Genre genre in randomGenres)
+                List<MovieGenre> movieGenres = new List<MovieGenre>();
+                Faker faker = new Faker();
+
+                foreach (Movie movie in movies)
                 {
-                    MovieGenre movieGenre = new MovieGenre
+                    int genresNumber = faker.Random.Int(1, genres.Count);
+                    List<Genre> randomGenres = faker.Random.Shuffle(genres).Take(genresNumber).ToList();
+
+                    foreach (Genre genre in randomGenres)
                     {
-                        MovieId = movie.Id,
-                        GenreId = genre.Id
-                    };
-                    movieGenres.Add(movieGenre);
+                        MovieGenre movieGenre = new MovieGenre
+                        {
+                            MovieId = movie.Id,
+                            GenreId = genre.Id
+                        };
+                        movieGenres.Add(movieGenre);
+                    }
                 }
-            }
-            await context.MovieGenres.AddRangeAsync(movieGenres);
-            await context.SaveChangesAsync();
+                await context.MovieGenres.AddRangeAsync(movieGenres);
+                await context.SaveChangesAsync();
+            }            
         }
     }
 }

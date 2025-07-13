@@ -46,17 +46,24 @@ namespace CinemaBookingSystemDAL.DbCreating
         public static async Task SeedAsync(CinemaDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             await UserGeneration.GenerateAsync(userManager, roleManager);
-            List<Genre> genres = await GenreGeneration.Generate(context);
-            List<Hall> halls = await HallGeneration.Generate(context);
-            List<Movie> movies = await MovieGeneration.Generate(context);
-            List<Seat> seats = await SeatGeneration.Generate(context, halls);
-            List<Session> sessions = await SessionGeneration.Generate(context, movies, halls);
-            List<User> users = userManager.Users.ToList();
-            List<Review> reviews = await ReviewGeneration.Generate(context, users, movies);
-            List<Ticket> tickets = await TicketGeneration.Generate(context, users, sessions, seats);
-            await MovieGenreGeneration.Generate(context, movies, genres);
-            await PaymentGeneration.Generate(context, tickets);
-            await context.SaveChangesAsync();
+
+            List<IGenerateData> generators = new List<IGenerateData>
+            {
+                new GenreGeneration(),
+                new HallGeneration(),
+                new MovieGeneration(),
+                new SeatGeneration(),
+                new SessionGeneration(),
+                new TicketGeneration(),
+                new ReviewGeneration(),
+                new MovieGenreGeneration(),
+                new PaymentGeneration()
+            };
+
+            foreach (IGenerateData generator in generators)
+            {
+                await generator.Generate(context);
+            }
         }
     }
 }

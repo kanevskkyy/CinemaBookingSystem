@@ -4,33 +4,33 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
-    public class HallGeneration
+    public class HallGeneration : IGenerateData
     {
-        public static async Task<List<Hall>> Generate(CinemaDbContext context)
+        public async Task Generate(CinemaDbContext context)
         {
-            if (await context.Halls.AnyAsync()) return await context.Halls.ToListAsync();
-
-            Faker<Hall> hallFaker = new Faker<Hall>("en")
+            if(!await context.Halls.AnyAsync())
+            {
+                Faker<Hall> hallFaker = new Faker<Hall>("en")
                 .RuleFor(p => p.RowsAmount, k => k.Random.Number(10, 30))
                 .RuleFor(p => p.SeatsPerRow, k => k.Random.Number(15, 40));
 
-            List<Hall> hallsList = new List<Hall>();
-            int hallCount = 1;
+                List<Hall> hallsList = new List<Hall>();
+                int hallCount = 1;
 
-            for (int i = 0; i < 10; i++)
-            {
-                Hall tempHall = new Hall
+                for (int i = 0; i < 10; i++)
                 {
-                    Name = $"Hall {hallCount++}",
-                    RowsAmount = hallFaker.Generate().RowsAmount,
-                    SeatsPerRow = hallFaker.Generate().SeatsPerRow
-                };
-                hallsList.Add(tempHall);
-            }
+                    Hall tempHall = new Hall
+                    {
+                        Name = $"Hall {hallCount++}",
+                        RowsAmount = hallFaker.Generate().RowsAmount,
+                        SeatsPerRow = hallFaker.Generate().SeatsPerRow
+                    };
+                    hallsList.Add(tempHall);
+                }
 
-            await context.Halls.AddRangeAsync(hallsList);
-            await context.SaveChangesAsync();
-            return hallsList;
+                await context.Halls.AddRangeAsync(hallsList);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

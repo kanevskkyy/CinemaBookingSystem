@@ -5,32 +5,38 @@ using System.Text;
 using System.Threading.Tasks;
 using Bogus;
 using CinemaBookingSystemDAL.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
-    public class PaymentGeneration
+    public class PaymentGeneration : IGenerateData
     {
-        public static async Task Generate(CinemaDbContext context, List<Ticket> tickets)
+        public async Task Generate(CinemaDbContext context)
         {
-            Faker faker = new Faker();
-            List<Payment> payments = new List<Payment>();
-
-            foreach (Ticket ticket in tickets.Where(t => t.IsPaid))
+            if(!await context.Payments.AnyAsync())
             {
-                Payment payment = new Payment
-                {
-                    TicketId = ticket.Id,
-                    Status = faker.PickRandom("Success", "Failed"),
-                    TransactionId = faker.Finance.Iban(),
-                    PaymentMethod = faker.PickRandom("Manual", "Card"),
-                    PaymentDate = ticket.PurchaseTime,
-                    CreatedAt = ticket.PurchaseTime
-                };
-                payments.Add(payment);
-            }
+                Faker faker = new Faker();
+                List<Payment> payments = new List<Payment>();
+                List<Ticket> tickets = await context.Tickets.ToListAsync();
+                tickets = tickets.Where(p => p.IsPaid).ToList();
 
-            await context.Payments.AddRangeAsync(payments);
-            await context.SaveChangesAsync();
+                foreach (Ticket ticket in tickets)
+                {
+                    Payment payment = new Payment
+                    {
+                        TicketId = ticket.Id,
+                        Status = faker.PickRandom("Success", "Failed"),
+                        TransactionId = faker.Finance.Iban(),
+                        PaymentMethod = faker.PickRandom("Manual", "Card"),
+                        PaymentDate = ticket.PurchaseTime,
+                        CreatedAt = ticket.PurchaseTime
+                    };
+                    payments.Add(payment);
+                }
+
+                await context.Payments.AddRangeAsync(payments);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
