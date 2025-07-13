@@ -70,9 +70,12 @@ namespace CinemaBookingSystemBLL.Services
             User user = mapper.Map<User>(dto);
 
             var result = await userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded) throw new UserCreationFailedException();
+            if (!result.Succeeded)
+            {
+                throw new UserCreationFailedException(string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
 
-            await userManager.AddToRoleAsync(user, "Customer");
+            await userManager.AddToRoleAsync(user, "Admin");
 
             string accessToken = await GenerateJwtToken(user);
             RefreshToken refreshToken = GenerateRefreshToken();

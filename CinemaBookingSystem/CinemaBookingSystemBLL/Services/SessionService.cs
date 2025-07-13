@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Threading;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using CinemaBookingSystemBLL.DTO.Movies;
 using CinemaBookingSystemBLL.DTO.Sessions;
@@ -59,24 +60,30 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<SessionResponseDTO>>(sessions);
         }
 
+        private async Task CheckDateAsync(Session existingSession, DateTime newStart, DateTime newEnd, int cleaningTime, CancellationToken cancellationToken)
+        {
+            Movie? existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
+            if (existingMovie == null) throw new NotFoundException("Movie", existingSession.MovieId);
+
+            DateTime existingStart = existingSession.StartTime.ToUniversalTime();
+            DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration + cleaningTime).ToUniversalTime();
+
+            if (newStart < existingEnd && existingStart < newEnd) throw new SessionHallException();
+        }
+
         public async Task<SessionResponseDTO> CreateAsync(SessionCreateDTO dto, CancellationToken cancellationToken = default)
         {
             Movie? movie = await unitOfWork.Movies.GetByIdAsync(dto.MovieId, cancellationToken);
             if (movie == null) throw new NotFoundException("Movie", dto.MovieId);
 
-            var sessionsInHall = await unitOfWork.Sessions.GetAllAsync();
+            var sessionsInHall = await unitOfWork.Sessions.GetAllAsync(cancellationToken);
 
             DateTime newStart = dto.StartTime.ToUniversalTime();
             DateTime newEnd = newStart.AddMinutes(movie.Duration + cleaningTime).ToUniversalTime();
 
             foreach (Session existingSession in sessionsInHall)
             {
-                Movie existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
-
-                DateTime existingStart = existingSession.StartTime.ToUniversalTime();
-                DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration + cleaningTime).ToUniversalTime();
-
-                if (newStart < existingEnd && existingStart < newEnd) throw new SessionHallException();
+                await CheckDateAsync(existingSession, newStart, newEnd, cleaningTime, cancellationToken);
             }
 
             Session session = mapper.Map<Session>(dto);
@@ -87,9 +94,10 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<SessionResponseDTO>(createdSession);
         }
 
+
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Session session = await unitOfWork.Sessions.GetByIdAsync(id, cancellationToken);
+            Session? session = await unitOfWork.Sessions.GetByIdAsync(id, cancellationToken);
             if (session == null) throw new NotFoundException("Session", id);
 
             unitOfWork.Sessions.Delete(session);
@@ -106,38 +114,43 @@ namespace CinemaBookingSystemBLL.Services
             if (movie == null) throw new NotFoundException("Movie", session.MovieId);
 
             DateTime newStart = dto.StartTime.ToUniversalTime();
-            DateTime newEnd = newStart.AddMinutes(movie.Duration).ToUniversalTime();
-            List<Session> sessionsInHall = await unitOfWork.Sessions.GetSessionsInHallExceptAsync(session.HallId, id, cancellationToken);
+            DateTime newEnd = newStart.AddMinutes(movie.Duration + cleaningTime).ToUniversalTime();
 
+            List<Session> sessionsInHall = await unitOfWork.Sessions.GetSessionsInHallExceptAsync(session.HallId, id, cancellationToken);
             foreach (Session existingSession in sessionsInHall)
             {
-                Movie existingMovie = await unitOfWork.Movies.GetByIdAsync(existingSession.MovieId, cancellationToken);
-                DateTime existingStart = existingSession.StartTime.ToUniversalTime();
-                DateTime existingEnd = existingStart.AddMinutes(existingMovie.Duration + cleaningTime).ToUniversalTime();
-
-                if (newStart < existingEnd && existingStart < newEnd) throw new SessionHallException();
+                await CheckDateAsync(existingSession, newStart, newEnd, cleaningTime, cancellationToken);
             }
 
             session.StartTime = dto.StartTime;
             session.Price = dto.Price;
             unitOfWork.Sessions.Update(session);
+
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             Session? updatedSession = await unitOfWork.Sessions.GetByIdWithDetailsAsync(id, cancellationToken);
             return mapper.Map<SessionResponseDTO>(updatedSession);
         }
 
-        public async Task<PagedList<SessionResponseDTO>> GetFilteredSessionsAsync(SessionFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        private IQueryable<Session> ApplyFilter(IQueryable<Session> queryable, SessionFilterDTO filter)
         {
-            IQueryable<Session> queryable = unitOfWork.Sessions.GetAll();
-
             if (filter.MovieId.HasValue) queryable = queryable.Where(s => s.MovieId == filter.MovieId.Value);
+
             if (filter.HallId.HasValue) queryable = queryable.Where(s => s.HallId == filter.HallId.Value);
+
             if (filter.StartTimeFrom.HasValue) queryable = queryable.Where(s => s.StartTime >= filter.StartTimeFrom.Value);
+
             if (filter.StartTimeTo.HasValue) queryable = queryable.Where(s => s.StartTime <= filter.StartTimeTo.Value);
+
             if (filter.MinPrice.HasValue) queryable = queryable.Where(s => s.Price >= filter.MinPrice.Value);
+
             if (filter.MaxPrice.HasValue) queryable = queryable.Where(s => s.Price <= filter.MaxPrice.Value);
 
+            return queryable;
+        }
+
+        private IQueryable<Session> ApplySorting(IQueryable<Session> queryable, SessionFilterDTO filter)
+        {
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
                 switch (filter.SortBy.ToLower())
@@ -171,6 +184,15 @@ namespace CinemaBookingSystemBLL.Services
                 }
 
             }
+            return queryable;
+        }
+
+        public async Task<PagedList<SessionResponseDTO>> GetFilteredSessionsAsync(SessionFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            IQueryable<Session> queryable = unitOfWork.Sessions.GetAll();
+            queryable = ApplyFilter(queryable, filter);
+            queryable = ApplySorting(queryable, filter);    
+            
             var projectedQuery = queryable.ProjectTo<SessionResponseDTO>(mapper.ConfigurationProvider);
             PagedList<SessionResponseDTO> pagedList = await PagedList<SessionResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
             

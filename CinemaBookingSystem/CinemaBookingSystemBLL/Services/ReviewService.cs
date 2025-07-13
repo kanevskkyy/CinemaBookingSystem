@@ -36,7 +36,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<ReviewResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
+            Review? review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
             if (review == null) throw new NotFoundException("Review", id);
 
             return mapper.Map<ReviewResponseDTO>(review);
@@ -68,7 +68,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<ReviewResponseDTO?> UpdateAsync(Guid id, ReviewUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
+            Review? review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
             if (review == null) throw new NotFoundException("Review", id);
 
             if (!string.IsNullOrEmpty(dto.Text)) review.Text = dto.Text;
@@ -82,7 +82,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Review review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
+            Review? review = await unitOfWork.Review.GetByIdAsync(id, cancellationToken);
             if (review == null) throw new NotFoundException("Review", id);
 
             unitOfWork.Review.Delete(review);
@@ -90,16 +90,27 @@ namespace CinemaBookingSystemBLL.Services
             return true;
         }
 
+        private IQueryable<Review> ApplyFilter(IQueryable<Review> queryable, ReviewFilterDTO filter)
+        {
+            if (!string.IsNullOrEmpty(filter.UserId)) queryable = queryable.Where(r => r.UserId == filter.UserId);
+            
+            if (filter.MinRating.HasValue) queryable = queryable.Where(r => r.Rating >= filter.MinRating.Value);
+            
+            if (filter.MaxRating.HasValue) queryable = queryable.Where(r => r.Rating <= filter.MaxRating.Value);
+            
+            if (!string.IsNullOrEmpty(filter.TextContains)) queryable = queryable.Where(r => r.Text.ToLower().Contains(filter.TextContains.ToLower()));
+            
+            if (filter.CreatedAfter.HasValue) queryable = queryable.Where(r => r.CreatedAt >= filter.CreatedAfter.Value);
+            
+            if (filter.CreatedBefore.HasValue) queryable = queryable.Where(r => r.CreatedAt <= filter.CreatedBefore.Value);
+
+            return queryable;
+        }
+
         public async Task<PagedList<ReviewResponseDTO>> GetFilteredReviewsAsync(Guid movieId, ReviewFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             IQueryable<Review> queryable = unitOfWork.Review.GetReviewsByMovieId(movieId);
-
-            if (!string.IsNullOrEmpty(filter.UserId)) queryable = queryable.Where(r => r.UserId == filter.UserId);
-            if (filter.MinRating.HasValue) queryable = queryable.Where(r => r.Rating >= filter.MinRating.Value);
-            if (filter.MaxRating.HasValue) queryable = queryable.Where(r => r.Rating <= filter.MaxRating.Value);
-            if (!string.IsNullOrEmpty(filter.TextContains)) queryable = queryable.Where(r => r.Text.ToLower().Contains(filter.TextContains.ToLower()));
-            if (filter.CreatedAfter.HasValue) queryable = queryable.Where(r => r.CreatedAt >= filter.CreatedAfter.Value);
-            if (filter.CreatedBefore.HasValue) queryable = queryable.Where(r => r.CreatedAt <= filter.CreatedBefore.Value);
+            queryable = ApplyFilter(queryable, filter);
 
             queryable = queryable.OrderByDescending(r => r.CreatedAt.ToUniversalTime());
             PagedList<Review> items = await PagedList<Review>.ToPagedListAsync(queryable, pageNumber, pageSize, cancellationToken);

@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using CinemaBookingSystemBLL.DTO.Payment;
 using CinemaBookingSystemBLL.DTO.Tickets;
 using CinemaBookingSystemBLL.DTO.Users;
 using CinemaBookingSystemBLL.Filters;
@@ -34,7 +35,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
             List<TicketResponseDTO> tickets = await ticketService.GetAllAsync(cancellationToken);
             return Ok(tickets);
@@ -52,7 +56,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPagedSessions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
             PagedList<TicketResponseDTO> paginatedTickets = await ticketService.GetPagedTicketsAsync(pageNumber, pageSize);
             return Ok(paginatedTickets);
@@ -71,9 +78,12 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
-            TicketResponseDTO ticket = await ticketService.GetByIdAsync(id, cancellationToken);
+            TicketResponseDTO? ticket = await ticketService.GetByIdAsync(id, cancellationToken);
             return Ok(ticket);
         }
 
@@ -91,7 +101,10 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetByUserId(string userId, CancellationToken cancellationToken)
         {
             string? current = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (current == null || (!User.IsInRole("Admin") && current != userId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
+            if (current == null || (!User.IsInRole("Admin") && current != userId)) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Access denied." 
+            });
 
             List<TicketResponseDTO> tickets = await ticketService.GetByUserIdAsync(userId, cancellationToken);
             return Ok(tickets);
@@ -109,7 +122,10 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetMyTickets(CancellationToken cancellationToken)
         {
             string? userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userID == null) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Access denied." });
+            if (userID == null) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Access denied." 
+            });
 
             List<TicketResponseDTO> tickets = await ticketService.GetByUserIdAsync(userID, cancellationToken);
             return Ok(tickets);
@@ -128,7 +144,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetBySessionId(Guid sessionId, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
             List<TicketResponseDTO> tickets = await ticketService.GetBySessionIdAsync(sessionId, cancellationToken);
             return Ok(tickets);
@@ -148,7 +167,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] TicketCreateDTO dto, CancellationToken cancellationToken)
         {
-            string userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            string? userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
             TicketResponseDTO created = await ticketService.CreateAsync(userId, dto, cancellationToken);
@@ -168,10 +187,16 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
             bool result = await ticketService.DeleteAsync(id, cancellationToken);
-            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete session with this id!" });
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new 
+            {
+                message = "Cannot delete session with this id!" 
+            });
 
             return NoContent();
         }
@@ -190,7 +215,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFilteredTickets([FromQuery] TicketFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            {
+                message = "Only admins are allowed to perform this action." 
+            });
 
             PagedList<TicketResponseDTO> result = await ticketService.GetFilteredTicketsAsync(filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);
@@ -200,15 +228,20 @@ namespace CinemaBookingSystemAPI.Controllers
         /// Confirm payment for ticket (admin only).
         /// </summary>
         /// <param name="id">Ticket ID.</param>
+        /// <param name="dto"></param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpPost("{id:Guid}/confirm-payment")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> ConfirmPayment(Guid id)
+        public async Task<IActionResult> ConfirmPayment(Guid id, [FromBody] PaymentConfirmDTO dto, CancellationToken cancellationToken = default)
         {
-            bool result = await ticketService.ConfirmPaymentAsync(id);
-            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot confirm payment ticket with this id!" });
+            bool result = await ticketService.ConfirmPaymentAsync(id, dto, cancellationToken);
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new 
+            { 
+                message = "Cannot confirm payment ticket with this id!" 
+            });
 
             return Ok();
         }

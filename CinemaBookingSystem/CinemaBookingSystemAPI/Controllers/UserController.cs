@@ -30,7 +30,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
             List<UserResponseDTO> result = await userService.GetAllAsync(cancellationToken);
             return Ok(result);
@@ -48,7 +51,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PagedList<UserResponseDTO>>> GetPagedUsers(int pageNumber = 1, int pageSize = 10)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
             PagedList<UserResponseDTO> result = await userService.GetPagedUsersAsync(pageNumber, pageSize);
             return Ok(result);
@@ -70,7 +76,7 @@ namespace CinemaBookingSystemAPI.Controllers
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!User.IsInRole("Admin") && userId != id) return Forbid();
 
-            UserResponseDTO user = await userService.GetByIdAsync(id, cancellationToken);
+            UserResponseDTO? user = await userService.GetByIdAsync(id, cancellationToken);
             return Ok(user);
         }
 
@@ -88,7 +94,7 @@ namespace CinemaBookingSystemAPI.Controllers
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Forbid();
 
-            UserResponseDTO user = await userService.GetByIdAsync(userId, cancellationToken);
+            UserResponseDTO? user = await userService.GetByIdAsync(userId, cancellationToken);
             return Ok(user);
         }
 
@@ -106,9 +112,12 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByEmail(string email, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
-            UserResponseDTO user = await userService.GetByEmailAsync(email, cancellationToken);
+            UserResponseDTO? user = await userService.GetByEmailAsync(email, cancellationToken);
             return Ok(user);
         }
 
@@ -127,8 +136,11 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(string id, [FromBody] UserUpdateDTO dto, CancellationToken cancellationToken)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!User.IsInRole("Admin") && userId != id) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admin or user who`s account is can update this account!" });
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!User.IsInRole("Admin") && userId != id) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admin or user who`s account is can update this account!" 
+            });
 
             UserResponseDTO updatedUser = await userService.UpdateAsync(id, dto, cancellationToken);
             return Ok(updatedUser);
@@ -147,10 +159,16 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO dto, CancellationToken cancellationToken)
         {
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserId)) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Cannot find your id in JWT token" });
+            if (string.IsNullOrEmpty(currentUserId)) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Cannot find your id in JWT token" 
+            });
 
             bool result = await userService.ChangePasswordAsync(currentUserId, dto, cancellationToken);
-            if (!result) return BadRequest(new { message = "Incorrect current password or password requirements not met." });
+            if (!result) return BadRequest(new 
+            { 
+                message = "Incorrect current password or password requirements not met." 
+            });
 
             return NoContent();
         }
@@ -168,11 +186,17 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!User.IsInRole("Admin") && userId != id) return StatusCode(StatusCodes.Status403Forbidden, new {message = "Only admin or user who`s account is can delete this account!"});
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!User.IsInRole("Admin") && userId != id) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admin or user who`s account is can delete this account!"
+            });
 
             bool result = await userService.DeleteAsync(id, cancellationToken);
-            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete user with this id!" });
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new 
+            { 
+                message = "Cannot delete user with this id!" 
+            });
 
             return NoContent();
         }

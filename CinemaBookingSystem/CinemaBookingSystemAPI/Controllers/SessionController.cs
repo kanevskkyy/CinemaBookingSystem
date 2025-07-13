@@ -58,7 +58,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
-            SessionResponseDTO session = await sessionService.GetByIdAsync(id, cancellationToken);
+            SessionResponseDTO? session = await sessionService.GetByIdAsync(id, cancellationToken);
             return Ok(session);
         }
 
@@ -104,7 +104,10 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] SessionCreateDTO dto, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
             SessionResponseDTO created = await sessionService.CreateAsync(dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
@@ -124,9 +127,12 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(Guid id, [FromBody] SessionUpdateDTO dto, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
-            SessionResponseDTO updated = await sessionService.UpdateAsync(id, dto, cancellationToken);
+            SessionResponseDTO? updated = await sessionService.UpdateAsync(id, dto, cancellationToken);
             return NoContent();
         }
 
@@ -142,10 +148,16 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed to perform this action." });
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed to perform this action." 
+            });
 
             bool result = await sessionService.DeleteAsync(id, cancellationToken);
-            if (!result) return StatusCode(StatusCodes.Status404NotFound, new { message = "Cannot delete session with this id!" });
+            if (!result) return StatusCode(StatusCodes.Status404NotFound, new 
+            { 
+                message = "Cannot delete session with this id!" 
+            });
 
             return NoContent();
         }

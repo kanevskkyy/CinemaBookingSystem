@@ -41,7 +41,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
-            ReviewResponseDTO review = await reviewService.GetByIdAsync(id, cancellationToken);
+            ReviewResponseDTO? review = await reviewService.GetByIdAsync(id, cancellationToken);
             return Ok(review);
         }
 
@@ -122,11 +122,14 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Update(Guid id, [FromBody] ReviewUpdateDTO dto, CancellationToken cancellationToken)
         {
-            ReviewResponseDTO existing = await reviewService.GetByIdAsync(id, cancellationToken);
+            ReviewResponseDTO? existing = await reviewService.GetByIdAsync(id, cancellationToken);
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed or user who`s reviews is to perform this action." });
+            if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed or user who`s reviews is to perform this action." 
+            });
 
-            ReviewResponseDTO updated = await reviewService.UpdateAsync(id, dto, cancellationToken);
+            ReviewResponseDTO? updated = await reviewService.UpdateAsync(id, dto, cancellationToken);
             return Ok(updated);
         }
 
@@ -142,10 +145,13 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
-            ReviewResponseDTO existing = await reviewService.GetByIdAsync(id, cancellationToken);
+            ReviewResponseDTO? existing = await reviewService.GetByIdAsync(id, cancellationToken);
 
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only admins are allowed or user who`s reviews is to perform this action." });
+            if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            { 
+                message = "Only admins are allowed or user who`s reviews is to perform this action." 
+            });
 
             await reviewService.DeleteAsync(id, cancellationToken);
             return NoContent();

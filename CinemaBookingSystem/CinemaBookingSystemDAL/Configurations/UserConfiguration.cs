@@ -18,6 +18,7 @@ namespace CinemaBookingSystemDAL.Configurations
 
             builder.Property(p => p.Email)
                 .HasMaxLength(256);
+
             builder.Property(p => p.UserName)
                 .HasMaxLength(256);
         }

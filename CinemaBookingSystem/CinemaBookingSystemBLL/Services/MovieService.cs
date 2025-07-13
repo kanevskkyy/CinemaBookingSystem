@@ -108,17 +108,25 @@ namespace CinemaBookingSystemBLL.Services
             return new PagedList<MovieResponseDTO>(movieDtos, pagedMovies.TotalCount, pagedMovies.CurrentPage, pagedMovies.PageSize);
         }
 
-        public async Task<PagedList<MovieResponseDTO>> GetFilteredMoviesAsync(MovieFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        private IQueryable<Movie> ApplyFilter(IQueryable<Movie> queryable, MovieFilterDTO filter)
         {
-            IQueryable<Movie> queryable = unitOfWork.Movies.GetAll();
-
             if (!string.IsNullOrEmpty(filter.Title)) queryable = queryable.Where(m => m.Title.ToLower().Contains(filter.Title.ToLower())).OrderBy(p => p.Title);
+            
             if (filter.GenreId.HasValue) queryable = queryable.Where(m => m.MovieGenres.Any(mg => mg.GenreId == filter.GenreId.Value));
+            
             if (filter.MinRating.HasValue) queryable = queryable.Where(m => m.Rating >= filter.MinRating.Value).OrderBy(p => p.Rating);
+            
             if (filter.MaxRating.HasValue) queryable = queryable.Where(m => m.Rating <= filter.MaxRating.Value).OrderBy(p => p.Rating);
+            
             if (filter.MinDuration.HasValue) queryable = queryable.Where(m => m.Duration >= filter.MinDuration.Value).OrderBy(p => p.Duration);
+            
             if (filter.MaxDuration.HasValue) queryable = queryable.Where(m => m.Duration <= filter.MaxDuration.Value).OrderBy(p => p.Duration);
 
+            return queryable;
+        }
+
+        private IQueryable<Movie> ApplySorting(IQueryable<Movie> queryable, MovieFilterDTO filter)
+        {
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
                 switch (filter.SortBy.ToLower())
@@ -159,7 +167,15 @@ namespace CinemaBookingSystemBLL.Services
                         break;
                 }
             }
+            return queryable;
+        }
 
+        public async Task<PagedList<MovieResponseDTO>> GetFilteredMoviesAsync(MovieFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            IQueryable<Movie> queryable = unitOfWork.Movies.GetAll();
+            queryable = ApplyFilter(queryable, filter);
+            queryable = ApplySorting(queryable, filter);
+            
             queryable = queryable.Include(m => m.MovieGenres);
             var resltDTO = queryable.ProjectTo<MovieResponseDTO>(mapper.ConfigurationProvider);
             var pagedResult = await PagedList<MovieResponseDTO>.ToPagedListAsync(resltDTO, pageNumber, pageSize, cancellationToken);

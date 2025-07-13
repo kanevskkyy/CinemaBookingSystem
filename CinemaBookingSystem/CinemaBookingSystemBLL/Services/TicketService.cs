@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using CinemaBookingSystemBLL.DTO.Payment;
 using CinemaBookingSystemBLL.DTO.Sessions;
 using CinemaBookingSystemBLL.DTO.Tickets;
 using CinemaBookingSystemBLL.Exceptions;
@@ -58,10 +59,10 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<TicketResponseDTO> CreateAsync(string userId, TicketCreateDTO dto, CancellationToken cancellationToken = default)
         {
-            Seat seat = await unitOfWork.Seats.GetByIdAsync(dto.SeatId, cancellationToken);
+            Seat? seat = await unitOfWork.Seats.GetByIdAsync(dto.SeatId, cancellationToken);
             if (seat == null) throw new NotFoundException("Seat", dto.SeatId);
                         
-            Session session = await unitOfWork.Sessions.GetByIdAsync(dto.SessionId, cancellationToken);
+            Session? session = await unitOfWork.Sessions.GetByIdAsync(dto.SessionId, cancellationToken);
             if (session == null) throw new NotFoundException("Session", dto.SessionId);
 
             Ticket existingTicket = await unitOfWork.Tickets.GetBySeatAndSessionAsync(dto.SeatId, dto.SessionId, cancellationToken);
@@ -83,7 +84,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Ticket ticket = await unitOfWork.Tickets.GetByIdAsync(id, cancellationToken);
+            Ticket? ticket = await unitOfWork.Tickets.GetByIdAsync(id, cancellationToken);
             if (ticket == null) throw new NotFoundException("Ticket", id);
 
             unitOfWork.Tickets.Delete(ticket);
@@ -109,16 +110,23 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<TicketResponseDTO>>(tickets);
         }
 
-        public async Task<PagedList<TicketResponseDTO>> GetFilteredTicketsAsync(TicketFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        private IQueryable<Ticket> ApplyFilter(IQueryable<Ticket> query, TicketFilterDTO filter)
         {
-            IQueryable<Ticket> queryable = unitOfWork.Tickets.GetAll();
+            if (!string.IsNullOrWhiteSpace(filter.UserId)) query = query.Where(t => t.UserId == filter.UserId);
 
-            if (filter.UserId?.Trim().Length > 0) queryable = queryable.Where(t => t.UserId == filter.UserId);
-            if (filter.SessionId.HasValue) queryable = queryable.Where(t => t.SessionId == filter.SessionId.Value);
-            if (filter.SeatId.HasValue) queryable = queryable.Where(t => t.SeatId == filter.SeatId.Value);
-            if (filter.PurchaseTimeFrom.HasValue) queryable = queryable.Where(t => t.PurchaseTime >= filter.PurchaseTimeFrom.Value);
-            if (filter.PurchaseTimeTo.HasValue) queryable = queryable.Where(t => t.PurchaseTime <= filter.PurchaseTimeTo.Value);
+            if (filter.SessionId.HasValue) query = query.Where(t => t.SessionId == filter.SessionId.Value);
 
+            if (filter.SeatId.HasValue) query = query.Where(t => t.SeatId == filter.SeatId.Value);
+
+            if (filter.PurchaseTimeFrom.HasValue) query = query.Where(t => t.PurchaseTime >= filter.PurchaseTimeFrom.Value);
+
+            if (filter.PurchaseTimeTo.HasValue) query = query.Where(t => t.PurchaseTime <= filter.PurchaseTimeTo.Value);
+
+            return query;
+        }
+
+        private IQueryable<Ticket> ApplySorting(IQueryable<Ticket> queryable, TicketFilterDTO filter)
+        {
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
                 switch (filter.SortBy.ToLower())
@@ -126,43 +134,65 @@ namespace CinemaBookingSystemBLL.Services
                     case "purchasetime":
                         if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.PurchaseTime);
                         else queryable = queryable.OrderBy(t => t.PurchaseTime);
-                        
+
                         break;
 
                     case "userid":
                         if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.UserId);
                         else queryable = queryable.OrderBy(t => t.UserId);
-                        
+
                         break;
 
                     case "sessionid":
                         if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.SessionId);
                         else queryable = queryable.OrderBy(t => t.SessionId);
-                        
+
                         break;
 
                     case "seatid":
                         if (filter.SortDescending) queryable = queryable.OrderByDescending(t => t.SeatId);
                         else queryable = queryable.OrderBy(t => t.SeatId);
-                        
+
                         break;
 
                     default:
                         break;
                 }
             }
+            return queryable;
+        }
+
+        public async Task<PagedList<TicketResponseDTO>> GetFilteredTicketsAsync(TicketFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            IQueryable<Ticket> queryable = unitOfWork.Tickets.GetAll();
+            queryable = ApplyFilter(queryable, filter);
+            queryable = ApplySorting(queryable, filter);
+            
             var projectedQuery = queryable.ProjectTo<TicketResponseDTO>(mapper.ConfigurationProvider);
             PagedList<TicketResponseDTO> pagedList = await PagedList<TicketResponseDTO>.ToPagedListAsync(projectedQuery, pageNumber, pageSize, cancellationToken);
             return pagedList;
         }
 
-        public async Task<bool> ConfirmPaymentAsync(Guid ticketId, CancellationToken cancellationToken = default)
+        public async Task<bool> ConfirmPaymentAsync(Guid ticketId, PaymentConfirmDTO paymentDto, CancellationToken cancellationToken = default)
         {
             Ticket? ticket = await unitOfWork.Tickets.GetByIdAsync(ticketId, cancellationToken);
             if (ticket == null) throw new NotFoundException("Ticket", ticketId);
 
+            if (ticket.IsPaid) throw new TicketAlreadyPaid();
             ticket.IsPaid = true;
+
+            Payment payment = new Payment
+            {
+                TicketId = ticket.Id,
+                Status = "Success",
+                TransactionId = Guid.NewGuid().ToString(),
+                PaymentMethod = paymentDto.PaymentMethod,
+                PaymentDate = DateTime.UtcNow.ToUniversalTime()
+            };
+
+            await unitOfWork.Payments.CreateAsync(payment, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
+
             return true;
         }
     }

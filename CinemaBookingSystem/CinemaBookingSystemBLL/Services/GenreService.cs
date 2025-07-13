@@ -33,7 +33,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<GenreResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Genre genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
+            Genre? genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
             if (genre == null) throw new NotFoundException("Genre", id);
             
             return mapper.Map<GenreResponseDTO>(genre);
@@ -54,7 +54,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<GenreResponseDTO?> UpdateAsync(Guid id, GenreUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            Genre genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
+            Genre? genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
             if (genre == null) throw new NotFoundException("Genre", id);
 
             bool existByGenre = await unitOfWork.Genres.ExistsByNameAsync(dto.Name, id, cancellationToken);
@@ -70,7 +70,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Genre genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
+            Genre? genre = await unitOfWork.Genres.GetByIdAsync(id, cancellationToken);
             if (genre == null) throw new NotFoundException("Genre", id);
 
             unitOfWork.Genres.Delete(genre);

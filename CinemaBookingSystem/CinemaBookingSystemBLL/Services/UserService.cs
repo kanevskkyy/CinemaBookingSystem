@@ -79,7 +79,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<UserResponseDTO?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            User user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
+            User? user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
             if (!Guid.TryParse(id, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
             if (user == null) throw new NotFoundException("User", guidId);
 
@@ -95,7 +95,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
         {
-            User user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
+            User? user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
             if (!Guid.TryParse(id, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
 
             if (user == null) throw new NotFoundException("User", guidId);
@@ -125,7 +125,7 @@ namespace CinemaBookingSystemBLL.Services
         }
         public async Task<UserResponseDTO> UpdateAsync(string id, UserUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            User user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
+            User? user = await unitOfWork.Users.GetByIdAsync(id, cancellationToken);
             if (!Guid.TryParse(id, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
             if (user == null) throw new NotFoundException("User", guidId);
 

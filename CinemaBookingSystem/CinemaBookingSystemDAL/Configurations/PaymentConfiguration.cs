@@ -19,6 +19,9 @@ namespace CinemaBookingSystemDAL.Configurations
                 .IsRequired()
                 .HasMaxLength(50);
 
+            builder.HasCheckConstraint("CK_Payment_Status", "Status IN ('Success', 'Failed')");
+            builder.HasCheckConstraint("CK_Payment_PaymentMethod", "PaymentMethod IN ('Manual', 'Card')");
+
             builder.Property(p => p.TransactionId)
                 .IsRequired()
                 .HasMaxLength(100);

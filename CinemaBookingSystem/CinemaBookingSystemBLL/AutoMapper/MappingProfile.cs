@@ -7,6 +7,7 @@ using AutoMapper;
 using CinemaBookingSystemBLL.DTO.Genres;
 using CinemaBookingSystemBLL.DTO.Halls;
 using CinemaBookingSystemBLL.DTO.Movies;
+using CinemaBookingSystemBLL.DTO.Payment;
 using CinemaBookingSystemBLL.DTO.Review;
 using CinemaBookingSystemBLL.DTO.Seats;
 using CinemaBookingSystemBLL.DTO.Sessions;
@@ -68,6 +69,10 @@ namespace CinemaBookingSystemBLL.AutoMapper
             CreateMap<UserUpdateDTO, User>().ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name));
             CreateMap<UserCreateDTO, User>().ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name));
             CreateMap<UserCreateCustomerDTO, User>().ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name));
+
+            CreateMap<Payment, PaymentResponseDTO>()
+                .ForMember(dest => dest.SessionId, opt => opt.MapFrom(src => src.Ticket.SessionId))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Ticket.UserId));
         }
     }
 }

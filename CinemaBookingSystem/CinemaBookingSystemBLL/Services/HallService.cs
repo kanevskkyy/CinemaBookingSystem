@@ -23,14 +23,13 @@ namespace CinemaBookingSystemBLL.Services
             this.mapper = mapper;
         }
 
-        public async Task<List<HallResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
+        private List<Hall> OrderHallByNumber(List<Hall> halls)
         {
-            List<Hall> halls = await unitOfWork.Halls.GetAllAsync(cancellationToken);
             List<Hall> orderedHalls = halls.OrderBy(h =>
             {
                 string name = h.Name;
                 int index = -1;
-                
+
                 for (int i = 0; i < name.Length; i++)
                 {
                     if (char.IsDigit(name[i]))
@@ -39,22 +38,30 @@ namespace CinemaBookingSystemBLL.Services
                         break;
                     }
                 }
-                
+
                 if (index == -1) return int.MaxValue;
                 string number = name.Substring(index);
-              
+
                 if (int.TryParse(number, out int result)) return result;
                 else return int.MaxValue;
             })
             .ThenBy(h => h.Name)
-            .ToList();   
+            .ToList();
+
+            return orderedHalls;
+        }
+
+        public async Task<List<HallResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            List<Hall> halls = await unitOfWork.Halls.GetAllAsync(cancellationToken);
+            List<Hall> orderedHalls = OrderHallByNumber(halls);
 
             return mapper.Map<List<HallResponseDTO>>(orderedHalls);
         }
 
         public async Task<HallResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
+            Hall? hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
             if (hall == null) throw new NotFoundException("Hall", id);
             else return mapper.Map<HallResponseDTO>(hall);
         }
@@ -88,7 +95,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<HallResponseDTO?> UpdateAsync(Guid id, HallUpdateDTO dto, CancellationToken cancellationToken = default)
         {
-            Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
+            Hall? hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
             if (hall == null) throw new NotFoundException("Hall", id);
 
             bool exist = await unitOfWork.Halls.ExistsByNameAsync(dto.Name, id, cancellationToken);
@@ -103,7 +110,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Hall hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
+            Hall? hall = await unitOfWork.Halls.GetByIdAsync(id, cancellationToken);
             if (hall == null) throw new NotFoundException("Hall", id);
 
             unitOfWork.Halls.Delete(hall);
