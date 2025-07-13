@@ -9,6 +9,8 @@ using CinemaBookingSystemBLL.Exceptions;
 using CinemaBookingSystemBLL.Interfaces;
 using CinemaBookingSystemDAL.DbCreating;
 using CinemaBookingSystemDAL.Entities;
+using CinemaBookingSystemDAL.Interfaces;
+using CinemaBookingSystemDAL.Unit_of_Work;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,15 +23,15 @@ namespace CinemaBookingSystemBLL.Services
         private UserManager<User> userManager;
         private SignInManager<User> signInManager;
         private IConfiguration config;
-        private CinemaDbContext context;
+        private IUnitOfWork unitOfWork;
         private IMapper mapper;
 
-        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, CinemaDbContext context, IMapper mapper)
+        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, IMapper mapper, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
+            this.unitOfWork = unitOfWork;
             this.signInManager = signInManager;
             config = configuration;
-            this.context = context;
             this.mapper = mapper;
         }
 
@@ -101,7 +103,7 @@ namespace CinemaBookingSystemBLL.Services
 
             string? userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            RefreshToken? savedToken = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken && rt.UserId == userId);
+            RefreshToken? savedToken = await unitOfWork.RefreshTokens.GetByTokenAndUserIdAsync(request.RefreshToken, userId);
             if (savedToken == null || savedToken.ExpiryDate <= DateTime.UtcNow) throw new SecurityTokenException("Invalid or expired refresh token");
 
             User? user = await userManager.FindByIdAsync(userId);
@@ -110,9 +112,10 @@ namespace CinemaBookingSystemBLL.Services
 
             savedToken.Token = newRefreshToken.Token;
             savedToken.ExpiryDate = newRefreshToken.ExpiryDate;
-            await context.SaveChangesAsync();
+            await unitOfWork.SaveChangesAsync();
 
             return (newAccessToken, newRefreshToken.Token);
+
         }
 
         private async Task<string> GenerateJwtToken(User user)
@@ -153,20 +156,7 @@ namespace CinemaBookingSystemBLL.Services
 
         private async Task SaveRefreshToken(string userId, RefreshToken refreshToken)
         {
-            RefreshToken? existing = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
-
-            if (existing != null)
-            {
-                existing.Token = refreshToken.Token;
-                existing.ExpiryDate = refreshToken.ExpiryDate;
-            }
-            else
-            {
-                refreshToken.UserId = userId;
-                await context.RefreshTokens.AddAsync(refreshToken);
-            }
-
-            await context.SaveChangesAsync();
+            await unitOfWork.RefreshTokens.SaveAsync(userId, refreshToken);
         }
 
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)

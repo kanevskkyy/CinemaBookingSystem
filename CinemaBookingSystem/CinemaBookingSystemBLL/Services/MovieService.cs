@@ -91,7 +91,7 @@ namespace CinemaBookingSystemBLL.Services
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            Movie movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
+            Movie? movie = await unitOfWork.Movies.GetByIdAsync(id, cancellationToken);
             if (movie == null) throw new NotFoundException("Movie", id);
 
             unitOfWork.Movies.Delete(movie);

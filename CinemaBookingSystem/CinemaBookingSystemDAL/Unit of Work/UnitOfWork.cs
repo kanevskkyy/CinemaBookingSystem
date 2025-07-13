@@ -27,6 +27,8 @@ namespace CinemaBookingSystemDAL.Unit_of_Work
         public ITicketRepository Tickets => new TicketRepository(context);
         public IUserRepository Users => new UserRepository(context);
         public IReviewRepository Review => new ReviewRepository(context);
+        public IRefreshTokenRepository RefreshTokens => new RefreshTokenRepository(context);
+
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
