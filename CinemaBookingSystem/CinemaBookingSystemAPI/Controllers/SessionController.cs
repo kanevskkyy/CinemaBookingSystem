@@ -63,36 +63,6 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         /// <summary>
-        /// Get sessions by movie ID.
-        /// </summary>
-        /// <param name="movieId">Movie ID.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("by-movie/{movieId:Guid}")]
-        [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByMovieId(Guid movieId, CancellationToken cancellationToken)
-        {
-            List<SessionResponseDTO> sessions = await sessionService.GetByMovieIdAsync(movieId, cancellationToken);
-            return Ok(sessions);
-        }
-
-        /// <summary>
-        /// Get sessions by hall ID.
-        /// </summary>
-        /// <param name="hallId">Hall ID.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("by-hall/{hallId:Guid}")]
-        [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByHallId(Guid hallId, CancellationToken cancellationToken)
-        {
-            List<SessionResponseDTO> sessions = await sessionService.GetByHallIdAsync(hallId, cancellationToken);
-            return Ok(sessions);
-        }
-
-        /// <summary>
         /// Create new session (admin only).
         /// </summary>
         /// <param name="dto">SessionCreateDTO object.</param>

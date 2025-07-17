@@ -92,24 +92,7 @@ namespace CinemaBookingSystemBLL.Services
             return true;
         }
 
-        public async Task<List<TicketResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
-        {
-            List<Ticket> tickets = await unitOfWork.Tickets.GetByUserIdAsync(userId, cancellationToken);
-            if (!Guid.TryParse(userId, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
-            if (tickets.IsNullOrEmpty()) throw new NotFoundException("Ticket", guidId);
-
-            return mapper.Map<List<TicketResponseDTO>>(tickets);
-        }
-
-
-        public async Task<List<TicketResponseDTO>> GetBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default)
-        {
-            List<Ticket> tickets = await unitOfWork.Tickets.GetBySessionIdAsync(sessionId, cancellationToken);
-            if (tickets.IsNullOrEmpty()) throw new NotFoundException("Ticket", sessionId);
-
-            return mapper.Map<List<TicketResponseDTO>>(tickets);
-        }
-
+        
         private IQueryable<Ticket> ApplyFilter(IQueryable<Ticket> query, TicketFilterDTO filter)
         {
             if (!string.IsNullOrWhiteSpace(filter.UserId)) query = query.Where(t => t.UserId == filter.UserId);

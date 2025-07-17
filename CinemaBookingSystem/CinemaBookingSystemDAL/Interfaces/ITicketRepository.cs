@@ -11,10 +11,6 @@ namespace CinemaBookingSystemDAL.Interfaces
     {
         Task<Ticket> GetBySeatAndSessionAsync(Guid seatId, Guid sessionId, CancellationToken cancellationToken = default);
         public Task<Ticket?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
-        public IQueryable<Ticket> GetAllWithDetails();
-        Task<List<Ticket>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default);
-        Task<List<Ticket>> GetBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default);
-        Task<List<Ticket>> GetBySeatIdAsync(Guid seatId, CancellationToken cancellationToken = default);
-        
+        public IQueryable<Ticket> GetAllWithDetails(); 
     }
 }

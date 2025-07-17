@@ -18,8 +18,6 @@ namespace CinemaBookingSystemBLL.Interfaces
         Task<TicketResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<TicketResponseDTO> CreateAsync(string userId, TicketCreateDTO dto, CancellationToken cancellationToken = default);
         Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<List<TicketResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default);
-        Task<List<TicketResponseDTO>> GetBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default);
         Task<PagedList<TicketResponseDTO>> GetPagedTicketsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         Task<PagedList<TicketResponseDTO>> GetFilteredTicketsAsync(TicketFilterDTO filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         Task<bool> ConfirmPaymentAsync(Guid ticketId, PaymentConfirmDTO paymentDto, CancellationToken cancellationToken = default);

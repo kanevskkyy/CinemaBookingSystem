@@ -43,33 +43,6 @@ namespace CinemaBookingSystemDAL.Repositories
                 .OrderBy(p => p.Id);
         }
 
-        public async Task<List<Ticket>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .AsNoTracking()
-                .Where(t => t.UserId == userId)
-                .Include(t => t.User)
-                .Include(t => t.Session)
-                .ThenInclude(s => s.Movie)
-                .Include(t => t.Seat)
-                .OrderBy(p => p.Id)
-                .ToListAsync(cancellationToken);
-        }
-
-        public async Task<List<Ticket>> GetBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .AsNoTracking()
-                .Where(t => t.SessionId == sessionId)
-                .Include(t => t.User)
-                .Include(t => t.Session)
-                .ThenInclude(s => s.Movie)
-                .Include(t => t.Seat)
-                .OrderBy(t => t.Id)
-                .OrderBy(p => p.Id)
-                .ToListAsync(cancellationToken);
-        }
-
         public async Task<List<Ticket>> GetBySeatIdAsync(Guid seatId, CancellationToken cancellationToken = default)
         {
             return await dbSet

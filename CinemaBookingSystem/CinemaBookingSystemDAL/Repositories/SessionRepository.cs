@@ -16,17 +16,6 @@ namespace CinemaBookingSystemDAL.Repositories
         
         }
 
-        public async Task<List<Session>> GetByMovieIdAsync(Guid movieId, CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .AsNoTracking()
-                .Where(p => p.MovieId == movieId)
-                .OrderBy(p => p.Id)
-                .Include(p => p.Movie)
-                .Include(p => p.Hall)
-                .ToListAsync(cancellationToken);
-        }
-
         public async Task<Session?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await dbSet
@@ -35,17 +24,6 @@ namespace CinemaBookingSystemDAL.Repositories
                 .Include(s => s.Movie)
                 .Include(s => s.Hall)
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
-        }
-
-        public async Task<List<Session>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default)
-        {
-            return await dbSet
-                .AsNoTracking()
-                .Where(p => p.HallId == hallId)
-                .OrderBy(p => p.Id)
-                .Include(p => p.Hall)
-                .Include(p => p.Movie)
-                .ToListAsync(cancellationToken);
         }
 
         public async Task<List<Session>> GetSessionsInHallExceptAsync(Guid hallId, Guid excludedSessionId, CancellationToken cancellationToken = default)
