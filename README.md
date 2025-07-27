@@ -1,47 +1,71 @@
+# CINEMABOOKINGSYSTEM
 
-# 🎬 CinemaBookingSystem
+<div align="center">
+  <h1>CINEMABOOKINGSYSTEM</h1>
 
-### 📖 Загальний опис
-Це REST API для кінотеатру, який дозволяє користувачам переглядати фільми, розклад сеансів та бронювати місця. Система створена з використанням архітектури API → BLL → DAL.
+  _Built with the tools and technologies:_
 
----
-
-## ✅ User Stories (беклог)
-
-1. **Як відвідувач**, я хочу бачити список фільмів, доступних у кінотеатрі, щоб обрати фільм для перегляду.
-2. **Як відвідувач**, я хочу бачити розклад сеансів обраного фільму, щоб обрати зручний час.
-3. **Як відвідувач**, я хочу переглянути план залу, щоб вибрати вільні місця.
-4. **Як відвідувач**, я хочу забронювати місця на певний сеанс, щоб бути впевненим у наявності квитків.
-5. **Як відвідувач**, я хочу мати можливість змінити мій нікнейм та пароль.
-6. **Як відвідувач**, я хочу мати можливість переглядати фільми, сеанси за певними фільтрами та сортуванням.
-7. **Як адміністратор**, я хочу додавати нові фільми та створювати сеанси, щоб оновлювати репертуар.
-8. **Як адміністратор**, я хочу редагувати інформацію про фільм (назва, опис, жанр, тривалість), сеанси, зали у будь-який момент.
-9. **Як адміністратор**, я хочу додавати нових адміністраторів та звичайних покупців (у разі необхідності).
+  ![JSON](https://img.shields.io/badge/JSON-000000.svg?style=flat&logo=JSON&logoColor=white)
+  ![Markdown](https://img.shields.io/badge/Markdown-000000.svg?style=flat&logo=Markdown&logoColor=white)
+  ![NuGet](https://img.shields.io/badge/NuGet-004880.svg?style=flat&logo=NuGet&logoColor=white)
+</div>
 
 ---
 
-## 🛠️ MVP (Minimum Viable Product)
+## Table of Contents
 
-🔹 **Сутності для реалізації MVP:**
-- `Movie` – фільм (назва, опис, жанр, тривалість, жанр)
-- `Hall` – зал (назва, кількість рядів і місць)
-- `Seat` – місце (зал, рядок в залі, колонка в залі)
-- `Session` – сеанс (дата, час, фільм, зал)
-- `Ticket` – квиток (користувач, сеанс, місце, дата купівлі)
-- `Booking` – бронювання (імʼя клієнта, email, password, сеанс, обрані місця)
-- `Genres` – жанри (назва жанру)
-
-🔹 **Функціонал MVP:**
-- [ ] Отримання списку фільмів
-- [ ] Отримання розкладу сеансів для обраного фільму
-- [ ] Перегляд вільних місць на конкретний сеанс
-- [ ] Створення бронювання
-- [ ] Додавання/редагування фільмів та сеансів (адміністративна частина)
+- [Overview](#overview)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Testing](#testing)
 
 ---
 
-## 🧱 Архітектура
+## Overview
 
-- **API** – відповідає за HTTP-запити, контролери
-- **BLL** – обробка логіки (бронювання, перевірки, перевірка вільних місць)
-- **DAL** – доступ до бази даних (через EF Core або інше)
+CinemaBookingSystem is a comprehensive backend framework tailored for building cinema management applications. It provides detailed REST API documentation, a layered architecture for organized development, and robust data handling with Entity Framework Core and PostgreSQL. The system includes features for data seeding, validation, exception handling, and object mapping, ensuring a clean and scalable codebase.
+
+**Why CinemaBookingSystem?**
+
+This project aims to simplify the development of cinema booking platforms by offering a modular, well-documented, and secure backend solution. The core features include:
+
+- 🛠️ **API Documentation:** Clear, comprehensive endpoints for seamless client integration
+- ⚙️ **Layered Architecture:** Organized separation of API, business logic, and data access layers
+- 🌱 **Data Seeding:** Automated test data generation for development and testing
+- 🔒 **Security & Validation:** Role-based access control and robust data validation
+- 🔍 **Flexible Data Handling:** Filtering, pagination, and efficient querying support
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+This project requires the following dependencies:
+
+- **Programming Language:** CSharp
+- **Package Manager:** Nuget
+
+### Installation
+
+Build CinemaBookingSystem from the source and install dependencies:
+
+```sh
+❯ git clone https://github.com/kanevskkyy/CinemaBookingSystem
+❯ cd CinemaBookingSystem
+❯ dotnet restore
+❯ dotnet ef database update
+❯ dotnet run
+```
+
+### Usage
+
+Run the project with:
+
+```sh
+dotnet run
+```
+
+[⬆ Return to top](#cinemabookingsystem)
