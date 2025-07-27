@@ -14,8 +14,6 @@ namespace CinemaBookingSystemBLL.Validations.Movie
         public MovieFilterDTOValidator()
         {
             RuleFor(p => p.GenreId)
-                .NotEmpty()
-                .WithMessage("GenreId is required.")
                 .Must(id => id != Guid.Empty)
                 .WithMessage("GenreId must be a valid GUID.");
 
@@ -36,8 +34,9 @@ namespace CinemaBookingSystemBLL.Validations.Movie
                 .WithMessage("The maximum duration for movie for filtering must be greater than or equal to 1");
 
             RuleFor(p => p.SortBy)
-                .Must(sortBy => new[] { "title", "rating", "duration" }.Contains(sortBy?.ToLower()))
-                .WithMessage("Sorting can only be by Title, Rating or Duration!");
+                .Must(sortBy => new[] { "title", "rating", "duration", "id" }.Contains(sortBy?.ToLower()))
+                .WithMessage("Sorting can only be by Title, Rating or Duration!")
+                .When(p => !string.IsNullOrWhiteSpace(p.SortBy));
         }
     }
 }

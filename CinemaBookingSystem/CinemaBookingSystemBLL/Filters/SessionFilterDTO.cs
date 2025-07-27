@@ -15,7 +15,7 @@ namespace CinemaBookingSystemBLL.Filters
         public int? MinPrice { get; set; }
         public int? MaxPrice { get; set; }
 
-        public string SortBy { get; set; } = "Id";
+        public string? SortBy { get; set; } = "Id";
         public bool SortDescending { get; set; } = false;
     }
 }

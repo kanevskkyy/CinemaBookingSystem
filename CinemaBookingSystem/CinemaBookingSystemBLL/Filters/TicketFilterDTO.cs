@@ -14,7 +14,7 @@ namespace CinemaBookingSystemBLL.Filters
         public DateTime? PurchaseTimeFrom { get; set; }
         public DateTime? PurchaseTimeTo { get; set; }
 
-        public string SortBy { get; set; } = "Id";
+        public string? SortBy { get; set; } = "Id";
         public bool SortDescending { get; set; } = false;
     }
 }

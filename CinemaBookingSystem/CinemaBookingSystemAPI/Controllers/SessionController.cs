@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaBookingSystemAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/sessions")]
     [ApiController]
     public class SessionController : ControllerBase
     {
@@ -21,24 +21,11 @@ namespace CinemaBookingSystemAPI.Controllers
         }
 
         /// <summary>
-        /// Get all sessions.
-        /// </summary>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet]
-        [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
-        {
-            List<SessionResponseDTO> allSessions = await sessionService.GetAllAsync(cancellationToken);
-            return Ok(allSessions);
-        }
-
-        /// <summary>
         /// Get paginated list of sessions.
         /// </summary>
         /// <param name="pageNumber">Page number.</param>
         /// <param name="pageSize">Page size.</param>
-        [HttpGet("paginated")]
+        [HttpGet("paged")]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPagedSessions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -76,7 +63,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action." 
             });
 
             SessionResponseDTO created = await sessionService.CreateAsync(dto, cancellationToken);
@@ -99,7 +86,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action." 
             });
 
             SessionResponseDTO? updated = await sessionService.UpdateAsync(id, dto, cancellationToken);
@@ -116,17 +103,11 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+        public IActionResult Delete(Guid id, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
-            { 
-                message = "Only admins are allowed to perform this action." 
-            });
-
-            bool result = await sessionService.DeleteAsync(id, cancellationToken);
-            if (!result) return StatusCode(StatusCodes.Status404NotFound, new 
-            { 
-                message = "Cannot delete session with this id!" 
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new
+            {
+                message = "You are not allowed to perform this action."
             });
 
             return NoContent();
@@ -139,10 +120,10 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="pageNumber">Page number.</param>
         /// <param name="pageSize">Page size.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("filtered")]
+        [HttpGet]
         [ProducesResponseType(typeof(List<SessionResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetFilteredSession([FromQuery] SessionFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllWithFilteredSession([FromQuery] SessionFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
             PagedList<SessionResponseDTO> result = await sessionService.GetFilteredSessionsAsync(filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);

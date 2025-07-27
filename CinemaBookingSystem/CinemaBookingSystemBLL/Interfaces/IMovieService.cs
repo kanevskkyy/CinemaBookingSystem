@@ -11,7 +11,6 @@ namespace CinemaBookingSystemBLL.Interfaces
 {
     public interface IMovieService
     {
-        Task<List<MovieResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<MovieResponseDTO> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<List<MovieResponseDTO>> GetTopRatedAsync(CancellationToken cancellationToken = default);
         Task<MovieResponseDTO> CreateAsync(MovieCreateDTO dto, CancellationToken cancellationToken = default);

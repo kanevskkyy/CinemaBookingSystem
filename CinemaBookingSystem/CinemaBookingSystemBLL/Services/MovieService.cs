@@ -22,13 +22,6 @@ namespace CinemaBookingSystemBLL.Services
             this.unitOfWork = unitOfWork;
         }
 
-        public async Task<List<MovieResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-            List<Movie> movies = await unitOfWork.Movies.GetAllWithGenresAsync(cancellationToken);
-
-            return mapper.Map<List<MovieResponseDTO>>(movies);
-        }
-
         public async Task<MovieResponseDTO> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Movie? movie = await unitOfWork.Movies.GetByIdWithGenresAsync(id, cancellationToken);

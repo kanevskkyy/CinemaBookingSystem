@@ -30,7 +30,7 @@ namespace CinemaBookingSystemBLL.Validations.Sessions
                 .WithMessage("The maximum ticket price per session must be greater than or equal to 0");
 
             RuleFor(p => p.SortBy)
-                .Must(sortBy => new[] { "starttime", "movieid", "hallid", "price" }.Contains(sortBy?.ToLower()))
+                .Must(sortBy => new[] { "starttime", "movieid", "hallid", "price", "id" }.Contains(sortBy?.ToLower()))
                 .WithMessage("Sorting can only be by StatTime, MovieID, HallID or Price!");
         }
     }

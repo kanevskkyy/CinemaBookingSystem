@@ -34,13 +34,6 @@ namespace CinemaBookingSystemBLL.Services
             return new PagedList<SessionResponseDTO>(sessionDtos, pagedSessions.TotalCount, pagedSessions.CurrentPage, pagedSessions.PageSize);
         }
 
-        public async Task<List<SessionResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-            List<Session> sessions = await unitOfWork.Sessions.GetAllMoviesAsyncDetail(cancellationToken).ToListAsync(cancellationToken);
-            List<SessionResponseDTO> result = mapper.Map<List<SessionResponseDTO>>(sessions);
-            return result;
-        }
-
         public async Task<SessionResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Session? session = await unitOfWork.Sessions.GetByIdWithDetailsAsync(id, cancellationToken);

@@ -21,7 +21,7 @@ namespace CinemaBookingSystemBLL.Validations.Tickets
                 .WithMessage("SeatId must be a valid GUID.");
 
             RuleFor(p => p.SortBy)
-                .Must(sortBy => new[] { "purchasetime", "userid", "sessionid", "seatid" }.Contains(sortBy?.ToLower()))
+                .Must(sortBy => new[] { "purchasetime", "userid", "sessionid", "seatid", "id" }.Contains(sortBy?.ToLower()))
                 .WithMessage("Sorting can only be by PurchaseTime, UserID, SessionID or SeatID!");
         }
     }

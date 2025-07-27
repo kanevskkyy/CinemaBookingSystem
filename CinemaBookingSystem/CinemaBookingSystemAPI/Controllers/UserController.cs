@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaBookingSystemAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -32,7 +32,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action." 
             });
 
             List<UserResponseDTO> result = await userService.GetAllAsync(cancellationToken);
@@ -44,7 +44,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// </summary>
         /// <param name="pageNumber">Page number.</param>
         /// <param name="pageSize">Page size.</param>
-        [HttpGet("paginated")]
+        [HttpGet("paged")]
         [Authorize]
         [ProducesResponseType(typeof(List<UserResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -53,7 +53,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action."
             });
 
             PagedList<UserResponseDTO> result = await userService.GetPagedUsersAsync(pageNumber, pageSize);
@@ -114,7 +114,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action." 
             });
 
             UserResponseDTO? user = await userService.GetByEmailAsync(email, cancellationToken);
@@ -139,7 +139,7 @@ namespace CinemaBookingSystemAPI.Controllers
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!User.IsInRole("Admin") && userId != id) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admin or user who`s account is can update this account!" 
+                message = "You are not allowed to perform this action."
             });
 
             UserResponseDTO updatedUser = await userService.UpdateAsync(id, dto, cancellationToken);
@@ -184,18 +184,12 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
+        public IActionResult Delete(string id, CancellationToken cancellationToken)
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!User.IsInRole("Admin") && userId != id) return StatusCode(StatusCodes.Status403Forbidden, new 
-            { 
-                message = "Only admin or user who`s account is can delete this account!"
-            });
-
-            bool result = await userService.DeleteAsync(id, cancellationToken);
-            if (!result) return StatusCode(StatusCodes.Status404NotFound, new 
-            { 
-                message = "Cannot delete user with this id!" 
+            if (!User.IsInRole("Admin") && userId != id) return StatusCode(StatusCodes.Status403Forbidden, new
+            {
+                message = "You are not allowed to perform this action."
             });
 
             return NoContent();

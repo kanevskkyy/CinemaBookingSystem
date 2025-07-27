@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaBookingSystemAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/halls")]
     [ApiController]
     public class HallController : ControllerBase
     {
@@ -77,11 +77,11 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update(Guid id, [FromBody] HallUpdateDTO dto, CancellationToken cancellationToken)
+        public IActionResult Update(Guid id, [FromBody] HallUpdateDTO dto, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
-            { 
-                message = "Only admins are allowed to perform this action." 
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new
+            {
+                message = "Only admins are allowed to perform this action."
             });
             return NoContent();
         }
@@ -103,11 +103,6 @@ namespace CinemaBookingSystemAPI.Controllers
                 message = "Only admins are allowed to perform this action." 
             });
 
-            bool result = await hallService.DeleteAsync(id, cancellationToken);
-            if (!result) return StatusCode(StatusCodes.Status404NotFound, new 
-            { 
-                message = "Cannot delete hall with this id!" 
-            }); ;
             return NoContent();
         }
     }

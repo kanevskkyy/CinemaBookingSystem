@@ -7,7 +7,7 @@ using CinemaBookingSystemBLL.Interfaces;
 namespace CinemaBookingSystemAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private IAuthService service;
@@ -69,7 +69,7 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <summary>
         /// Refresh access token and return new access token and refresh token
         /// </summary>
-        [HttpPost("refresh")]
+        [HttpPost("refresh-token")]
         [ProducesResponseType(typeof(TokenResponseDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> RefreshToken([FromBody] TokenRefreshDTO dto)
         {

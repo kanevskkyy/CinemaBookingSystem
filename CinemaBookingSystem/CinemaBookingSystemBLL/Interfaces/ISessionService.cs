@@ -13,7 +13,6 @@ namespace CinemaBookingSystemBLL.Interfaces
 {
     public interface ISessionService
     {
-        Task<List<SessionResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<SessionResponseDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<SessionResponseDTO> CreateAsync(SessionCreateDTO dto, CancellationToken cancellationToken = default);
         Task<SessionResponseDTO?> UpdateAsync(Guid id, SessionUpdateDTO dto, CancellationToken cancellationToken = default);

@@ -13,7 +13,7 @@ using Npgsql;
 
 namespace CinemaBookingSystemAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/tickets")]
     [ApiController]
     public class TicketController : ControllerBase
     {
@@ -24,32 +24,13 @@ namespace CinemaBookingSystemAPI.Controllers
             this.ticketService = ticketService;
         }
 
-        /// <summary>
-        /// Get all tickets (admin only).
-        /// </summary>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet]
-        [Authorize]
-        [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
-        {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new
-            { 
-                message = "Only admins are allowed to perform this action." 
-            });
-
-            List<TicketResponseDTO> tickets = await ticketService.GetAllAsync(cancellationToken);
-            return Ok(tickets);
-        }
 
         /// <summary>
         /// Get paginated list of tickets (admin only).
         /// </summary>
         /// <param name="pageNumber">Page number.</param>
         /// <param name="pageSize">Page size.</param>
-        [HttpGet("paginated")]
+        [HttpGet("paged")]
         [Authorize]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -58,7 +39,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action."
             });
 
             PagedList<TicketResponseDTO> paginatedTickets = await ticketService.GetPagedTicketsAsync(pageNumber, pageSize);
@@ -80,7 +61,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action."
             });
 
             TicketResponseDTO? ticket = await ticketService.GetByIdAsync(id, cancellationToken);
@@ -119,17 +100,11 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+        public IActionResult Delete(Guid id, CancellationToken cancellationToken)
         {
-            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
-            { 
-                message = "Only admins are allowed to perform this action." 
-            });
-
-            bool result = await ticketService.DeleteAsync(id, cancellationToken);
-            if (!result) return StatusCode(StatusCodes.Status404NotFound, new 
+            if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new
             {
-                message = "Cannot delete session with this id!" 
+                message = "You are not allowed to perform this action."
             });
 
             return NoContent();
@@ -142,16 +117,16 @@ namespace CinemaBookingSystemAPI.Controllers
         /// <param name="pageNumber">Page number.</param>
         /// <param name="pageSize">Page size.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("filtered")]
+        [HttpGet]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetFilteredTickets([FromQuery] TicketFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllWithFilters([FromQuery] TicketFilterDTO filter, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             {
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action." 
             });
 
             PagedList<TicketResponseDTO> result = await ticketService.GetFilteredTicketsAsync(filter, pageNumber, pageSize, cancellationToken);

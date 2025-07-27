@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace CinemaBookingSystemAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/genres")]
     [ApiController]
     public class GenreController : ControllerBase
     {
@@ -56,7 +56,7 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action." 
             });
 
             GenreResponseDTO created = await genreService.CreateAsync(dto, cancellationToken);
@@ -78,10 +78,10 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action." 
             });
 
-            GenreResponseDTO? updated = await genreService.UpdateAsync(id, dto, cancellationToken);
+            await genreService.UpdateAsync(id, dto, cancellationToken);
             return NoContent();
         }
 
@@ -99,10 +99,10 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             if (!User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed to perform this action." 
+                message = "You are not allowed to perform this action." 
             });
 
-            bool result = await genreService.DeleteAsync(id, cancellationToken);            
+            await genreService.DeleteAsync(id, cancellationToken);            
             return NoContent();
         }
 

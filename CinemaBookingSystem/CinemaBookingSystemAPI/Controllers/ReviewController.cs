@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaBookingSystemAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/reviews")]
     [ApiController]
     public class ReviewController : ControllerBase
     {
@@ -124,9 +124,9 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             ReviewResponseDTO? existing = await reviewService.GetByIdAsync(id, cancellationToken);
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            if (existing?.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed or user who`s reviews is to perform this action." 
+                message = "You are not allowed to modify this review."
             });
 
             ReviewResponseDTO? updated = await reviewService.UpdateAsync(id, dto, cancellationToken);
@@ -148,9 +148,9 @@ namespace CinemaBookingSystemAPI.Controllers
             ReviewResponseDTO? existing = await reviewService.GetByIdAsync(id, cancellationToken);
 
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (existing.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
+            if (existing?.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
             { 
-                message = "Only admins are allowed or user who`s reviews is to perform this action." 
+                message = "You are not allowed to modify this review."
             });
 
             await reviewService.DeleteAsync(id, cancellationToken);
