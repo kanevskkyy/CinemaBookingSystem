@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class GenericRepository<T, Key> : IGenericRepository<T, Key> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         protected CinemaDbContext context;
         protected DbSet<T> dbSet;
@@ -21,7 +21,7 @@ namespace CinemaBookingSystemDAL.Repositories
             dbSet = this.context.Set<T>();
         }
 
-        public async Task<T?> GetByIdAsync(Key id, CancellationToken cancellationToken = default)
+        public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await dbSet.FindAsync(new object[] { id }, cancellationToken);
         }

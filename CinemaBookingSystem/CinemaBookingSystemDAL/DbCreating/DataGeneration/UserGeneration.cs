@@ -7,13 +7,13 @@ namespace CinemaBookingSystemDAL.DbCreating.DataGeneration
 {
     public class UserGeneration
     {
-        public static async Task GenerateAsync(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task GenerateAsync(UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             string[] roles = new[] { "Admin", "Customer" };
 
             foreach (string role in roles)
             {
-                if (!await roleManager.RoleExistsAsync(role)) await roleManager.CreateAsync(new IdentityRole(role));
+                if (!await roleManager.RoleExistsAsync(role)) await roleManager.CreateAsync(new Role { Name = role });
             }
 
             if (userManager.Users.Any()) return;

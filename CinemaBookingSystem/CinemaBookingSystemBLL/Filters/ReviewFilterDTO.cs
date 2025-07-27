@@ -8,7 +8,7 @@ namespace CinemaBookingSystemBLL.Filters
 {
     public class ReviewFilterDTO
     {
-        public string? UserId { get; set; }
+        public Guid? UserId { get; set; }
         public int? MinRating { get; set; }
         public int? MaxRating { get; set; }
         public string? TextContains { get; set; }

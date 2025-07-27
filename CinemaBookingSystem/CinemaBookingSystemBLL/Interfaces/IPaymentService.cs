@@ -11,6 +11,6 @@ namespace CinemaBookingSystemBLL.Interfaces
     {
         Task<List<PaymentResponseDTO>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<List<PaymentResponseDTO>> GetBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default);
-        Task<List<PaymentResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default);
+        Task<List<PaymentResponseDTO>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     }
 }

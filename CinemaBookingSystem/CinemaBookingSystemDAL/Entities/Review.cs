@@ -13,7 +13,7 @@ namespace CinemaBookingSystemDAL.Entities
         public string Text { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow.ToUniversalTime();
         public int Rating { get; set; }
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
         public User User { get; set; }
 
         public Guid MovieId { get; set; }

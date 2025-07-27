@@ -7,7 +7,7 @@ using CinemaBookingSystemDAL.Entities;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface IHallRepository : IGenericRepository<Hall, Guid>
+    public interface IHallRepository : IGenericRepository<Hall>
     {
         Task<bool> ExistsByNameAsync(string name, Guid? id = null, CancellationToken cancellationToken = default);
     }

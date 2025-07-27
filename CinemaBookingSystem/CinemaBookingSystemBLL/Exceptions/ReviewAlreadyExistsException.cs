@@ -8,7 +8,7 @@ namespace CinemaBookingSystemBLL.Exceptions
 {
     public class ReviewAlreadyExistsException : Exception
     {
-        public ReviewAlreadyExistsException(string userId, Guid movieId) : base($"User with ID: {userId} has already left review about movie with ID: {movieId}") 
+        public ReviewAlreadyExistsException(Guid userId, Guid movieId) : base($"User with ID: {userId} has already left review about movie with ID: {movieId}") 
         {
 
         }

@@ -7,10 +7,10 @@ using CinemaBookingSystemDAL.Entities;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface IRefreshTokenRepository
+    public interface IRefreshTokenRepository : IGenericRepository<RefreshToken>
     {
-        Task<RefreshToken?> GetByUserIdAsync(string userId);
-        Task<RefreshToken?> GetByTokenAndUserIdAsync(string token, string userId);
-        Task SaveAsync(string userId, RefreshToken refreshToken);
+        Task<RefreshToken?> GetByUserIdAsync(Guid userId);
+        Task<RefreshToken?> GetByTokenAndUserIdAsync(string token, Guid userId);
+        Task SaveAsync(Guid userId, RefreshToken refreshToken);
     }
 }

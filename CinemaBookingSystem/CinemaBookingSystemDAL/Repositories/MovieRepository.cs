@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class MovieRepository : GenericRepository<Movie, Guid>, IMovieRepository
+    public class MovieRepository : GenericRepository<Movie>, IMovieRepository
     {
         public MovieRepository(CinemaDbContext context) : base(context) {
         

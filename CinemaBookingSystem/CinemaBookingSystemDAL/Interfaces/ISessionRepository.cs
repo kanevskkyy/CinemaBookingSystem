@@ -10,7 +10,7 @@ namespace CinemaBookingSystemDAL.Interfaces
 
     namespace CinemaBookingSystemDAL.Interfaces
     {
-        public interface ISessionRepository : IGenericRepository<Session, Guid>
+        public interface ISessionRepository : IGenericRepository<Session>
         {
             Task<List<Session>> GetSessionsInHallExceptAsync(Guid hallId, Guid excludedSessionId, CancellationToken cancellationToken = default);
             Task<Session?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);

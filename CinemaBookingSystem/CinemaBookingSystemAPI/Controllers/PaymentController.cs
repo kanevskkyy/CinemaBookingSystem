@@ -52,7 +52,7 @@ namespace CinemaBookingSystemAPI.Controllers
         [HttpGet("user/{userId}")]
         [ProducesResponseType(typeof(List<PaymentResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByUserIdAsync(string userId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
         {
             List<PaymentResponseDTO> payments = await paymentService.GetByUserIdAsync(userId, cancellationToken);
             return Ok(payments);

@@ -10,26 +10,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class RefreshTokenRepository : IRefreshTokenRepository
+    public class RefreshTokenRepository : GenericRepository<RefreshToken>, IRefreshTokenRepository
     {
-        private CinemaDbContext context;
 
-        public RefreshTokenRepository(CinemaDbContext context)
+        public RefreshTokenRepository(CinemaDbContext context) : base(context)
         {
-            this.context = context;
+
         }
 
-        public async Task<RefreshToken?> GetByUserIdAsync(string userId)
+        public async Task<RefreshToken?> GetByUserIdAsync(Guid userId)
         {
             return await context.RefreshTokens.FirstOrDefaultAsync(r => r.UserId == userId);
         }
 
-        public async Task<RefreshToken?> GetByTokenAndUserIdAsync(string token, string userId)
+        public async Task<RefreshToken?> GetByTokenAndUserIdAsync(string token, Guid userId)
         {
             return await context.RefreshTokens.FirstOrDefaultAsync(r => r.Token == token && r.UserId == userId);
         }
 
-        public async Task SaveAsync(string userId, RefreshToken refreshToken)
+        public async Task SaveAsync(Guid userId, RefreshToken refreshToken)
         {
             RefreshToken? existing = await GetByUserIdAsync(userId);
             

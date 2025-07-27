@@ -35,6 +35,18 @@ namespace CinemaBookingSystemBLL.Services
             this.mapper = mapper;
         }
 
+        public async Task LogoutAsync(Guid userId)
+        {
+            RefreshToken? token = await unitOfWork.RefreshTokens.GetByUserIdAsync(userId);
+            
+            if (token != null)
+            {
+                unitOfWork.RefreshTokens.Delete(token);
+                await unitOfWork.SaveChangesAsync();
+            }
+        }
+
+
         public async Task<(string AccessToken, string RefreshToken)> LoginAsync(LoginDTO dto)
         {
             User? user = await userManager.FindByEmailAsync(dto.Email);
@@ -75,7 +87,7 @@ namespace CinemaBookingSystemBLL.Services
                 throw new UserCreationFailedException(string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
-            await userManager.AddToRoleAsync(user, "Admin");
+            await userManager.AddToRoleAsync(user, "Customer");
 
             string accessToken = await GenerateJwtToken(user);
             RefreshToken refreshToken = GenerateRefreshToken();
@@ -106,10 +118,12 @@ namespace CinemaBookingSystemBLL.Services
 
             string? userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            RefreshToken? savedToken = await unitOfWork.RefreshTokens.GetByTokenAndUserIdAsync(request.RefreshToken, userId);
+            if (!Guid.TryParse(userId, out Guid parsedUserId)) throw new SecurityTokenException("Invalid user ID in token");
+
+            RefreshToken? savedToken = await unitOfWork.RefreshTokens.GetByTokenAndUserIdAsync(request.RefreshToken, parsedUserId);
             if (savedToken == null || savedToken.ExpiryDate <= DateTime.UtcNow) throw new SecurityTokenException("Invalid or expired refresh token");
 
-            User? user = await userManager.FindByIdAsync(userId);
+            User? user = await userManager.FindByIdAsync(userId.ToString());
             string newAccessToken = await GenerateJwtToken(user);
             RefreshToken newRefreshToken = GenerateRefreshToken();
 
@@ -125,7 +139,7 @@ namespace CinemaBookingSystemBLL.Services
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email)
             };
@@ -157,7 +171,7 @@ namespace CinemaBookingSystemBLL.Services
             return refreshToken;
         }
 
-        private async Task SaveRefreshToken(string userId, RefreshToken refreshToken)
+        private async Task SaveRefreshToken(Guid userId, RefreshToken refreshToken)
         {
             await unitOfWork.RefreshTokens.SaveAsync(userId, refreshToken);
         }

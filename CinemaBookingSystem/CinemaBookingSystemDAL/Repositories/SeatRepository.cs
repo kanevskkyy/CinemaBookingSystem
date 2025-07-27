@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class SeatRepository : GenericRepository<Seat, Guid>, ISeatRepository
+    public class SeatRepository : GenericRepository<Seat>, ISeatRepository
     {
         public SeatRepository(CinemaDbContext context) : base(context) { 
         

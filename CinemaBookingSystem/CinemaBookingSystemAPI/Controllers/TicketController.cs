@@ -24,6 +24,25 @@ namespace CinemaBookingSystemAPI.Controllers
             this.ticketService = ticketService;
         }
 
+        /// <summary>
+        /// Cancel reservation.
+        /// </summary>
+        /// <param name="ticketId">Ticket id.</param>
+        [HttpPost("cancel/{ticketId}")]
+        [Authorize]
+        public async Task<IActionResult> CancelReservation(Guid ticketId)
+        {
+            string? userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdString, out Guid userId))
+            {
+                return Unauthorized("Invalid user ID in token");
+            }
+
+            await ticketService.CancelReservationAsync(ticketId, userId);
+
+            return NoContent();
+        }
+
 
         /// <summary>
         /// Get paginated list of tickets (admin only).
@@ -82,8 +101,8 @@ namespace CinemaBookingSystemAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] TicketCreateDTO dto, CancellationToken cancellationToken)
         {
-            string? userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+            string? userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out Guid userId)) return Unauthorized();
 
             TicketResponseDTO created = await ticketService.CreateAsync(userId, dto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
@@ -131,6 +150,26 @@ namespace CinemaBookingSystemAPI.Controllers
 
             PagedList<TicketResponseDTO> result = await ticketService.GetFilteredTicketsAsync(filter, pageNumber, pageSize, cancellationToken);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Get current user's tickets.
+        /// </summary>
+        /// <param name="pageNumber">Page number.</param>
+        /// <param name="pageSize">Page size.</param>
+        [HttpGet("my")]
+        [Authorize]
+        [ProducesResponseType(typeof(List<TicketResponseDTO>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMyTickets([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdStr, out Guid userId))
+            {
+                return Unauthorized("Invalid user ID in token");
+            }
+
+            PagedList<TicketResponseDTO> tickets = await ticketService.GetUserTicketsAsync(userId, pageNumber, pageSize);
+            return Ok(tickets);
         }
 
         /// <summary>

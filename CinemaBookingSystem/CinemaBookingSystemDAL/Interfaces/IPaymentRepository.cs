@@ -7,10 +7,10 @@ using CinemaBookingSystemDAL.Entities;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface IPaymentRepository : IGenericRepository<Payment, Guid>
+    public interface IPaymentRepository : IGenericRepository<Payment>
     {
         Task<List<Payment>> GetBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default);
-        Task<List<Payment>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default);
+        Task<List<Payment>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<List<Payment>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default);
     }
 }

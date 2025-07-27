@@ -9,7 +9,7 @@ namespace CinemaBookingSystemBLL.DTO.Tickets
     public class TicketResponseDTO
     {
         public Guid Id { get; set; }
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
         public string UserName { get; set; }
         public Guid SessionId { get; set; }
         public bool IsPaid { get; set; }

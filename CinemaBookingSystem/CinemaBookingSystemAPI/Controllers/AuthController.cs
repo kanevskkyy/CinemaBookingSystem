@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using CinemaBookingSystemBLL.DTO.Users;
 using Microsoft.AspNetCore.Authorization;
 using CinemaBookingSystemBLL.Interfaces;
+using System.Security.Claims;
 
 namespace CinemaBookingSystemAPI.Controllers
 {
@@ -15,6 +16,24 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             service = authService;
         }
+
+        /// <summary>
+        /// Logout user.
+        /// </summary>
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(userIdString, out Guid userId))
+            {
+                return Unauthorized();
+            }
+
+            await service.LogoutAsync(userId);
+            return NoContent();
+        }
+
 
         /// <summary>
         /// Authenticate user and return JWT access token (alive 15 min) and refresh token (alive 7 days).

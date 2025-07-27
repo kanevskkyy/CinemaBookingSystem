@@ -81,12 +81,12 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<CinemaDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly("CinemaBookingSystemDAL")));
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
@@ -104,7 +104,16 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
-builder.Services.AddIdentity<User, IdentityRole>()
+// Реєструємо Identity з кастомним Role та ключем Guid
+builder.Services.AddIdentity<User, Role>(options =>
+{
+    // Налаштування IdentityOptions, якщо потрібно
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
+})
     .AddEntityFrameworkStores<CinemaDbContext>()
     .AddDefaultTokenProviders();
 
@@ -143,7 +152,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<CinemaDbContext>();
     var userManager = services.GetRequiredService<UserManager<User>>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager = services.GetRequiredService<RoleManager<Role>>(); 
 
     await CinemaDbContext.SeedAsync(context, userManager, roleManager);
 }
@@ -155,10 +164,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors(); 
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.MapControllers();
+
 app.Run();

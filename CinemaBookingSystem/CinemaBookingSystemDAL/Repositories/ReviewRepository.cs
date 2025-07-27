@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class ReviewRepository : GenericRepository<Review, Guid>, IReviewRepository
+    public class ReviewRepository : GenericRepository<Review>, IReviewRepository
     {
         public ReviewRepository(CinemaDbContext context) : base(context)
         {
@@ -22,13 +22,13 @@ namespace CinemaBookingSystemDAL.Repositories
             return dbSet.Where(r => r.MovieId == movieId);
         }
 
-        public async Task<bool> ExistsByUserAndMovieAsync(string userId, Guid movieId, CancellationToken cancellationToken = default)
+        public async Task<bool> ExistsByUserAndMovieAsync(Guid userId, Guid movieId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AnyAsync(r => r.UserId == userId && r.MovieId == movieId, cancellationToken);
         }
 
-        public async Task<List<Review>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<List<Review>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .AsNoTracking()

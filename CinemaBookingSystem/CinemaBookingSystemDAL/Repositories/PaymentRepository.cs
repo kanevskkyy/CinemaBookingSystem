@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class PaymentRepository : GenericRepository<Payment, Guid>, IPaymentRepository
+    public class PaymentRepository : GenericRepository<Payment>, IPaymentRepository
     {
         public PaymentRepository(CinemaDbContext context) : base(context) 
         {
@@ -25,7 +25,7 @@ namespace CinemaBookingSystemDAL.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Payment>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<List<Payment>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await dbSet
                 .Include(p => p.Ticket)

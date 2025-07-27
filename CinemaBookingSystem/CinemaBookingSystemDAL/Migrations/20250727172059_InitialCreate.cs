@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CinemaBookingSystemDAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreatingDbWithGuid : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,7 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
@@ -30,7 +30,7 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -75,6 +75,26 @@ namespace CinemaBookingSystemDAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Halls", x => x.Id);
+                    table.CheckConstraint("CK_Hall_RowsAmount", "\"RowsAmount\" >= 1");
+                    table.CheckConstraint("CK_Hall_SeatsPerRow", "\"SeatsPerRow\" >= 1");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Movies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "character varying(90)", maxLength: 90, nullable: false),
+                    Description = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: false),
+                    Duration = table.Column<int>(type: "integer", nullable: false),
+                    PosterUrl = table.Column<string>(type: "text", nullable: false),
+                    Rating = table.Column<double>(type: "double precision", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Movies", x => x.Id);
+                    table.CheckConstraint("CK_Movie_Duration", "\"Duration\" >= 1");
+                    table.CheckConstraint("CK_Movie_Rating", "\"Rating\" >= 2.0 AND \"Rating\" <= 10.0 ");
                 });
 
             migrationBuilder.CreateTable(
@@ -83,7 +103,7 @@ namespace CinemaBookingSystemDAL.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RoleId = table.Column<string>(type: "text", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -104,7 +124,7 @@ namespace CinemaBookingSystemDAL.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -126,7 +146,7 @@ namespace CinemaBookingSystemDAL.Migrations
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<string>(type: "text", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -143,8 +163,8 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    RoleId = table.Column<string>(type: "text", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -167,7 +187,7 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
@@ -187,11 +207,10 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "RefreshTokens",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Token = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -200,29 +219,6 @@ namespace CinemaBookingSystemDAL.Migrations
                         name: "FK_RefreshTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Movies",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "character varying(90)", maxLength: 90, nullable: false),
-                    Description = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: false),
-                    Duration = table.Column<int>(type: "integer", nullable: false),
-                    PosterUrl = table.Column<string>(type: "text", nullable: false),
-                    GenreId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Rating = table.Column<double>(type: "double precision", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Movies", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Movies_Genres_GenreId",
-                        column: x => x.GenreId,
-                        principalTable: "Genres",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -239,10 +235,36 @@ namespace CinemaBookingSystemDAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Seats", x => x.Id);
+                    table.CheckConstraint("CK_Seat_RowNumber", "\"RowNumber\" >= 1");
+                    table.CheckConstraint("CK_Seat_SeatNumber", "\"SeatNumber\" >= 1");
                     table.ForeignKey(
                         name: "FK_Seats_Halls_HallId",
                         column: x => x.HallId,
                         principalTable: "Halls",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MovieGenres",
+                columns: table => new
+                {
+                    MovieId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GenreId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MovieGenres", x => new { x.MovieId, x.GenreId });
+                    table.ForeignKey(
+                        name: "FK_MovieGenres_Genres_GenreId",
+                        column: x => x.GenreId,
+                        principalTable: "Genres",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MovieGenres_Movies_MovieId",
+                        column: x => x.MovieId,
+                        principalTable: "Movies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -255,7 +277,7 @@ namespace CinemaBookingSystemDAL.Migrations
                     Text = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: false, defaultValue: 1),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     MovieId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -289,6 +311,7 @@ namespace CinemaBookingSystemDAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sessions", x => x.Id);
+                    table.CheckConstraint("CK_Session_Price", "\"Price\" >= 1");
                     table.ForeignKey(
                         name: "FK_Sessions_Halls_HallId",
                         column: x => x.HallId,
@@ -308,7 +331,7 @@ namespace CinemaBookingSystemDAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SessionId = table.Column<Guid>(type: "uuid", nullable: false),
                     SeatId = table.Column<Guid>(type: "uuid", nullable: false),
                     PurchaseTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -333,6 +356,31 @@ namespace CinemaBookingSystemDAL.Migrations
                         name: "FK_Tickets_Sessions_SessionId",
                         column: x => x.SessionId,
                         principalTable: "Sessions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TicketId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    TransactionId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    PaymentMethod = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.Id);
+                    table.CheckConstraint("CK_Payment_PaymentMethod", "\"PaymentMethod\" IN ('Manual', 'Card')");
+                    table.CheckConstraint("CK_Payment_Status", "\"Status\" IN ('Success', 'Failed')");
+                    table.ForeignKey(
+                        name: "FK_Payments_Tickets_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "Tickets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -369,6 +417,12 @@ namespace CinemaBookingSystemDAL.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Email",
+                table: "AspNetUsers",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -387,14 +441,14 @@ namespace CinemaBookingSystemDAL.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_MovieGenres_GenreId",
+                table: "MovieGenres",
+                column: "GenreId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Movies_Duration",
                 table: "Movies",
                 column: "Duration");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Movies_GenreId",
-                table: "Movies",
-                column: "GenreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Movies_Rating",
@@ -405,6 +459,12 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "IX_Movies_Title",
                 table: "Movies",
                 column: "Title",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_TicketId",
+                table: "Payments",
+                column: "TicketId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -502,16 +562,25 @@ namespace CinemaBookingSystemDAL.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "MovieGenres");
+
+            migrationBuilder.DropTable(
+                name: "Payments");
+
+            migrationBuilder.DropTable(
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "Reviews");
 
             migrationBuilder.DropTable(
-                name: "Tickets");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "Genres");
+
+            migrationBuilder.DropTable(
+                name: "Tickets");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
@@ -527,9 +596,6 @@ namespace CinemaBookingSystemDAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Movies");
-
-            migrationBuilder.DropTable(
-                name: "Genres");
         }
     }
 }

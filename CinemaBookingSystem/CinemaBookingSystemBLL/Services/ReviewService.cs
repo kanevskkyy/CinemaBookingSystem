@@ -42,16 +42,15 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<ReviewResponseDTO>(review);
         }
 
-        public async Task<List<ReviewResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<List<ReviewResponseDTO>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             List<Review> reviews = await unitOfWork.Review.GetByUserIdAsync(userId, cancellationToken);
-            if (!Guid.TryParse(userId, out Guid guidId)) throw new ArgumentException("Invalid user ID format");
-            if (reviews.IsNullOrEmpty()) throw new NotFoundException("Review", guidId); 
+            if (reviews.IsNullOrEmpty()) throw new NotFoundException("Review", userId); 
             
             return mapper.Map<List<ReviewResponseDTO>>(reviews);
         }
 
-        public async Task<ReviewResponseDTO> CreateAsync(ReviewCreateDTO dto, string userId, CancellationToken cancellationToken = default)
+        public async Task<ReviewResponseDTO> CreateAsync(ReviewCreateDTO dto, Guid userId, CancellationToken cancellationToken = default)
         {
             bool exists = await unitOfWork.Review.ExistsByUserAndMovieAsync(userId, dto.MovieId, cancellationToken);
             if (exists) throw new ReviewAlreadyExistsException(userId, dto.MovieId);
@@ -92,7 +91,7 @@ namespace CinemaBookingSystemBLL.Services
 
         private IQueryable<Review> ApplyFilter(IQueryable<Review> queryable, ReviewFilterDTO filter)
         {
-            if (!string.IsNullOrEmpty(filter.UserId)) queryable = queryable.Where(r => r.UserId == filter.UserId);
+            if (!string.IsNullOrEmpty(filter.UserId.ToString())) queryable = queryable.Where(r => r.UserId == filter.UserId);
             
             if (filter.MinRating.HasValue) queryable = queryable.Where(r => r.Rating >= filter.MinRating.Value);
             

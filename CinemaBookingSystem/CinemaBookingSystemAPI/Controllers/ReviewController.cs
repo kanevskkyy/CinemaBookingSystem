@@ -50,10 +50,10 @@ namespace CinemaBookingSystemAPI.Controllers
         /// </summary>
         /// <param name="userId">User ID.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        [HttpGet("by-user/{userId}")]
+        [HttpGet("by-user/{userId:guid}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(List<ReviewResponseDTO>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetByUserId(string userId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetByUserId(Guid userId, CancellationToken cancellationToken)
         {
             List<ReviewResponseDTO> result = await reviewService.GetByUserIdAsync(userId, cancellationToken);
             return Ok(result);
@@ -69,9 +69,9 @@ namespace CinemaBookingSystemAPI.Controllers
         public async Task<IActionResult> GetMyReviews(CancellationToken cancellationToken)
         {
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserId)) return Unauthorized();
+            if (!Guid.TryParse(currentUserId, out Guid userId)) return Unauthorized();
 
-            List<ReviewResponseDTO> result = await reviewService.GetByUserIdAsync(currentUserId, cancellationToken);
+            List<ReviewResponseDTO> result = await reviewService.GetByUserIdAsync(userId, cancellationToken);
             return Ok(result);
         }
 
@@ -105,7 +105,9 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            ReviewResponseDTO created = await reviewService.CreateAsync(dto, currentUserId, cancellationToken);
+            if (!Guid.TryParse(currentUserId, out Guid userId)) throw new ArgumentException("Invalid user ID format");
+
+            ReviewResponseDTO created = await reviewService.CreateAsync(dto, userId, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
@@ -124,10 +126,16 @@ namespace CinemaBookingSystemAPI.Controllers
         {
             ReviewResponseDTO? existing = await reviewService.GetByIdAsync(id, cancellationToken);
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (existing?.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
-            { 
-                message = "You are not allowed to modify this review."
-            });
+
+            if (string.IsNullOrEmpty(currentUserId) || !Guid.TryParse(currentUserId, out Guid parsedUserId)) return Unauthorized();
+
+            if (existing?.UserId != parsedUserId && !User.IsInRole("Admin"))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "You are not allowed to modify this review."
+                });
+            }
 
             ReviewResponseDTO? updated = await reviewService.UpdateAsync(id, dto, cancellationToken);
             return Ok(updated);
@@ -148,13 +156,19 @@ namespace CinemaBookingSystemAPI.Controllers
             ReviewResponseDTO? existing = await reviewService.GetByIdAsync(id, cancellationToken);
 
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (existing?.UserId != currentUserId && !User.IsInRole("Admin")) return StatusCode(StatusCodes.Status403Forbidden, new 
-            { 
-                message = "You are not allowed to modify this review."
-            });
+            if (string.IsNullOrEmpty(currentUserId) || !Guid.TryParse(currentUserId, out Guid parsedUserId)) return Unauthorized();
+
+            if (existing?.UserId != parsedUserId && !User.IsInRole("Admin"))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "You are not allowed to modify this review."
+                });
+            }
 
             await reviewService.DeleteAsync(id, cancellationToken);
             return NoContent();
         }
+
     }
 }

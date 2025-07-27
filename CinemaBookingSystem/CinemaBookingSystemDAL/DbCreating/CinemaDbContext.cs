@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.Mapping;
 
 namespace CinemaBookingSystemDAL.DbCreating
 {
-    public class CinemaDbContext : IdentityDbContext<User>
+    public class CinemaDbContext : IdentityDbContext<User, Role, Guid>
     {
         public CinemaDbContext(DbContextOptions<CinemaDbContext> options) : base(options)
         {
@@ -43,7 +43,7 @@ namespace CinemaBookingSystemDAL.DbCreating
             base.OnModelCreating(modelBuilder);
         }
 
-        public static async Task SeedAsync(CinemaDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task SeedAsync(CinemaDbContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             await UserGeneration.GenerateAsync(userManager, roleManager);
 

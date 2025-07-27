@@ -8,7 +8,7 @@ namespace CinemaBookingSystemBLL.DTO.Users
 {
     public class UserResponseDTO
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; } 
         public string Email { get; set; }
         public string Role { get; set; } 

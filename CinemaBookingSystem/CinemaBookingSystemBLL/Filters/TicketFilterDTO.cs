@@ -8,7 +8,7 @@ namespace CinemaBookingSystemBLL.Filters
 {
     public class TicketFilterDTO
     {
-        public string? UserId { get; set; }
+        public Guid? UserId { get; set; }
         public Guid? SessionId { get; set; }
         public Guid? SeatId { get; set; }
         public DateTime? PurchaseTimeFrom { get; set; }

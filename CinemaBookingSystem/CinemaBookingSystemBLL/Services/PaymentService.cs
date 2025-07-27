@@ -38,7 +38,7 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<List<PaymentResponseDTO>>(payments);
         }
 
-        public async Task<List<PaymentResponseDTO>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<List<PaymentResponseDTO>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             List<Payment> payments = await unitOfWork.Payments.GetByUserIdAsync(userId, cancellationToken);
             if (!payments.Any()) throw new UserPaymentsNotFoundException(userId);

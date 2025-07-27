@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CinemaBookingSystemDAL.Entities
 {
-    public class User : IdentityUser
+    public class User : IdentityUser<Guid>
     {
         public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();

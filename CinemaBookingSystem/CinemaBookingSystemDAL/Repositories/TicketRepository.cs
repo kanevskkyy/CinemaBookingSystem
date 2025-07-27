@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CinemaBookingSystemDAL.Repositories
 {
-    public class TicketRepository : GenericRepository<Ticket, Guid>, ITicketRepository
+    public class TicketRepository : GenericRepository<Ticket>, ITicketRepository
     {
         public TicketRepository(CinemaDbContext context) : base(context) {
         
         }
 
-        public async Task<Ticket> GetBySeatAndSessionAsync(Guid seatId, Guid sessionId, CancellationToken cancellationToken = default)
+        public async Task<Ticket?> GetBySeatAndSessionAsync(Guid seatId, Guid sessionId, CancellationToken cancellationToken = default)
         {
             return await context.Tickets.FirstOrDefaultAsync(t => t.SeatId == seatId && t.SessionId == sessionId, cancellationToken);
         }
@@ -41,6 +41,18 @@ namespace CinemaBookingSystemDAL.Repositories
                 .ThenInclude(s => s.Movie)
                 .Include(t => t.Seat)
                 .OrderBy(p => p.Id);
+        }
+
+        public IQueryable<Ticket> GetTicketsByUserId(Guid userId)
+        {
+            return dbSet
+                .AsNoTracking()
+                .Include(t => t.User)
+                .Include(t => t.Session)
+                .ThenInclude(s => s.Movie)
+                .Include(t => t.Seat)
+                .Where(t => t.UserId == userId)
+                .OrderBy(t => t.PurchaseTime);
         }
 
         public async Task<List<Ticket>> GetBySeatIdAsync(Guid seatId, CancellationToken cancellationToken = default)

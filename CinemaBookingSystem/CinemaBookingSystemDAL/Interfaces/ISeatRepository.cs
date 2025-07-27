@@ -7,7 +7,7 @@ using CinemaBookingSystemDAL.Entities;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface ISeatRepository : IGenericRepository<Seat, Guid>
+    public interface ISeatRepository : IGenericRepository<Seat>
     {
         Task<List<Seat>> GetByHallIdAsync(Guid hallId, CancellationToken cancellationToken = default);
     }

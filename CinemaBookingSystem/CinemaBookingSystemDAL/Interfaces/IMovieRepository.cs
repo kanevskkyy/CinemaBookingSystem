@@ -7,7 +7,7 @@ using CinemaBookingSystemDAL.Entities;
 
 namespace CinemaBookingSystemDAL.Interfaces
 {
-    public interface IMovieRepository : IGenericRepository<Movie, Guid>
+    public interface IMovieRepository : IGenericRepository<Movie>
     {
         IQueryable<Movie> GetAllWithGenres();
         Task<bool> ExistsByTitleAsync(string title, Guid? id = null, CancellationToken cancellationToken = default);

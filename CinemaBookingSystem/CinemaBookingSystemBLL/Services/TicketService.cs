@@ -50,21 +50,42 @@ namespace CinemaBookingSystemBLL.Services
             return mapper.Map<TicketResponseDTO>(ticket);
         }
 
-        public async Task<TicketResponseDTO> CreateAsync(string userId, TicketCreateDTO dto, CancellationToken cancellationToken = default)
+        public async Task<TicketResponseDTO> CreateAsync(Guid userId, TicketCreateDTO dto, CancellationToken cancellationToken = default)
         {
             Seat? seat = await unitOfWork.Seats.GetByIdAsync(dto.SeatId, cancellationToken);
             if (seat == null) throw new NotFoundException("Seat", dto.SeatId);
-                        
+
             Session? session = await unitOfWork.Sessions.GetByIdAsync(dto.SessionId, cancellationToken);
             if (session == null) throw new NotFoundException("Session", dto.SessionId);
 
-            Ticket existingTicket = await unitOfWork.Tickets.GetBySeatAndSessionAsync(dto.SeatId, dto.SessionId, cancellationToken);
-            if (existingTicket != null) throw new SeatAlreadyBookedException();
+            Ticket? existingTicket = await unitOfWork.Tickets.GetBySeatAndSessionAsync(dto.SeatId, dto.SessionId, cancellationToken);
+
+            if (existingTicket != null)
+            {
+                if (existingTicket.IsPaid == false && existingTicket.ReservedUntil.HasValue && existingTicket.ReservedUntil > DateTime.UtcNow.ToUniversalTime()) throw new SeatAlreadyBookedException();
+                else if (existingTicket.IsPaid) throw new SeatAlreadyBookedException();
+
+                else
+                {
+                    existingTicket.UserId = userId;
+                    existingTicket.PurchaseTime = DateTime.UtcNow;
+                    existingTicket.ReservedUntil = DateTime.UtcNow.AddMinutes(10);
+                    existingTicket.IsPaid = false;
+
+                    unitOfWork.Tickets.Update(existingTicket);
+                    await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return mapper.Map<TicketResponseDTO>(existingTicket);
+                }
+            }
 
             if (seat.HallId != session.HallId) throw new InvalidSeatInHall();
 
             Ticket ticket = mapper.Map<Ticket>(dto);
             ticket.UserId = userId;
+            ticket.PurchaseTime = DateTime.UtcNow;
+            ticket.IsPaid = false;
+            ticket.ReservedUntil = DateTime.UtcNow.AddMinutes(10);
 
             await unitOfWork.Tickets.CreateAsync(ticket, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -74,6 +95,32 @@ namespace CinemaBookingSystemBLL.Services
 
             return mapper.Map<TicketResponseDTO>(createdTicket);
         }
+
+        public async Task<bool> CancelReservationAsync(Guid ticketId, Guid userId, CancellationToken cancellationToken = default)
+        {
+            Ticket? ticket = await unitOfWork.Tickets.GetByIdAsync(ticketId, cancellationToken);
+            if (ticket == null) throw new NotFoundException("Ticket", ticketId);
+
+            if (ticket.UserId != userId) throw new UnauthorizedAccessException("You cannot cancel someone else's reservation.");
+
+            if (ticket.IsPaid) throw new InvalidOperationException("Cannot cancel a paid ticket.");
+
+            unitOfWork.Tickets.Delete(ticket);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return true;
+        }
+
+        public async Task<PagedList<TicketResponseDTO>> GetUserTicketsAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            IQueryable<Ticket> query = unitOfWork.Tickets.GetTicketsByUserId(userId);
+            PagedList<Ticket> pagedTickets = await PagedList<Ticket>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
+
+            List<TicketResponseDTO> result = mapper.Map<List<TicketResponseDTO>>(pagedTickets.Items);
+
+            return new PagedList<TicketResponseDTO>(result, pagedTickets.TotalCount, pagedTickets.CurrentPage, pagedTickets.PageSize);
+        }
+
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
@@ -88,7 +135,7 @@ namespace CinemaBookingSystemBLL.Services
         
         private IQueryable<Ticket> ApplyFilter(IQueryable<Ticket> query, TicketFilterDTO filter)
         {
-            if (!string.IsNullOrWhiteSpace(filter.UserId)) query = query.Where(t => t.UserId == filter.UserId);
+            if (!string.IsNullOrWhiteSpace(filter.UserId.ToString())) query = query.Where(t => t.UserId == filter.UserId);
 
             if (filter.SessionId.HasValue) query = query.Where(t => t.SessionId == filter.SessionId.Value);
 
