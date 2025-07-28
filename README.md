@@ -53,7 +53,7 @@ This project requires the following dependencies:
 Build CinemaBookingSystem from the source and install dependencies:
 
 ```sh
-❯ git clone https://github.com/kanevskkyy/CinemaBookingSystem
+❯ git clone https://github.com/kanevskkyy/CinemaBookingSystem.git
 ❯ cd CinemaBookingSystem
 ❯ dotnet restore
 ❯ dotnet ef database update
